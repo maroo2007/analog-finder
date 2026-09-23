@@ -199,7 +199,7 @@ dependencies:
   - pillow=12.3.0=py311h36f029a_4
   - pip=26.2.1=pyh8b19718_0
   - pixman=0.46.4=h5112557_3
-  - platformdirs=4.11.11=pyh5ded981_0
+  - platformdirs=4.11.12=pyh5ded981_0
   - proj=9.7.1=hd30e2cd_3
   - prometheus_client=0.26.0=pyhd8ed1ab_0
   - prompt-toolkit=3.0.53=pyha770c72_0
@@ -222,7 +222,7 @@ dependencies:
   - python-fastjsonschema=2.22.2=pyhcf101f3_0
   - python-gil=3.11.16=hd8ed1ab_2
   - python-json-logger=4.2.0=pyhd8ed1ab_0
-  - python-tzdata=2026.3=pyhd8ed1ab_0
+  - python-tzdata=2026.4=pyh5ded981_0
   - python_abi=3.11=9_cp311
   - pyu2f=0.1.5=pyhd8ed1ab_1
   - pywin32=312=py311h0610301_2
