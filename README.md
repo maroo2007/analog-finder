@@ -32,3 +32,25 @@ pip install earthengine-api
 ```
 
 `check_ee.py` recognises both failures and prints the fix.
+
+## Team workflow
+
+- Run `git pull` before you start work.
+- Run `git push` when you're done.
+- For bigger changes, work on your own branch (one per person) and open a pull
+  request.
+- Never commit anything in `data/`, or any key, password or service account
+  file.
+
+Setting up a new laptop:
+
+```bash
+git clone https://github.com/maroo2007/analog-finder
+cd analog-finder
+conda env create -f environment.yml
+conda activate analog
+earthengine authenticate
+```
+
+On Windows 11, turn off Smart App Control first, or it blocks parts of pandas
+and other compiled libraries. See `CLAUDE.md`.
