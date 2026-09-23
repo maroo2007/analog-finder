@@ -65,6 +65,11 @@ def _load_service_account_info():
     if not raw:
         return None
 
+    # Some .env parsers keep the surrounding quotes, others strip them.
+    # Tolerate both so a pasted value works either way.
+    if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "\"'":
+        raw = raw[1:-1].strip()
+
     if raw.startswith("{"):
         source = raw
     elif _is_readable_file(raw):
