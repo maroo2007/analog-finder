@@ -221,7 +221,9 @@ __marimo__/
 
 
 # Project data (too big for GitHub)
-data/
+data/**
+!data/**/
+!data/**/.gitkeep
 *.tif
 *.tiff
 *.cub
