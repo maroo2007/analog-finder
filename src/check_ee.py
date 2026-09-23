@@ -32,10 +32,22 @@ def _hint(exc):
             "file for pip to uninstall from."
         )
 
+    # Two different IAM gaps, hit in sequence, with two different fixes.
+    # Check the Earth Engine one first: its message also contains the word
+    # "denied", so an over-broad serviceusage match would swallow it and
+    # send people to the wrong role.
+    if "earthengine." in text and "denied" in text:
+        return (
+            "The key authenticates, but the service account has no Earth "
+            "Engine role, so it cannot run computations. Grant it "
+            "roles/earthengine.writer (Earth Engine Resource Writer) in "
+            "IAM & Admin. Allow a couple of minutes for IAM to propagate."
+        )
+
     if "serviceusage" in text or "does not have required permission" in text:
         return (
-            "The key is valid but the service account lacks IAM permission "
-            "to use the project. Grant it roles/serviceusage.serviceUsageConsumer "
+            "The key is valid but the service account cannot use the "
+            "project at all. Grant it roles/serviceusage.serviceUsageConsumer "
             "in IAM & Admin, and check the project is registered for Earth "
             "Engine at https://code.earthengine.google.com/register"
         )
