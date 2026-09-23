@@ -3,6 +3,9 @@ Finding places on Earth that match the ground on the Moon and Mars. NASA Space A
 
 ## Setup
 
+Mac and Linux: use `environment.yml`. Windows: `environment-lock.yml`
+reproduces the exact build.
+
 Rebuild the Python environment:
 
 ```bash
