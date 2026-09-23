@@ -1,15 +1,39 @@
+# Rebuild the project environment with:
+#   conda env create -f environment.yml
+#   conda activate analog
+#
+# Solving takes roughly 15 minutes; GDAL is the slow part. That is normal.
+#
+# Python is pinned to 3.11 because rasterio and GDAL lag behind the newest
+# releases. If 3.11 ever refuses to solve, move to 3.12. Do not jump to 3.13
+# or 3.14.
+#
+# conda-forge only. Anaconda defaults are deliberately not used.
+
 name: analog
+
 channels:
   - conda-forge
+
 dependencies:
-  - pandas
   - python=3.11
-  - geopandas
-  - numpy
-  - earthengine-api
-  - matplotlib
+
+  # Raster and vector IO
   - rasterio
   - gdal
-  - requests
-  - jupyterlab
+  - geopandas
+
+  # Numerics, tables, plotting
+  - numpy
+  - pandas
+  - matplotlib
+
+  # Similarity search and feature scaling
   - scikit-learn
+
+  # Notebooks
+  - jupyterlab
+
+  # Data fetching: OpenTopography and AppEEARS (Plan B), Earth Engine (Plan A)
+  - requests
+  - earthengine-api

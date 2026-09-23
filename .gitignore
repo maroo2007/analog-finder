@@ -221,8 +221,13 @@ __marimo__/
 
 
 # Project data (too big for GitHub)
-data/**
-!data/**/
+# Ignore everything inside data/, but keep the empty folder structure so a
+# fresh clone has somewhere to download into. Nothing real ever gets tracked.
+data/*
+!data/raw/
+!data/processed/
+data/raw/*
+data/processed/*
 !data/**/.gitkeep
 *.tif
 *.tiff
@@ -239,3 +244,11 @@ keys.txt
 
 
 
+
+# Google Cloud service account keys. The download is named
+# <project-id>-<hash>.json, so the *.key pattern above does not catch it.
+rare-decker-*.json
+*service-account*.json
+*service_account*.json
+*credentials*.json
+gee-key*.json
