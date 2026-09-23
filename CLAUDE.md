@@ -65,8 +65,28 @@ from config import init_ee   # with src/ on the path
 ee = init_ee()               # project rare-decker-493720-c2
 ```
 
+A cloud service account needs **two** IAM roles, and they fail one at a time,
+so granting only the first looks like the key is broken:
+
+| Role | Without it |
+|---|---|
+| `roles/serviceusage.serviceUsageConsumer` | "Caller does not have required permission to use project" |
+| `roles/earthengine.writer` | "Permission 'earthengine.computations.create' denied on resource" |
+
+Neither is a bad key. `src/check_ee.py` recognises both messages and names the
+missing role. The project is registered `REGISTERED_NOT_COMMERCIALLY`, which
+confirms service accounts do work on the Community tier. IAM changes take a
+couple of minutes to propagate.
+
 ## Known issues
 
+- **Fresh cloud containers ship a broken `cryptography`.** `import ee` fails
+  with `ModuleNotFoundError: No module named '_cffi_backend'`, which names
+  neither Earth Engine nor the real cause. Fix before anything else:
+  `pip install --ignore-installed cffi cryptography`, then
+  `pip install earthengine-api`. Plain `--upgrade` does not work, because the
+  system package has no RECORD file for pip to uninstall from. This recurs in
+  every new container.
 - **Smart App Control (Windows 11) must be off.** When it is on, it blocks
   unsigned compiled Python files at random, for example
   `ImportError: DLL load failed ... An Application Control policy has blocked
@@ -124,6 +144,11 @@ As of 2026-09-23, setup is done and Phase 1 hasn't started.
   scikit-learn 1.9.1. The repo has its structure, both environment files and
   `HANDOFF.md`. Earth Engine auth code (`src/config.py`, `src/check_ee.py`) was
   merged in PR #1.
+- **Earth Engine works from the cloud.** `python src/check_ee.py` returns 0 in
+  a cloud session using `GEE_SERVICE_ACCOUNT_KEY`: service account
+  `analog-finder-bot@rare-decker-493720-c2.iam.gserviceaccount.com`, both IAM
+  roles granted, SRTM reachable. The key is stored as an environment variable
+  on the Claude cloud environment, base64 encoded, never in the repository.
 - **Not done:** `earthengine authenticate` on Marwan's laptop (no credentials
   yet); inviting the remaining teammates.
 - **Next:** Phase 1 of the build order in `HANDOFF.md`. Build a small
