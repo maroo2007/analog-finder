@@ -13,6 +13,12 @@ features, data sources, build order, accounts and open decisions.
 
 ## Rules we work by
 
+- **Fetch before starting work.** Several people push from different laptops
+  and from Claude Code cloud sessions. Run `git fetch origin` and
+  `git status --short --branch` first. If `main` is behind, read what changed
+  (`git log main..origin/main`, `git diff main origin/main`) before editing
+  anything, then `git pull --ff-only`. On 2026-09-23 this caught 8 commits
+  nobody on the laptop knew about.
 - **Quote every path.** The project folder name has spaces
   (`Nasa Space Apps 2026` on Marwan's laptop).
 - **Never commit keys or data.** No API keys, passwords, tokens or service
@@ -119,8 +125,7 @@ As of 2026-09-23, setup is done and Phase 1 hasn't started.
   `HANDOFF.md`. Earth Engine auth code (`src/config.py`, `src/check_ee.py`) was
   merged in PR #1.
 - **Not done:** `earthengine authenticate` on Marwan's laptop (no credentials
-  yet); inviting the remaining teammates. `HANDOFF.md` section 6 is out of
-  date: it still calls the environment "in progress".
+  yet); inviting the remaining teammates.
 - **Next:** Phase 1 of the build order in `HANDOFF.md`. Build a small
   elevation-only test on coarse grids, including the Nile Delta control, then
   run the validation test.

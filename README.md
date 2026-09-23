@@ -33,6 +33,21 @@ pip install earthengine-api
 
 `check_ee.py` recognises both failures and prints the fix.
 
+## Daily workflow
+
+Every time you start working (Windows PowerShell shown; quote the path, it has
+spaces):
+
+```powershell
+conda activate analog
+cd "C:\Users\Marwan\Desktop\Nasa Space Apps 2026"   # your own clone's folder
+git pull
+jupyter lab
+```
+
+JupyterLab opens in your browser. Stop it with Ctrl+C in the terminal, then
+`git push` your work.
+
 ## Team workflow
 
 - Run `git pull` before you start work.
