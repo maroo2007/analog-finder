@@ -1,6 +1,6 @@
 # Project handoff
 
-**Last updated:** 22 September 2026
+**Last updated:** 23 September 2026
 
 Read this first if you are joining the project, or if you are an AI assistant
 picking up work in a new session. It records what we are building, what has
@@ -176,31 +176,68 @@ The folder name has spaces, so quote every path in commands.
 - Miniforge 26.7.2 installed at `C:\Users\Marwan\miniforge3`, user-only install,
   not added to PATH, system Python not registered
 - Installer SHA256 verified against the GitHub release before running
-- Channels: conda-forge only, Anaconda defaults not in use
+- Channels: conda-forge. Anaconda defaults are not used. Miniforge also ships
+  a `prefix.dev` mirror of conda-forge, kept on purpose because a second
+  source helps on a flaky connection
 - `conda init powershell` run, profile created at
   `C:\Users\Marwan\Documents\WindowsPowerShell\profile.ps1`
 - Base auto-activation turned off
+- `analog` environment built from conda-forge and every import tested:
 
-**In progress at time of writing:** creating the `analog` environment. Solving
-took about 14 minutes, which is normal for ten packages including GDAL on
-Python 3.11. Download and install followed.
+  | Package | Version |
+  |---|---|
+  | Python | 3.11.16 |
+  | GDAL | 3.12.3 |
+  | rasterio | 1.4.4 |
+  | geopandas | 1.1.4 |
+  | scikit-learn | 1.9.1 |
+  | numpy / pandas / matplotlib | 2.4.6 / 3.0.6 / 3.11.2 |
+  | jupyterlab / earthengine-api | 4.6.4 / 1.7.45 |
+
+- Repository cloned into the project folder itself, which is now the repo root
+- `data/raw`, `data/processed`, `notebooks`, `src` created, each with a
+  `.gitkeep`. `.gitignore` lets only the `.gitkeep` files through under `data/`
+- `environment.yml` (portable, unpinned) and `environment-lock.yml` (exact
+  Windows build) written and committed
+- Sherif's Earth Engine code merged via PR #1: `src/config.py` holds the
+  project ID and handles both laptop login and a cloud service account key;
+  `src/check_ee.py` checks the connection
+- `CLAUDE.md` added, so Claude Code sessions on any laptop share the same
+  rules and status
+
+Rebuild the environment with:
 
 ```bash
-conda create -n analog -c conda-forge python=3.11 rasterio gdal numpy pandas \
-  matplotlib scikit-learn geopandas jupyterlab requests earthengine-api
+conda env create -f environment.yml
 conda activate analog
 ```
 
-If the environment ever has to be rebuilt and 3.11 will not solve, use Python
-**3.12**. Do not jump to 3.13 or 3.14; rasterio and GDAL lag behind.
+Solving took 14 minutes the first time and 5 minutes on the retry, which is
+normal for GDAL. If the environment ever has to be rebuilt and 3.11 will not
+solve, use Python **3.12**. Do not jump to 3.13 or 3.14; rasterio and GDAL lag
+behind.
+
+### Problems we hit, in case they happen again
+
+- **Dropped connection during download.** The first `conda create` failed
+  with `Connection broken: IncompleteRead`. The file that broke was `mkl`
+  (109 MB, Intel's maths library), the largest in the environment. conda's
+  retry settings were raised (`remote_max_retries 6`,
+  `remote_read_timeout_secs 120`, `remote_connect_timeout_secs 60`), and the
+  retry reused everything already downloaded and finished cleanly. If `mkl`
+  keeps failing, `nomkl` avoids it.
+- **Smart App Control blocked pandas.** Windows 11's Smart App Control
+  refused to load unsigned compiled Python files, so `import geopandas`
+  failed with "An Application Control policy has blocked this file". It was
+  turned off on 23 September, and every import now passes. Every teammate on
+  Windows 11 needs to turn it off too.
 
 **Not done yet:**
 
-- `earthengine authenticate`, needed once before Python can reach Earth Engine
-- Clone the repository into the project folder
-- Create `data/raw`, `data/processed`, `notebooks`, `src`
-- Write `environment.yml` so teammates can rebuild the environment
-- Invite teammates on GitHub, and have each make their own Earthdata account
+- `earthengine authenticate` on this laptop, needed once before Python can
+  reach Earth Engine. Then run `python src/check_ee.py`
+- Invite the remaining teammates on GitHub, and have each make their own
+  Earthdata account
 
 ### A known oddity
 
