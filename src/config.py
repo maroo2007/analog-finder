@@ -65,10 +65,13 @@ def _load_service_account_info():
     if not raw:
         return None
 
-    # Some .env parsers keep the surrounding quotes, others strip them.
-    # Tolerate both so a pasted value works either way.
-    if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "\"'":
-        raw = raw[1:-1].strip()
+    # Strip wrappers a pasted value picks up on its way here: quotes that
+    # some .env parsers keep and others remove, and the angle brackets left
+    # behind when someone pastes over a <placeholder> and keeps the brackets.
+    # Strict base64 decoding rejects both, so they have to go before parsing.
+    for opener, closer in (('"', '"'), ("'", "'"), ("<", ">")):
+        if len(raw) >= 2 and raw[0] == opener and raw[-1] == closer:
+            raw = raw[1:-1].strip()
 
     if raw.startswith("{"):
         source = raw
