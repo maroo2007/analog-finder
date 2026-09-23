@@ -44,9 +44,16 @@ python src/check_ee.py                 # confirms Earth Engine works
 ```
 
 - `environment.yml` lists only the requested packages, unpinned (Python 3.11,
-  conda-forge only). `environment-lock.yml` is the exact Windows (win-64) build
-  of Marwan's environment, for `conda env create -f environment-lock.yml` if an
-  exact rebuild is ever needed. It does not work on Mac or Linux.
+  conda-forge only). `environment-lock.yml` is an exact Windows (win-64) build,
+  for `conda env create -f environment-lock.yml` if an exact rebuild is ever
+  needed. It does not work on Mac or Linux. Regenerated on 2026-09-23 from the
+  second laptop: the two machines solved to the same 292 packages apart from
+  `platformdirs` and `python-tzdata`, which is real evidence the environment is
+  reproducible rather than an accident of one machine.
+- Don't overwrite `environment.yml` with a generated export. It is hand-written
+  and carries the reasoning for the Python 3.11 pin; `--from-history` produces
+  the same package list but strips every comment and adds a personal `prefix:`
+  path. Only `environment-lock.yml` is meant to be regenerated.
 - Solving takes 5 to 15 minutes. That is normal; check the CPU is busy before
   calling it stuck.
 - If 3.11 ever refuses to solve, use Python 3.12. Not 3.13 or 3.14.
@@ -120,7 +127,7 @@ couple of minutes to propagate.
     the message to a file.
   - `Invoke-WebRequest` stalls on large downloads. Use `curl.exe -L --fail`.
 
-## Machine-specific: Marwan's laptop only
+## Machine-specific: Marwan's laptop
 
 - **`C:\` is a stray git repository** (an old Flutter checkout, thousands of
   files showing as deleted). Leave it completely alone: don't run git against
@@ -133,24 +140,51 @@ couple of minutes to propagate.
   separate and left untouched.
 - Smart App Control turned off on 2026-09-23.
 
+## Machine-specific: second Windows laptop (`C:\Users\user`)
+
+Set up on 2026-09-23. It does **not** share Marwan's quirks: there is no stray
+`C:\.git` here, so that warning does not apply on this machine.
+
+- Project folder: `C:\Users\user\Desktop\NASA Hackathon\analog-finder`
+- Miniforge 26.7.2 at `C:\Users\user\miniforge3`, installed `JustMe`, not on
+  PATH, not registered as system Python. System Python 3.14.4 is separate and
+  left untouched.
+- Because conda is not on PATH, call it as
+  `& "$env:USERPROFILE\miniforge3\Scripts\conda.exe"`, or dot-source
+  `miniforge3\shell\condabin\conda-hook.ps1` before `conda activate` in a
+  non-interactive shell. An interactive shell gets this from the profile that
+  `conda init powershell` wrote.
+- Smart App Control was already off (`VerifiedAndReputablePolicyState` = 0).
+- Retry settings applied here on 2026-09-23, after `conda create` aborted part
+  way through the downloads. `conda.anaconda.org` intermittently failed DNS
+  (`getaddrinfo failed`) and took about 20 seconds to answer when it did, while
+  the `prefix.dev` mirror answered in under a second. The solve and 254 of the
+  packages had already succeeded, and re-running the identical command finished
+  from the cache in minutes. Retry before changing anything else.
+- Disk is the binding constraint here: about 41 GB free on `C:` against the
+  25 to 40 GB `HANDOFF.md` expects for working-scale data. `conda clean -a`
+  only returns about 0.5 GB, because most of `pkgs` is hardlinked into the
+  environment, so it is not a useful lever.
+
 ## Where we are
 
 *Update this section whenever the status changes.*
 
 As of 2026-09-23, setup is done and Phase 1 hasn't started.
 
-- **Done:** the `analog` environment is built on Marwan's laptop and every
-  import passes: Python 3.11.16, GDAL 3.12.3, rasterio 1.4.4, geopandas 1.1.4,
-  scikit-learn 1.9.1. The repo has its structure, both environment files and
-  `HANDOFF.md`. Earth Engine auth code (`src/config.py`, `src/check_ee.py`) was
-  merged in PR #1.
+- **Done:** the `analog` environment is built on **two** Windows laptops and
+  every import passes on both: Python 3.11.16, GDAL 3.12.3, rasterio 1.4.4,
+  geopandas 1.1.4, scikit-learn 1.9.1. The repo has its structure, both
+  environment files and `HANDOFF.md`. Earth Engine auth code (`src/config.py`,
+  `src/check_ee.py`) was merged in PR #1.
 - **Earth Engine works from the cloud.** `python src/check_ee.py` returns 0 in
   a cloud session using `GEE_SERVICE_ACCOUNT_KEY`: service account
   `analog-finder-bot@rare-decker-493720-c2.iam.gserviceaccount.com`, both IAM
   roles granted, SRTM reachable. The key is stored as an environment variable
   on the Claude cloud environment, base64 encoded, never in the repository.
-- **Not done:** `earthengine authenticate` on Marwan's laptop (no credentials
-  yet); inviting the remaining teammates.
+- **Not done:** `earthengine authenticate` on either laptop (no credentials
+  yet), so `src/check_ee.py` has not been run locally on either; inviting the
+  remaining teammates.
 - **Next:** Phase 1 of the build order in `HANDOFF.md`. Build a small
   elevation-only test on coarse grids, including the Nile Delta control, then
   run the validation test.
