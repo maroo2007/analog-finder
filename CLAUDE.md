@@ -170,7 +170,14 @@ Set up on 2026-09-23. It does **not** share Marwan's quirks: there is no stray
 
 *Update this section whenever the status changes.*
 
-As of 2026-09-23, setup is done and Phase 1 hasn't started.
+As of 2026-10-10, Phase 1 has passed and Phase 2 is next.
+
+- **Phase 1 validation passed on 2026-10-10, using elevation only.** Without
+  being told about them, the model sent 73% of the Mars matches to Atacama and
+  Death Valley. Code is in `src/terrain.py` and `src/run_phase1.py`, and the
+  chart is `figures/validation_elevation_only.png`. Earth elevation now comes
+  from the Copernicus DEM on AWS (no API key), with OpenTopography only as a
+  backup. Details are in `HANDOFF.md` section 7.
 
 - **Done:** the `analog` environment is built on **two** Windows laptops and
   every import passes on both: Python 3.11.16, GDAL 3.12.3, rasterio 1.4.4,
@@ -185,6 +192,5 @@ As of 2026-09-23, setup is done and Phase 1 hasn't started.
 - **Not done:** `earthengine authenticate` on either laptop (no credentials
   yet), so `src/check_ee.py` has not been run locally on either; inviting the
   remaining teammates.
-- **Next:** Phase 1 of the build order in `HANDOFF.md`. Build a small
-  elevation-only test on coarse grids, including the Nile Delta control, then
-  run the validation test.
+- **Next:** Phase 2 of the build order in `HANDOFF.md`. Add thermal inertia,
+  albedo and minerals, raise resolution in the chosen regions, add the Moon.

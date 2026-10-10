@@ -1,6 +1,6 @@
 # Project handoff
 
-**Last updated:** 23 September 2026
+**Last updated:** 10 October 2026
 
 Read this first if you are joining the project, or if you are an AI assistant
 picking up work in a new session. It records what we are building, what has
@@ -122,8 +122,9 @@ and regional so the quota lasts.
 **Plan A, Google Earth Engine.** Fast, no storage needed, handles global
 analysis well. Approved and working.
 
-**Plan B, direct downloads.** OpenTopography for elevation, NASA AppEEARS for
-temperature and brightness. Slower and more manual, but nothing can revoke it,
+**Plan B, direct downloads.** Copernicus DEM on AWS Open Data for elevation,
+which needs no account or API key (OpenTopography is now only a backup), and
+NASA AppEEARS for temperature and brightness. Slower and more manual, but nothing can revoke it,
 and it works offline at the venue.
 
 **Decision:** build on Plan B, use Plan A only for the global heatmap, and have
@@ -138,7 +139,7 @@ all data on local disk before the hackathon so no demo depends on the internet.
 | Mars quick exports | JMARS map server, small files, fastest way to start |
 | Moon elevation | LOLA, Astropedia or PDS Geosciences |
 | Moon temperature | Diviner, PDS Geosciences |
-| Earth elevation | Copernicus GLO-30 or GLO-90, via Earth Engine or OpenTopography |
+| Earth elevation | Copernicus DEM GLO-30, AWS Open Data, no API key (used in Phase 1). Backup: OpenTopography or Earth Engine |
 | Earth temperature | MODIS MOD11A1 and MYD11A1, day minus night |
 | Earth albedo | MODIS MCD43A3 |
 | Earth minerals | ASTER, and EMIT for Egypt |
@@ -256,6 +257,14 @@ Phase 1 is the gate. Everything else waits on it.
 1. **Small test.** Coarse Mars and Earth grids, elevation only, three or four
    regions including the Nile Delta control. Build the report cards, build the
    similarity search, and run the validation test.
+
+   **Passed on 10 October 2026, using elevation only.** Without being told
+   which sites NASA uses, the model sent 73% of the Mars matches to Atacama
+   and Death Valley. By Mars site, the two known analogs took 92% of Jezero's
+   matches, 96% of Gale's and 30% of Meridiani's. The Nile Delta control
+   scored only on Meridiani, a flat plain, as expected, which is the case for
+   adding thermal data next. Code: `src/terrain.py` and `src/run_phase1.py`.
+   Chart: `figures/validation_elevation_only.png`.
 2. **Scale up.** Add thermal inertia, albedo, minerals. Raise resolution inside
    the chosen regions. Add the Moon. Build the global heatmap and the new
    analogs list.

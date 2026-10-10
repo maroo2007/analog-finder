@@ -1,0 +1,115 @@
+"""Phase 1: compare the shape of the ground on Mars with the shape of the ground on Earth.
+
+Nothing here needs an account or an API key. Both data sources are open:
+  Mars  - MOLA global elevation, 463 m per pixel, USGS Astropedia (public domain)
+  Earth - Copernicus DEM 30 m, 1 degree tiles, AWS Open Data
+
+Both are read straight from the internet with GDAL's /vsicurl, so only the small
+window we ask for is downloaded. Nothing is saved to disk.
+"""
+
+from __future__ import annotations
+
+import math
+
+import numpy as np
+import pandas as pd
+import rasterio
+from rasterio.windows import Window
+
+# Mars
+MOLA = ("/vsicurl/https://planetarymaps.usgs.gov/mosaic/"
+        "Mars_MGS_MOLA_DEM_mosaic_global_463m.tif")
+MARS_RADIUS_M = 3396190.0
+MARS_PIXEL_M = 463.0
+
+# Earth
+COP_BASE = "https://copernicus-dem-30m.s3.eu-central-1.amazonaws.com"
+EARTH_PIXEL_DEG = 1.0 / 3600.0      # 1 arc second
+EARTH_METRES_PER_DEG = 111320.0
+
+# One tile is this many pixels across, on both worlds, after Earth is coarsened.
+TILE_PX = 20
+
+
+# ---------------------------------------------------------------- Mars
+
+def mars_patch(lat: float, lon: float, size_px: int = 400) -> np.ndarray:
+    """Cut a square of Martian ground centred on a latitude and longitude.
+
+    The MOLA map is an equirectangular projection measured in metres, so a
+    latitude and longitude has to be turned into metres before asking for a
+    pixel. Doing that by hand, rather than assuming the map is a plain
+    lat/lon grid, is what keeps the squares in the right place.
+    """
+    x = math.radians(lon) * MARS_RADIUS_M
+    y = math.radians(lat) * MARS_RADIUS_M
+    with rasterio.open(MOLA) as src:
+        row, col = src.index(x, y)
+        half = size_px // 2
+        window = Window(col - half, row - half, size_px, size_px)
+        return src.read(1, window=window).astype("float32")
+
+
+# ---------------------------------------------------------------- Earth
+
+def _cop_tile_name(lat_floor: int, lon_floor: int) -> str:
+    ns = f"{'N' if lat_floor >= 0 else 'S'}{abs(lat_floor):02d}"
+    ew = f"{'E' if lon_floor >= 0 else 'W'}{abs(lon_floor):03d}"
+    return f"Copernicus_DSM_COG_10_{ns}_00_{ew}_00_DEM"
+
+
+def earth_patch(lat: float, lon: float, out_px: int = 240
+                ) -> tuple[np.ndarray, float, float]:
+    """Read one Copernicus tile, coarsened to roughly Mars's pixel size.
+
+    Returns the heights plus how many metres one pixel covers east-west and
+    north-south. Those two numbers differ away from the equator, because lines
+    of longitude crowd together towards the poles, and slope is wrong if you
+    ignore it.
+    """
+    lat_floor, lon_floor = math.floor(lat), math.floor(lon)
+    name = _cop_tile_name(lat_floor, lon_floor)
+    url = f"/vsicurl/{COP_BASE}/{name}/{name}.tif"
+    with rasterio.open(url) as src:
+        # out_shape makes GDAL read a decimated copy from the file's own
+        # overviews, so a 240 x 240 request does not download 25 MB.
+        elev = src.read(1, out_shape=(out_px, out_px),
+                        masked=True).astype("float32").filled(np.nan)
+
+    centre_lat = lat_floor + 0.5
+    deg_per_px = 1.0 / out_px
+    px_y_m = deg_per_px * EARTH_METRES_PER_DEG
+    px_x_m = px_y_m * math.cos(math.radians(centre_lat))
+    return elev, px_x_m, px_y_m
+
+
+# ------------------------------------------------------- the report cards
+
+def report_cards(elev: np.ndarray, px_x_m: float, px_y_m: float,
+                 tile: int = TILE_PX) -> pd.DataFrame:
+    """Describe every small square of ground with the same three numbers.
+
+    mean_slope    how steep it is on average, in degrees
+    slope_spread  whether the steepness is even or a mix of flat and steep
+    relief        the height difference between the lowest and highest point
+    """
+    gy, gx = np.gradient(elev, px_y_m, px_x_m)
+    slope = np.degrees(np.arctan(np.hypot(gx, gy)))
+
+    rows = []
+    for r in range(0, elev.shape[0] - tile + 1, tile):
+        for c in range(0, elev.shape[1] - tile + 1, tile):
+            e = elev[r:r + tile, c:c + tile]
+            s = slope[r:r + tile, c:c + tile]
+            if np.isnan(e).any():
+                continue
+            rows.append({
+                "mean_slope": float(s.mean()),
+                "slope_spread": float(s.std()),
+                "relief": float(e.max() - e.min()),
+            })
+    return pd.DataFrame(rows)
+
+
+FEATURES = ["mean_slope", "slope_spread", "relief"]
