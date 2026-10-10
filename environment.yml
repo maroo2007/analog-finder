@@ -28,11 +28,17 @@ dependencies:
   - pandas
   - matplotlib
 
+  # Feature tables saved as Parquet
+  - pyarrow
+
   # Similarity search and feature scaling
   - scikit-learn
 
   # Notebooks
   - jupyterlab
+
+  # Known-answer tests (tests/), run with: pytest -m network
+  - pytest
 
   # Data fetching: OpenTopography and AppEEARS (Plan B), Earth Engine (Plan A)
   - requests
