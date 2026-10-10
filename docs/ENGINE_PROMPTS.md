@@ -8,8 +8,8 @@ Order:
 
 | # | What | Depends on | Who |
 |---|---|---|---|
-| 0 | Save Phase 1, set up the test suite | nothing | anyone, first |
-| 1 | Heat, brightness, and the "could this be Mars" filter | 0 | Earth person |
+| 0 | Save Phase 1, set up the test suite | nothing | done 10 Oct |
+| 1 | Heat, brightness, and the "could this be Mars" filter | 0 | done 10 Oct |
 | 2 | Real target sites: NASA's Mars landing zones and Artemis Moon regions | 0 | Mars/Moon person |
 | 3 | Score the whole Earth | 1 | Earth person |
 | 4 | Discoveries list and the data the interface reads | 2 and 3 | either |
@@ -22,7 +22,8 @@ Data sources below were checked on 10 October and all open with no key:
 
 - Mars elevation: `planetarymaps.usgs.gov/mosaic/Mars_MGS_MOLA_DEM_mosaic_global_463m.tif`
 - Mars brightness: `planetarymaps.usgs.gov/mosaic/Mars_MGS_TES_Albedo_mosaic_global_7410m.tif`
-- Mars night-time infrared, 60N to 60S, 100 m, with overviews:
+- Mars night-time infrared, 60N to 60S, 100 m, no overviews (read small
+  windows only; one site window is about 3 MB):
   `asc-pds-services.s3.us-west-2.amazonaws.com/wms_basemaps/Mars/THEMIS_ASU/Mars_MO_THEMIS-IR-Night_mosaic_60N60S_100m_v14_clon0.tif`
 - Mars human landing zones, one GeoTIFF per zone:
   `asc-pds-services.s3.us-west-2.amazonaws.com/wms_basemaps/Mars/CTX_EZs/`
@@ -71,64 +72,36 @@ yes.
 
 ---
 
-## Prompt 1: heat, brightness, and the "could this be Mars" filter
+## Prompt 1: heat, brightness, and the "could this be Mars" filter (done)
 
-```
-Read CLAUDE.md and HANDOFF.md. Fetch and pull. Work on a branch named
-feature/thermal.
+Done on 10 October 2026, branch `feature/thermal`. The method we actually
+used differs from the original prompt, which asked for heat and brightness
+as percentiles within each world. That failed: the Nile Delta box rose from
+13% to 29% of Mars matches, because the Mars sites are typical Mars while
+Earth's analogs are extreme Earth. The full story is in `HANDOFF.md`
+section 7.
 
-Goal: the Nile Delta must stop matching Mars, while Atacama and Death Valley
-keep matching. Right now the model only sees the shape of the ground, so it
-cannot tell a flat Martian plain from flat farmland.
+The method in use, called V1:
 
-Add three things, each as its own function in a new src/surface.py.
+- **Mars-possible filter**, Earth only (`src/surface.py`): median NDVI over
+  2023 to 2025 below 0.15 (MODIS/061/MOD13A2) and under 5% permanent water
+  (JRC/GSW1_4 seasonality = 12). Tiles that fail are never offered as twins.
+- **Absolute albedo**, both worlds, in physical units 0 to 1: Earth MODIS
+  white-sky shortwave albedo (MODIS/061/MCD43A3), Mars TES albedo. No
+  percentiles. Different instruments and atmospheres, so small differences
+  mean little.
+- **Terrain** as in Phase 1: mean slope, slope spread, relief.
+- **Heat is not a matching feature.** On Earth the stand-in (apparent thermal
+  inertia from MODIS) mostly measures moisture; on Mars THEMIS night infrared
+  measures rock versus dust. It is computed only to label Mars tiles dusty,
+  sandy or rocky. Earth tiles get no label. V2 (V1 + heat, Earth ranked
+  against bare dry land) stays available with
+  `python src/run_thermal.py --with-heat`.
 
-A. A "could this be Mars" filter, Earth only.
-   Mars has no plants and no surface water. Use Earth Engine (src/config.py,
-   init_ee) to compute, per tile:
-   - median NDVI over the last 3 years from MODIS (verify the dataset ID in
-     the Earth Engine catalog, likely MODIS/061/MOD13A2)
-   - fraction of permanent water from JRC Global Surface Water
-   Mark a tile "Mars-possible" when median NDVI < 0.15 and water fraction
-   < 5%. Tiles that fail are never offered as twins. Make the thresholds
-   constants at the top of the file so we can explain and tune them.
-
-B. How well the ground holds heat.
-   - Earth: apparent thermal inertia, ATI = (1 - albedo) / (T_day - T_night),
-     from MODIS land surface temperature (verify the ID, likely
-     MODIS/061/MOD11A2) and MODIS albedo (likely MODIS/061/MCD43A3,
-     white-sky shortwave). Use the median over 3 years.
-   - Mars: the THEMIS night-time infrared mosaic (URL in
-     docs/ENGINE_PROMPTS.md). Ground that stays bright at night holds heat:
-     rock, crusts. Ground that goes dark is dust and fine sand. It is an
-     8-bit qualitative product, not calibrated thermal inertia.
-   The two are measured in different units, so do not compare raw values.
-   Convert each to a percentile within its own world, and call the feature
-   heat_rank. Write a short paragraph in HANDOFF.md explaining this choice
-   honestly: it compares "how rocky is this place for its planet", and it is
-   a stand-in because the quantitative THEMIS mosaic returns 404.
-
-C. Brightness.
-   - Earth: MODIS albedo as above.
-   - Mars: TES albedo mosaic (URL in docs/ENGINE_PROMPTS.md).
-   Also as a within-world percentile, called bright_rank.
-
-Then extend terrain.report_cards so every tile carries mean_slope,
-slope_spread, relief, heat_rank and bright_rank, plus mars_possible for
-Earth. Rerun the Phase 1 comparison with the filter applied.
-
-Success:
-- Nile Delta under 5% of matches (unskip the placeholder test)
-- Atacama plus Death Valley still at least 60%
-- Make a second chart, figures/validation_with_heat.png, in the same style
-  as validation_elevation_only.png, so the two sit side by side in the
-  presentation.
-
-If the Nile Delta does not drop, stop and show me the numbers before
-changing anything. Do not tune thresholds just to pass the test.
-
-Show me the results, the charts and the diff. Wait before committing.
-```
+Result: Atacama and Death Valley take 92.3% of Mars matches. The filter
+removes 79% of the Nile Delta box; its remaining 7.7% comes from desert
+east of Cairo. Charts: `figures/validation_elevation_only.png` and
+`figures/validation_with_heat.png`. Tests: `tests/test_validation.py`.
 
 ---
 
@@ -192,14 +165,30 @@ Goal: one feature row for every land tile on Earth, about 9 km across to
 match our Mars tiles (20 pixels x 463 m). This becomes the global
 "how Mars-like is every place" map, the poster image of the project.
 
+Use the V1 method from prompt 1, exactly: terrain + absolute albedo + the
+Mars-possible filter. No heat, and no within-world percentiles anywhere.
+Read src/surface.py and src/run_thermal.py first and reuse their constants
+(NDVI_MAX, WATER_MAX, DATE_START, DATE_END) so the grid matches the
+validated method.
+
 Use Earth Engine, because downloading global elevation would be terabytes.
-- Compute slope from Copernicus DEM (verify the ID, likely
-  COPERNICUS/DEM/GLO30) at about 90 m, then aggregate to a 9 km grid with
-  reduceResolution for mean slope, slope standard deviation, and relief
-  (max minus min elevation).
-- Add the Earth layers from src/surface.py: heat, brightness, NDVI, water.
+- Terrain: resample Copernicus DEM (verify the ID, likely
+  COPERNICUS/DEM/GLO30) to 463 m first, the same pixel size as MOLA, and
+  only then compute slope. Slope depends on pixel size, so computing it at
+  90 m would make Earth look rougher than Mars for no real reason. Then
+  aggregate to the 9.26 km grid for mean slope, slope standard deviation,
+  and relief (max minus min elevation).
+- Albedo: median MODIS white-sky shortwave albedo (MCD43A3), in physical
+  units 0 to 1, as in surface.earth_layers.
+- Filter: median NDVI and permanent-water fraction, as in surface.py. Keep
+  them as columns and a mars_possible flag; only Mars-possible tiles are
+  ever offered as twins.
 - Restrict to land between 85N and 85S. Include Antarctica, since the Dry
   Valleys are a known analog.
+
+Targets need the same features. Mars zones: terrain from MOLA plus TES
+albedo (surface.mars_albedo). Moon regions: terrain only, since there is no
+Moon albedo source yet; say so wherever Moon matches are shown.
 
 Quota matters. We are on the Community tier with a monthly compute limit
 and no billing account. So:
@@ -211,8 +200,9 @@ and no billing account. So:
 - Export each continent as a table to Google Drive, then download into
   data/processed/earth_grid/. That folder is gitignored.
 
-Then apply the same within-world percentile ranking as prompt 1, and save
-data/processed/earth_grid.parquet.
+Save data/processed/earth_grid.parquet. Match with the same
+standardization as run_thermal.match (z-scores fitted on targets and Earth
+tiles together), not percentiles.
 
 Validation, which is the chart judges will remember most:
 - Known analog sites: Atacama, Death Valley, Haughton Crater, Devon Island,
@@ -224,6 +214,11 @@ Validation, which is the chart judges will remember most:
   where the known analogs fall: their median percentile across all targets.
 - If the known analogs sit in the top 10% of all Earth land, that is our
   headline result. Draw figures/known_analogs_rank.png.
+
+Egypt: report the best Egyptian tiles for each Mars target. We do not
+hand-pick the Egypt site; this list chooses it. Expect dark ground: the
+Mars sites have albedo 0.15 to 0.22, while most Earth desert is brighter,
+so the best twins should be dark, basaltic ground.
 
 Show me the compute used, the validation numbers and the chart. Wait before
 committing.
@@ -242,7 +237,8 @@ A. Similarity scores.
    Earth tile, compute a similarity score from 0 to 100, standardized the
    same way as before. Also keep, per match, how close each single feature
    is, so the interface can show "why this matches" bars (slope 92%,
-   heat 87% and so on).
+   albedo 87% and so on). Heat is not a matching feature; Mars tiles may show
+   a dusty, sandy or rocky label, Earth tiles never.
 
 B. Discoveries.
    - Drop Earth tiles within 50 km of a known analog in

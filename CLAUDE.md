@@ -170,7 +170,15 @@ Set up on 2026-09-23. It does **not** share Marwan's quirks: there is no stray
 
 *Update this section whenever the status changes.*
 
-As of 2026-10-10, Phase 1 has passed and Phase 2 is next.
+As of 2026-10-10, Phase 1 has passed and Prompt 1 of Phase 2 is done.
+
+- **Matching method is V1** (decided 2026-10-10): terrain + the Mars-possible
+  filter (NDVI below 0.15, under 5% permanent water) + absolute albedo. Heat is
+  not a matching feature; it only labels Mars tiles dusty, sandy or rocky, and
+  Earth tiles get no label. Atacama and Death Valley take 92.3% of Mars
+  matches. Within-world percentiles were tried and failed; don't reintroduce
+  them. Code: `src/surface.py`, `src/run_thermal.py` (V2 with heat behind
+  `--with-heat`). Details and history: `HANDOFF.md` section 7.
 
 - **Phase 1 validation passed on 2026-10-10, using elevation only.** Without
   being told about them, the model sent 73% of the Mars matches to Atacama and
@@ -189,8 +197,8 @@ As of 2026-10-10, Phase 1 has passed and Phase 2 is next.
   `analog-finder-bot@rare-decker-493720-c2.iam.gserviceaccount.com`, both IAM
   roles granted, SRTM reachable. The key is stored as an environment variable
   on the Claude cloud environment, base64 encoded, never in the repository.
-- **Not done:** `earthengine authenticate` on either laptop (no credentials
-  yet), so `src/check_ee.py` has not been run locally on either; inviting the
-  remaining teammates.
-- **Next:** Phase 2 of the build order in `HANDOFF.md`. Add thermal inertia,
-  albedo and minerals, raise resolution in the chosen regions, add the Moon.
+- **Earth Engine works on Marwan's laptop** (`earthengine authenticate` done
+  and `src/check_ee.py` passing, 2026-10-10). The second laptop still needs
+  it. Inviting the remaining teammates is not done.
+- **Next:** Prompts 2 and 3 in `docs/ENGINE_PROMPTS.md` (real target sites
+  and the Moon; the global Earth grid, which also picks the Egypt site).

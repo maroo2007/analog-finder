@@ -61,6 +61,10 @@ Earth has no standard thermal inertia product, so we use day temperature minus
 night temperature from MODIS as a stand-in. Say clearly in the presentation that
 this is a proxy, not the same measurement.
 
+**Update, 10 October 2026:** heat is no longer a matching feature. On Earth the
+stand-in mostly measures soil moisture, on Mars it measures rock versus dust,
+so the two are not comparable. Albedo is compared directly. See section 7.
+
 ### Planned features
 
 1. **Click and compare.** Click a spot on Mars or the Moon, Earth lights up with
@@ -268,6 +272,76 @@ Phase 1 is the gate. Everything else waits on it.
 2. **Scale up.** Add thermal inertia, albedo, minerals. Raise resolution inside
    the chosen regions. Add the Moon. Build the global heatmap and the new
    analogs list.
+
+   **Heat, brightness and the Mars filter (done, 10 October 2026).** Code:
+   `src/surface.py`, `src/run_thermal.py`. Chart:
+   `figures/validation_with_heat.png`, a slide on what we tried and why it
+   failed.
+
+   **Decision: V1.** Matching uses terrain (slope, slope spread, relief), the
+   Mars-possible filter and absolute albedo. Heat is not used for matching.
+   V2 stays in the code behind `python src/run_thermal.py --with-heat`. Why:
+
+   - V1 sends 92.3% of Mars matches to the known analogs, V2 83.6%.
+   - On Earth, heat still tracks moisture: Atacama is labelled 100% dusty and
+     the Nile Delta box 94% rocky. So dusty, sandy or rocky labels are shown
+     for Mars tiles only, never for Earth tiles, until we have a better Earth
+     measure.
+   - V1's remaining 7.7% Nile Delta box share comes from desert tiles east of
+     Cairo that pass the filter, not from farmland.
+
+   **Albedo finding.** The Mars sites have albedo 0.15 to 0.22, while most
+   Earth desert is brighter: the Black Desert box has median 0.40, mostly pale
+   limestone. So the best Earth twins should be dark, basaltic ground. We will
+   not hand-pick the Egypt site; the global grid (Prompt 3 in
+   `docs/ENGINE_PROMPTS.md`) will find the best Egyptian candidate.
+
+   The record of how we got here:
+
+   - **The Mars filter works.** An Earth tile is "Mars-possible" only if its
+     median NDVI is below 0.15 (no plants) and under 5% of it is permanent
+     water. It removes 79% of the Nile Delta box's tiles and keeps all of
+     Atacama's. No vegetated tile is ever matched.
+   - **First attempt, which failed: percentiles within each world.** Heat and
+     brightness were turned into percentiles within each planet, with Earth
+     ranked against all land. The Nile Delta box *rose* from 13.3% (elevation
+     only) to **29.4%** of Mars matches, and Atacama fell from 45% to 22%. The
+     reason: the Mars sites are typical Mars, sitting near the middle of their
+     planet, while Earth's real analogs are extreme Earth (Atacama had the
+     lowest heat rank on the planet). Ranking within each world rewarded
+     ordinary Earth land and penalised the deserts we are looking for. Heat
+     also measures different things on the two worlds: mostly soil moisture
+     on Earth, rock versus dust on Mars.
+   - **The Nile Delta box is not all farmland.** The 1 degree square at 30 to
+     31N, 31 to 32E also covers desert east of Cairo, and 30 of its 144 tiles
+     pass the filter. Those tiles are the ones still matching Mars. The box
+     stays as it is, because we had already seen the results; the test now
+     checks that the filter removes at least 70% of it, not that it scores
+     under 5%.
+   - **New method.** Albedo is compared directly, in physical units, because
+     MODIS (Earth) and TES (Mars) both estimate surface albedo. They come from
+     different instruments and atmospheres, so treat small differences with
+     caution. Heat is removed from matching and kept only to label tiles
+     dusty, sandy or rocky for display.
+   - **Two variants compared.** Atacama + Death Valley share, and Nile Delta
+     box share, of all Mars matches:
+
+     | Variant | Features | Atacama + Death Valley | Nile Delta box |
+     |---|---|---|---|
+     | Elevation only | terrain | 72.7% | 13.3% |
+     | + filter | terrain, filter | 73.0% | 7.6% |
+     | Percentile method (failed) | terrain, filter, heat and brightness ranks | 70.6% | 29.4% |
+     | **V1** | terrain, filter, absolute albedo | **92.3%** | **7.7%** |
+     | **V2** | V1 + heat, Earth ranked against bare dry land only | **83.6%** | **16.4%** |
+
+     We agreed in advance not to choose by the Nile Delta number; V1 was
+     chosen for the reasons above.
+   - The Black Desert box (28 to 29N, 28 to 29E) gets no Mars matches with
+     albedo, because its ground is far brighter than the Mars sites.
+   - THEMIS night infrared has no overviews, contrary to the note in
+     `docs/ENGINE_PROMPTS.md`; reading a site window costs about 3 MB. The
+     reference distributions take about 14 minutes to build and are cached in
+     `data/processed/`.
 3. **Visual engine.** Image tiles, DINOv2 on Colab, compare with the physical
    engine.
 4. **Application.** Clickable globe, Earth heatmap, passport cards, reverse
