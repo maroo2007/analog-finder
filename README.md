@@ -67,5 +67,16 @@ conda activate analog
 earthengine authenticate
 ```
 
+Install the GitHub CLI and log in once, so pull requests can be opened and
+merged from the terminal. On Windows (open a new terminal after installing):
+
+```bash
+winget install --id GitHub.cli
+gh auth login
+```
+
+On Mac, `brew install gh`; on Linux, see https://cli.github.com. During
+`gh auth login` choose GitHub.com, HTTPS and "Login with a web browser".
+
 On Windows 11, turn off Smart App Control first, or it blocks parts of pandas
 and other compiled libraries. See `CLAUDE.md`.
