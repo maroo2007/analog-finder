@@ -15,6 +15,7 @@ import math
 import numpy as np
 import pandas as pd
 import rasterio
+from rasterio.enums import Resampling
 from rasterio.windows import Window
 
 # Mars
@@ -74,8 +75,13 @@ def earth_patch(lat: float, lon: float, out_px: int = 240
     with rasterio.open(url) as src:
         # out_shape makes GDAL read a decimated copy from the file's own
         # overviews, so a 240 x 240 request does not download 25 MB.
-        elev = src.read(1, out_shape=(out_px, out_px),
-                        masked=True).astype("float32").filled(np.nan)
+        # Average, not the default nearest neighbour: MOLA's 463 m pixels are
+        # averages of the original shots, and nearest neighbour made Earth
+        # look rougher (slope spread 6 to 9% high). Averaging the overviews
+        # lands within 1 to 3% of averaging the full 30 m data, 20x faster.
+        elev = src.read(1, out_shape=(out_px, out_px), masked=True,
+                        resampling=Resampling.average
+                        ).astype("float32").filled(np.nan)
 
     centre_lat = lat_floor + 0.5
     deg_per_px = 1.0 / out_px
