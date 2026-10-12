@@ -264,11 +264,23 @@ Phase 1 is the gate. Everything else waits on it.
 
    **Passed on 10 October 2026, using elevation only.** Without being told
    which sites NASA uses, the model sent 73% of the Mars matches to Atacama
-   and Death Valley. By Mars site, the two known analogs took 92% of Jezero's
-   matches, 96% of Gale's and 30% of Meridiani's. The Nile Delta control
+   and Death Valley. By Mars site, the two known analogs took 93% of Jezero's
+   matches, 96% of Gale's and 30% of Meridiani's (after the 12 October
+   resampling fix below; 92%, 96% and 30% before). The Nile Delta control
    scored only on Meridiani, a flat plain, as expected, which is the case for
-   adding thermal data next. Code: `src/terrain.py` and `src/run_phase1.py`.
-   Chart: `figures/validation_elevation_only.png`.
+   the Mars filter and albedo. Code: `src/terrain.py` and `src/run_phase1.py`,
+   which also draws `figures/validation_elevation_only.png`.
+
+   **Resampling fix (12 October 2026).** MOLA's 463 m pixels are averages of
+   the original laser shots, but `terrain.earth_patch` read Earth elevation
+   with rasterio's default nearest neighbour, which keeps single 30 m samples.
+   That made Earth look rougher than Mars: against a true average of the
+   30 m data, slope spread came out 6 to 9% too high and relief about 3% too
+   high (Atacama and Death Valley squares). It now uses average resampling,
+   which lands within 1 to 3% of the full 30 m average at a twentieth of the
+   time. The validation barely moved: Phase 1 Atacama + Death Valley 72.7% to
+   73.0%, V1 92.3% to 92.5%. Lesson: match how each world's data was
+   averaged, not just the pixel size.
 2. **Scale up.** Add thermal inertia, albedo, minerals. Raise resolution inside
    the chosen regions. Add the Moon. Build the global heatmap and the new
    analogs list.
@@ -282,13 +294,14 @@ Phase 1 is the gate. Everything else waits on it.
    Mars-possible filter and absolute albedo. Heat is not used for matching.
    V2 stays in the code behind `python src/run_thermal.py --with-heat`. Why:
 
-   - V1 sends 92.3% of Mars matches to the known analogs, V2 83.6%.
+   - V1 sends 92.3% of Mars matches to the known analogs, V2 83.6% (92.5%
+     and 84.3% after the 12 October resampling fix).
    - On Earth, heat still tracks moisture: Atacama is labelled 100% dusty and
      the Nile Delta box 94% rocky. So dusty, sandy or rocky labels are shown
      for Mars tiles only, never for Earth tiles, until we have a better Earth
      measure.
-   - V1's remaining 7.7% Nile Delta box share comes from desert tiles east of
-     Cairo that pass the filter, not from farmland.
+   - V1's remaining 7.7% Nile Delta box share (7.5% after the fix) comes from
+     desert tiles east of Cairo that pass the filter, not from farmland.
 
    **Albedo finding.** The Mars sites have albedo 0.15 to 0.22, while most
    Earth desert is brighter: the Black Desert box has median 0.40, mostly pale
@@ -326,13 +339,13 @@ Phase 1 is the gate. Everything else waits on it.
    - **Two variants compared.** Atacama + Death Valley share, and Nile Delta
      box share, of all Mars matches:
 
-     | Variant | Features | Atacama + Death Valley | Nile Delta box |
-     |---|---|---|---|
-     | Elevation only | terrain | 72.7% | 13.3% |
-     | + filter | terrain, filter | 73.0% | 7.6% |
-     | Percentile method (failed) | terrain, filter, heat and brightness ranks | 70.6% | 29.4% |
-     | **V1** | terrain, filter, absolute albedo | **92.3%** | **7.7%** |
-     | **V2** | V1 + heat, Earth ranked against bare dry land only | **83.6%** | **16.4%** |
+     | Variant | Features | Atacama + Death Valley, 10 Oct | after 12 Oct fix | Nile Delta box, 10 Oct | after 12 Oct fix |
+     |---|---|---|---|---|---|
+     | Elevation only | terrain | 72.7% | 73.0% | 13.3% | 11.6% |
+     | + filter | terrain, filter | 73.0% | 73.2% | 7.6% | 7.0% |
+     | Percentile method (failed) | terrain, filter, heat and brightness ranks | 70.6% | 71.7% | 29.4% | 28.3% |
+     | **V1** | terrain, filter, absolute albedo | **92.3%** | **92.5%** | **7.7%** | **7.5%** |
+     | **V2** | V1 + heat, Earth ranked against bare dry land only | **83.6%** | **84.3%** | **16.4%** | **15.6%** |
 
      We agreed in advance not to choose by the Nile Delta number; V1 was
      chosen for the reasons above.
@@ -342,6 +355,53 @@ Phase 1 is the gate. Everything else waits on it.
      `docs/ENGINE_PROMPTS.md`; reading a site window costs about 3 MB. The
      reference distributions take about 14 minutes to build and are cached in
      `data/processed/`.
+
+   **Global Earth grid (Prompt 3, in progress, 12 October 2026).** Code:
+   `src/earth_grid.py` builds V1 features for every land tile (1/12 degree,
+   lined up with the Phase 1 tiles); `src/match_grid.py` ranks tiles against
+   a Mars site. Data stays in `data/processed/earth_grid/` (gitignored).
+
+   - **Method.** Earth Engine does the cheap layers only: coarse NDVI
+     (MOD13C1, 0.05 degree) for every land tile, then permanent water (JRC)
+     and albedo (MCD43C3, 0.05 degree) only for tiles that pass NDVI.
+     Terrain is computed on the laptop from the Copernicus DEM on AWS with
+     `terrain.earth_patch` and `report_cards`, the exact validated code: no
+     Earth Engine quota, about 1.2 s per 1 degree square, one resumable file
+     per square. Checked on the Atacama square against the validated local
+     method: albedo within 0.002, NDVI within 0.001, no tile crosses the
+     NDVI threshold, and Atacama + Death Valley stays at 92.2% versus 92.3%.
+   - **Cost incident.** A first, uncapped Africa export computed 30 m water
+     over the whole bounding box, ocean included, and burned **14.7
+     EECU-hours** before it was cancelled by hand. It had been estimated at
+     5 from a single all-land 1 degree square, which hid both the ocean and
+     the overhead. Since then every Earth Engine export runs under a cost cap
+     (`earth_grid.run_capped`, polled every 10 seconds), and costs are
+     estimated from a realistic test country first. Measured on one 1 degree
+     square, terrain was 87% of the old cost; reading it locally removed it.
+   - **Egypt** (test area, cap 1): 0.20 EECU-hours. 12,820 land tiles, 11,694
+     Mars-possible. Best matches, at least 25 km apart:
+
+     | Mars site | Egyptian tile (lat, lon) | Slope | Relief | Albedo |
+     |---|---|---|---|---|
+     | Jezero | 25.2917, 34.5417 | 2.0 deg | 214 m | 0.139 |
+     | Jezero | 24.7083, 34.9583 | 1.9 deg | 223 m | 0.156 |
+     | Jezero | 23.9583, 35.2917 | 1.7 deg | 185 m | 0.147 |
+     | Gale | 22.8750, 35.1250 | 0.7 deg | 117 m | 0.229 |
+     | Gale | 24.2083, 33.3750 | 0.8 deg | 107 m | 0.220 |
+     | Gale | 24.0417, 35.3750 | 0.8 deg | 122 m | 0.235 |
+
+     Jezero's best twins are dark ground in the Eastern Desert inland from
+     the Red Sea, as the albedo finding predicted. Not yet checked on the
+     ground or in imagery; `python src/match_grid.py egypt Jezero Gale`
+     prints the full lists with Google Maps links. These rank against the
+     three Phase 1 Mars sites until Prompt 2 adds NASA's own target zones.
+   - **Africa** (cap 8, estimated 2.3 from Egypt): 2.90 EECU-hours of Earth
+     Engine. 368,405 land tiles, 130,060 Mars-possible (35%), and every
+     Mars-possible tile has terrain: 1,155 1 degree squares computed locally
+     in about 22 minutes, none failed.
+   - **Next:** the other continents, each estimated from a test country and
+     run under a cap; then rank against NASA's target zones once Prompt 2
+     exists, and run the known-analog validation.
 3. **Visual engine.** Image tiles, DINOv2 on Colab, compare with the physical
    engine.
 4. **Application.** Clickable globe, Earth heatmap, passport cards, reverse

@@ -86,12 +86,30 @@ def main() -> None:
         print(f"  {region:13s} {share:5.1%}")
 
     print("\nPer Mars site")
+    table = {}
     for name in MARS_SITES:
         rows = np.where(mars["site"].values == name)[0]
         v = pd.Series(earth["region"].values[idx[rows].ravel()])
         top = v.value_counts(normalize=True)
+        table[name] = top
         print(f"  {name:11s} " + "  ".join(
             f"{r} {s:.0%}" for r, s in top.items()))
+
+    # Imported here so the tests, which only call compare(), need no plotting.
+    import config
+    import plot_validation
+    chart = pd.DataFrame(table).T.reindex(columns=list(EARTH_SITES),
+                                          fill_value=0.0).fillna(0.0)
+    path = config.ROOT / "figures" / "validation_elevation_only.png"
+    plot_validation.plot_shares(
+        chart,
+        title="Mars terrain matched against Earth, using elevation alone",
+        caption=("Atacama and Death Valley are the analog sites NASA already "
+                 "uses. The model was never told that.\nThe Nile Delta is a "
+                 "control: wet farmland. It only scores on Meridiani, a flat "
+                 "plain, which is why the Mars filter and albedo come next."),
+        path=path)
+    print(f"\nChart written to {path.relative_to(config.ROOT)}")
 
 
 if __name__ == "__main__":

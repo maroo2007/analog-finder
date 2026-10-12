@@ -171,7 +171,19 @@ Read src/surface.py and src/run_thermal.py first and reuse their constants
 (NDVI_MAX, WATER_MAX, DATE_START, DATE_END) so the grid matches the
 validated method.
 
-Use Earth Engine, because downloading global elevation would be terabytes.
+Status, 12 October 2026: built as src/earth_grid.py, which differs from the
+plan below because the first Africa export burned 14.7 EECU-hours (see
+HANDOFF.md section 7). Earth Engine does only coarse NDVI (MOD13C1) for
+every land tile, then water (JRC) and albedo (MCD43C3) for tiles that pass
+NDVI, each export under a cost cap. Terrain is computed on the laptop from
+the Copernicus DEM on AWS, with terrain.earth_patch (average resampling)
+and report_cards, so the grid uses exactly the validated code. Egypt and
+Africa are done; run other areas with:
+    python src/earth_grid.py run <area> --cap <EECU-hours>
+after adding the area to AREAS and estimating its cost from a similar
+country first.
+
+Original plan:
 - Terrain: resample Copernicus DEM (verify the ID, likely
   COPERNICUS/DEM/GLO30) to 463 m first, the same pixel size as MOLA, and
   only then compute slope. Slope depends on pixel size, so computing it at

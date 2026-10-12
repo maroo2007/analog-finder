@@ -33,6 +33,13 @@ features, data sources, build order, accounts and open decisions.
   it and wait for approval. If a command fails, show the error and explain it
   before trying a fix. Don't stage, commit or push unless asked.
 - **Read code before running it.** A judge may ask how it works.
+- **Every Earth Engine task gets a cost cap.** Run batch exports through
+  `earth_grid.run_capped`, which polls every 10 seconds and cancels the task
+  the moment its compute passes the cap. Estimate from a realistic test area
+  (one country, with coast and sea), never from a tiny all-land square: on
+  2026-10-10 an uncapped Africa export estimated at 5 EECU-hours burned 14.7
+  before it was cancelled by hand. The Community tier gives 150 EECU-hours a
+  month (resets on the 1st); the team budget for October is 60.
 
 ## Setup
 
@@ -170,22 +177,35 @@ Set up on 2026-09-23. It does **not** share Marwan's quirks: there is no stray
 
 *Update this section whenever the status changes.*
 
-As of 2026-10-10, Phase 1 has passed and Prompt 1 of Phase 2 is done.
+As of 2026-10-12, Phase 1 has passed, Prompt 1 of Phase 2 is done, and the
+global Earth grid (Prompt 3) is being built continent by continent.
 
 - **Matching method is V1** (decided 2026-10-10): terrain + the Mars-possible
   filter (NDVI below 0.15, under 5% permanent water) + absolute albedo. Heat is
   not a matching feature; it only labels Mars tiles dusty, sandy or rocky, and
-  Earth tiles get no label. Atacama and Death Valley take 92.3% of Mars
+  Earth tiles get no label. Atacama and Death Valley take 92.5% of Mars
   matches. Within-world percentiles were tried and failed; don't reintroduce
   them. Code: `src/surface.py`, `src/run_thermal.py` (V2 with heat behind
   `--with-heat`). Details and history: `HANDOFF.md` section 7.
 
 - **Phase 1 validation passed on 2026-10-10, using elevation only.** Without
   being told about them, the model sent 73% of the Mars matches to Atacama and
-  Death Valley. Code is in `src/terrain.py` and `src/run_phase1.py`, and the
-  chart is `figures/validation_elevation_only.png`. Earth elevation now comes
+  Death Valley. Code is in `src/terrain.py` and `src/run_phase1.py`, which
+  also draws `figures/validation_elevation_only.png`. Earth elevation comes
   from the Copernicus DEM on AWS (no API key), with OpenTopography only as a
   backup. Details are in `HANDOFF.md` section 7.
+
+- **Earth elevation uses average resampling** (fixed 2026-10-12). MOLA's
+  463 m pixels are averages, so Earth must be averaged too; rasterio's default
+  nearest neighbour made Earth 6 to 9% rougher. Keep
+  `resampling=Resampling.average` in `terrain.earth_patch`.
+
+- **Global grid** (`src/earth_grid.py`, `src/match_grid.py`): Earth Engine does
+  only coarse NDVI for every land tile, then water and albedo for tiles that
+  pass NDVI, each export under a cost cap. Terrain is computed on the laptop
+  from AWS with the validated code, one resumable file per 1 degree square in
+  `data/processed/earth_grid/terrain/`. Egypt cost 0.2 EECU-hours. Details,
+  costs and results: `HANDOFF.md` section 7.
 
 - **Done:** the `analog` environment is built on **two** Windows laptops and
   every import passes on both: Python 3.11.16, GDAL 3.12.3, rasterio 1.4.4,
