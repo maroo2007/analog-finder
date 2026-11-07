@@ -1,0 +1,230 @@
+[
+ {
+  "target": "acheron_fossae",
+  "lat": 27.2083,
+  "lon": 32.7083,
+  "score": 90.2
+ },
+ {
+  "target": "acidalia_plantia",
+  "lat": 23.2917,
+  "lon": 30.2917,
+  "score": 83.9
+ },
+ {
+  "target": "arabia_terra",
+  "lat": 23.9583,
+  "lon": 34.375,
+  "score": 84.9
+ },
+ {
+  "target": "aram_chaos",
+  "lat": 24.2917,
+  "lon": 35.2917,
+  "score": 66.4
+ },
+ {
+  "target": "arcadia",
+  "lat": 23.2917,
+  "lon": 30.2917,
+  "score": 84.6
+ },
+ {
+  "target": "arcadia_planitia",
+  "lat": 30.125,
+  "lon": 27.5417,
+  "score": 86.7
+ },
+ {
+  "target": "ausonia",
+  "lat": 23.375,
+  "lon": 30.2917,
+  "score": 83.0
+ },
+ {
+  "target": "cerberus",
+  "lat": 29.2083,
+  "lon": 25.625,
+  "score": 91.5
+ },
+ {
+  "target": "columbus_crater",
+  "lat": 25.5417,
+  "lon": 33.875,
+  "score": 76.5
+ },
+ {
+  "target": "copernicus_crater",
+  "lat": 25.5417,
+  "lon": 33.875,
+  "score": 76.2
+ },
+ {
+  "target": "coprates_emelas_chasm",
+  "lat": 24.7083,
+  "lon": 34.875,
+  "score": 66.9
+ },
+ {
+  "target": "deuteronilus1_2",
+  "lat": 23.2917,
+  "lon": 30.2917,
+  "score": 78.0
+ },
+ {
+  "target": "erebus_montes",
+  "lat": 30.2917,
+  "lon": 27.9583,
+  "score": 91.1
+ },
+ {
+  "target": "gale",
+  "lat": 24.2917,
+  "lon": 33.375,
+  "score": 71.5
+ },
+ {
+  "target": "gusev",
+  "lat": 27.2083,
+  "lon": 32.7083,
+  "score": 85.7
+ },
+ {
+  "target": "hadriacus",
+  "lat": 23.375,
+  "lon": 30.2917,
+  "score": 78.8
+ },
+ {
+  "target": "hale_crater",
+  "lat": 23.375,
+  "lon": 30.2917,
+  "score": 66.5
+ },
+ {
+  "target": "hebrus",
+  "lat": 23.2917,
+  "lon": 30.375,
+  "score": 91.4
+ },
+ {
+  "target": "hellas3",
+  "lat": 24.7083,
+  "lon": 34.2083,
+  "score": 80.8
+ },
+ {
+  "target": "hellas_hellas2",
+  "lat": 23.2917,
+  "lon": 30.2917,
+  "score": 80.2
+ },
+ {
+  "target": "huygens",
+  "lat": 23.2083,
+  "lon": 30.875,
+  "score": 82.2
+ },
+ {
+  "target": "hypanis_delta",
+  "lat": 22.875,
+  "lon": 35.125,
+  "score": 86.7
+ },
+ {
+  "target": "ismenius_cavus",
+  "lat": 27.7083,
+  "lon": 33.2083,
+  "score": 83.1
+ },
+ {
+  "target": "jezero",
+  "lat": 25.125,
+  "lon": 34.5417,
+  "score": 67.9
+ },
+ {
+  "target": "kasei_valles",
+  "lat": 31.5417,
+  "lon": 26.125,
+  "score": 84.9
+ },
+ {
+  "target": "mawrth_valles",
+  "lat": 23.125,
+  "lon": 35.125,
+  "score": 71.8
+ },
+ {
+  "target": "mclaughlin_crater",
+  "lat": 25.5417,
+  "lon": 33.875,
+  "score": 68.5
+ },
+ {
+  "target": "ne_marineris_crater",
+  "lat": 25.5417,
+  "lon": 33.875,
+  "score": 61.7
+ },
+ {
+  "target": "newton_crater",
+  "lat": 23.375,
+  "lon": 30.2917,
+  "score": 61.5
+ },
+ {
+  "target": "nili",
+  "lat": 25.875,
+  "lon": 33.7083,
+  "score": 61.4
+ },
+ {
+  "target": "noachis",
+  "lat": 25.875,
+  "lon": 33.7083,
+  "score": 76.2
+ },
+ {
+  "target": "noactis_landing",
+  "lat": 24.7083,
+  "lon": 34.9583,
+  "score": 51.0
+ },
+ {
+  "target": "protonilus",
+  "lat": 27.375,
+  "lon": 33.375,
+  "score": 66.7
+ },
+ {
+  "target": "se_marineris",
+  "lat": 23.375,
+  "lon": 30.2917,
+  "score": 85.2
+ },
+ {
+  "target": "s_meridiani_sinus_planium",
+  "lat": 23.375,
+  "lon": 30.2917,
+  "score": 81.3
+ },
+ {
+  "target": "s_nectaris_fossae",
+  "lat": 23.2083,
+  "lon": 30.875,
+  "score": 65.9
+ },
+ {
+  "target": "viking",
+  "lat": 27.875,
+  "lon": 33.375,
+  "score": 88.3
+ },
+ {
+  "target": "zephyria",
+  "lat": 23.7083,
+  "lon": 32.625,
+  "score": 92.7
+ }
+]

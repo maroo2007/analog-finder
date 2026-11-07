@@ -1,0 +1,458 @@
+[
+ {
+  "id": "acheron_fossae",
+  "name": "Acheron Fossae",
+  "lat": 39.8,
+  "lon": -139.4,
+  "bbox": [
+   -141.603,
+   38.108,
+   -137.197,
+   41.492
+  ]
+ },
+ {
+  "id": "acidalia_plantia",
+  "name": "Acidalia Planitia",
+  "lat": 20.0,
+  "lon": -40.0,
+  "bbox": [
+   -41.801,
+   18.308,
+   -38.199,
+   21.692
+  ]
+ },
+ {
+  "id": "arabia_terra",
+  "name": "Arabia Terra",
+  "lat": 0.4,
+  "lon": -8.3,
+  "bbox": [
+   -9.992,
+   -1.292,
+   -6.608,
+   2.092
+  ]
+ },
+ {
+  "id": "aram_chaos",
+  "name": "Aram Chaos",
+  "lat": 2.4,
+  "lon": -20.0,
+  "bbox": [
+   -21.694,
+   0.708,
+   -18.306,
+   4.092
+  ]
+ },
+ {
+  "id": "arcadia",
+  "name": "Arcadia",
+  "lat": 38.945,
+  "lon": 172.008,
+  "bbox": [
+   169.681,
+   37.024,
+   174.336,
+   40.867
+  ]
+ },
+ {
+  "id": "arcadia_planitia",
+  "name": "Arcadia Planitia",
+  "lat": 46.2,
+  "lon": -171.2,
+  "bbox": [
+   -173.645,
+   44.508,
+   -168.755,
+   47.892
+  ]
+ },
+ {
+  "id": "ausonia",
+  "name": "Ausonia",
+  "lat": -32.032,
+  "lon": 96.529,
+  "bbox": [
+   94.161,
+   -33.914,
+   98.896,
+   -30.149
+  ]
+ },
+ {
+  "id": "cerberus",
+  "name": "Cerberus",
+  "lat": 9.973,
+  "lon": 162.001,
+  "bbox": [
+   160.191,
+   8.204,
+   163.811,
+   11.743
+  ]
+ },
+ {
+  "id": "columbus_crater",
+  "name": "Columbus Crater",
+  "lat": -29.0,
+  "lon": -166.0,
+  "bbox": [
+   -167.935,
+   -30.692,
+   -164.065,
+   -27.308
+  ]
+ },
+ {
+  "id": "copernicus_crater",
+  "name": "Copernicus Crater",
+  "lat": -49.2,
+  "lon": -169.2,
+  "bbox": [
+   -171.79,
+   -50.892,
+   -166.61,
+   -47.508
+  ]
+ },
+ {
+  "id": "coprates_emelas_chasm",
+  "name": "Coprates / East Melas Chasma",
+  "lat": -11.7,
+  "lon": -68.3,
+  "bbox": [
+   -71.728,
+   -13.392,
+   -64.871,
+   -10.008
+  ]
+ },
+ {
+  "id": "deuteronilus1_2",
+  "name": "Deuteronilus",
+  "lat": 40.027,
+  "lon": 22.586,
+  "bbox": [
+   19.406,
+   37.229,
+   25.766,
+   42.825
+  ]
+ },
+ {
+  "id": "erebus_montes",
+  "name": "Erebus Montes",
+  "lat": 39.0,
+  "lon": -167.9,
+  "bbox": [
+   -170.077,
+   37.308,
+   -165.723,
+   40.692
+  ]
+ },
+ {
+  "id": "gale",
+  "name": "Gale",
+  "lat": -4.691,
+  "lon": 137.213,
+  "bbox": [
+   135.184,
+   -6.573,
+   139.241,
+   -2.808
+  ]
+ },
+ {
+  "id": "gusev",
+  "name": "Gusev",
+  "lat": -13.607,
+  "lon": 175.855,
+  "bbox": [
+   173.246,
+   -16.222,
+   178.463,
+   -10.993
+  ]
+ },
+ {
+  "id": "hadriacus",
+  "name": "Hadriacus",
+  "lat": -26.802,
+  "lon": 77.509,
+  "bbox": [
+   75.585,
+   -28.524,
+   79.433,
+   -25.08
+  ]
+ },
+ {
+  "id": "hale_crater",
+  "name": "Hale Crater",
+  "lat": -35.8,
+  "lon": -36.3,
+  "bbox": [
+   -38.386,
+   -37.492,
+   -34.214,
+   -34.108
+  ]
+ },
+ {
+  "id": "hebrus",
+  "name": "Hebrus",
+  "lat": 20.056,
+  "lon": 126.603,
+  "bbox": [
+   124.753,
+   18.286,
+   128.453,
+   21.825
+  ]
+ },
+ {
+  "id": "hellas3",
+  "name": "Hellas East",
+  "lat": -35.434,
+  "lon": 93.987,
+  "bbox": [
+   91.724,
+   -37.254,
+   96.25,
+   -33.614
+  ]
+ },
+ {
+  "id": "hellas_hellas2",
+  "name": "Hellas",
+  "lat": -39.561,
+  "lon": 102.97,
+  "bbox": [
+   99.663,
+   -41.808,
+   106.277,
+   -37.315
+  ]
+ },
+ {
+  "id": "huygens",
+  "name": "Huygens",
+  "lat": -13.498,
+  "lon": 55.505,
+  "bbox": [
+   53.731,
+   -15.22,
+   57.279,
+   -11.776
+  ]
+ },
+ {
+  "id": "hypanis_delta",
+  "name": "Hypanis Delta",
+  "lat": 11.7,
+  "lon": -45.3,
+  "bbox": [
+   -47.028,
+   10.008,
+   -43.572,
+   13.392
+  ]
+ },
+ {
+  "id": "ismenius_cavus",
+  "name": "Ismenius Cavus",
+  "lat": 33.8,
+  "lon": 17.2,
+  "bbox": [
+   15.164,
+   32.108,
+   19.236,
+   35.492
+  ]
+ },
+ {
+  "id": "jezero",
+  "name": "Jezero",
+  "lat": 17.676,
+  "lon": 77.013,
+  "bbox": [
+   75.154,
+   15.906,
+   78.872,
+   19.445
+  ]
+ },
+ {
+  "id": "kasei_valles",
+  "name": "Kasei Valles",
+  "lat": 24.8,
+  "lon": -72.6,
+  "bbox": [
+   -74.464,
+   23.108,
+   -70.736,
+   26.492
+  ]
+ },
+ {
+  "id": "mawrth_valles",
+  "name": "Mawrth Valles",
+  "lat": 24.3,
+  "lon": -19.2,
+  "bbox": [
+   -21.057,
+   22.608,
+   -17.343,
+   25.992
+  ]
+ },
+ {
+  "id": "mclaughlin_crater",
+  "name": "McLaughlin Crater",
+  "lat": 21.9,
+  "lon": -22.4,
+  "bbox": [
+   -24.224,
+   20.208,
+   -20.576,
+   23.592
+  ]
+ },
+ {
+  "id": "ne_marineris_crater",
+  "name": "NE Marineris Crater",
+  "lat": -4.1,
+  "lon": -35.2,
+  "bbox": [
+   -36.896,
+   -5.792,
+   -33.504,
+   -2.408
+  ]
+ },
+ {
+  "id": "newton_crater",
+  "name": "Newton Crater",
+  "lat": -40.6,
+  "lon": -160.0,
+  "bbox": [
+   -162.229,
+   -42.292,
+   -157.771,
+   -38.908
+  ]
+ },
+ {
+  "id": "nili",
+  "name": "Nili",
+  "lat": 22.083,
+  "lon": 77.005,
+  "bbox": [
+   75.151,
+   20.361,
+   78.86,
+   23.805
+  ]
+ },
+ {
+  "id": "noachis",
+  "name": "Noachis",
+  "lat": -37.23,
+  "lon": -9.504,
+  "bbox": [
+   -11.744,
+   -39.068,
+   -7.264,
+   -35.392
+  ]
+ },
+ {
+  "id": "noactis_landing",
+  "name": "Noctis Landing",
+  "lat": -6.5,
+  "lon": -92.5,
+  "bbox": [
+   -94.203,
+   -8.192,
+   -90.797,
+   -4.808
+  ]
+ },
+ {
+  "id": "protonilus",
+  "name": "Protonilus",
+  "lat": 42.174,
+  "lon": 48.108,
+  "bbox": [
+   45.792,
+   40.404,
+   50.423,
+   43.944
+  ]
+ },
+ {
+  "id": "se_marineris",
+  "name": "SE Marineris",
+  "lat": -18.8,
+  "lon": -49.2,
+  "bbox": [
+   -50.988,
+   -20.492,
+   -47.412,
+   -17.108
+  ]
+ },
+ {
+  "id": "s_meridiani_sinus_planium",
+  "name": "South Meridiani",
+  "lat": -2.75,
+  "lon": -5.449,
+  "bbox": [
+   -8.093,
+   -4.893,
+   -2.804,
+   -0.608
+  ]
+ },
+ {
+  "id": "s_nectaris_fossae",
+  "name": "South Nectaris Fossae",
+  "lat": -28.9,
+  "lon": -59.7,
+  "bbox": [
+   -61.633,
+   -30.592,
+   -57.767,
+   -27.208
+  ]
+ },
+ {
+  "id": "viking",
+  "name": "Viking",
+  "lat": 22.3,
+  "lon": -48.3,
+  "bbox": [
+   -50.129,
+   20.608,
+   -46.471,
+   23.992
+  ]
+ },
+ {
+  "id": "zephyria",
+  "name": "Zephyria",
+  "lat": -1.411,
+  "lon": 157.106,
+  "bbox": [
+   155.39,
+   -3.124,
+   158.821,
+   0.302
+  ]
+ }
+]
