@@ -248,6 +248,16 @@ grid (Prompt 3) covers Egypt and Africa.
 - **Earth Engine works on Marwan's laptop** (`earthengine authenticate` done
   and `src/check_ee.py` passing, 2026-10-10). The second laptop still needs
   it. Inviting the remaining teammates is not done.
+- **Judging and submission rules are in `docs/JUDGING_CRITERIA.md`**, and
+  the challenge's official data list is in `docs/CHALLENGE_RESOURCES.md`
+  (both added 2026-11-13). Read them before planning the final demo. In
+  short: there is no live pitching; judges see only a **30 second video or
+  exactly 7 slides**, uploaded first to the local Cairo form and then to the
+  global Space Apps site. Still open: the Cairo PDF gives the event as
+  **13 to 14 November** while this file says 14 to 15 (confirm); the GitHub
+  repository is private, so judges cannot open its link until it is made
+  public; the submission needs an AI-use disclosure. The final demo is
+  planned for later.
 - **Next:** Prompt 4 in `docs/ENGINE_PROMPTS.md` (discoveries list and
   interface data), more continents for the grid (each estimated from a test
   country and run under a cost cap), and the known-analog validation.
