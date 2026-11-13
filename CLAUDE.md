@@ -9,7 +9,8 @@ a future session needs belongs here.
 Planetary Twin Finder: finds places on Earth whose terrain best matches proposed
 landing and base sites on the Moon and Mars, for NASA Space Apps Challenge 2026
 (hackathon 14 to 15 November 2026). **Read `HANDOFF.md` for the full picture:**
-features, data sources, build order, accounts and open decisions.
+status, method, targets, data sources, the website plan, submission rules,
+accounts, open decisions and history.
 
 ## Rules we work by
 
@@ -177,7 +178,7 @@ Set up on 2026-09-23. It does **not** share Marwan's quirks: there is no stray
   packages had already succeeded, and re-running the identical command finished
   from the cache in minutes. Retry before changing anything else.
 - Disk is the binding constraint here: about 41 GB free on `C:` against the
-  25 to 40 GB `HANDOFF.md` expects for working-scale data. `conda clean -a`
+  25 to 40 GB the original plan expected for working-scale data. `conda clean -a`
   only returns about 0.5 GB, because most of `pkgs` is hardlinked into the
   environment, so it is not a useful lever.
 
@@ -185,9 +186,20 @@ Set up on 2026-09-23. It does **not** share Marwan's quirks: there is no stray
 
 *Update this section whenever the status changes.*
 
-As of 2026-11-13 (hackathon 14 to 15 November), Phase 1 has passed, Prompts
-1 and 2 are done (Prompt 2 on branch `feature/targets`), and the global Earth
-grid (Prompt 3) covers Egypt and Africa.
+As of 2026-11-14 (hackathon 14 to 15 November), Phase 1 has passed, Prompts
+1 and 2 are done and merged, and the global Earth grid (Prompt 3) covers
+Africa and the Americas south of 50 N (merged in pull request #5). Every
+twin has a shaded relief image (`shade/earth/<id>_<n>.webp`, n = place 1 to
+25 in `matches/<id>.json`; `python src/render_shades.py --twins`). The website is being built on `feature/website`, in a git
+worktree at `C:\Users\Marwan\Desktop\analog-finder-website` (Marwan's
+laptop); open Claude Code on that folder so the Impeccable design hooks run.
+
+- **The Americas** (2026-11-13): 18,865 Mars-possible tiles, 1.43
+  EECU-hours (stage A 0.03 run alone first with `--ndvi-only`, then stage B
+  1.40 under a cap of 2 with `--reuse-ndvi`). A new ice filter (MODIS
+  MCD12Q1 class 15, over 50% of a tile) keeps glaciers out. Read finished
+  tables with `python src/earth_grid.py fetch <area>`: one big read hung for
+  an hour. Jezero's closest twin is still the Egyptian tile, #1 of 148,925.
 
 - **Targets are NASA's own sites** (Prompt 2, 2026-11-13). Mars: the 38
   candidate human Exploration Zones (`src/targets/mars_human_ez.json`).
@@ -197,10 +209,11 @@ grid (Prompt 3) covers Egypt and Africa.
   flight and the first landing is Artemis IV; the file says so.
 - **The Moon is matched on terrain only**, from the LOLA south pole DEM on
   NASA PGDA (`terrain.moon_patch`, averaged to 463 m like Mars and Earth),
-  with its own scaler. Moon scores are low (best 15) because the pole is far
-  rougher than dry African land, and are not comparable with Mars scores;
-  every match also stores its rank (`rank` of `of`, e.g. 1 of 130,060), which
-  the website should show. Code: `src/run_moon_targets.py`,
+  with its own scaler. Moon scores are low (best 5 to 33) because the pole
+  is far rougher than almost any dry land, and are not comparable with Mars
+  scores; every match also stores its rank (`rank` of `of`, e.g. 1 of
+  148,925) and its rank within its continent (`rank_continent` of
+  `of_continent`), which the website should show. Code: `src/run_moon_targets.py`,
   `src/build_web_data.py`.
 - **Website data** is committed in `web/public/data/` (about 6 MB): targets,
   top 25 twins per target at least 25 km apart (true distance,
@@ -214,14 +227,14 @@ grid (Prompt 3) covers Egypt and Africa.
   Earth tiles get no label. Atacama and Death Valley take 92.5% of Mars
   matches. Within-world percentiles were tried and failed; don't reintroduce
   them. Code: `src/surface.py`, `src/run_thermal.py` (V2 with heat behind
-  `--with-heat`). Details and history: `HANDOFF.md` section 7.
+  `--with-heat`). Details and history: `HANDOFF.md` sections 3 and 14.
 
 - **Phase 1 validation passed on 2026-10-10, using elevation only.** Without
   being told about them, the model sent 73% of the Mars matches to Atacama and
   Death Valley. Code is in `src/terrain.py` and `src/run_phase1.py`, which
   also draws `figures/validation_elevation_only.png`. Earth elevation comes
   from the Copernicus DEM on AWS (no API key), with OpenTopography only as a
-  backup. Details are in `HANDOFF.md` section 7.
+  backup. Details are in `HANDOFF.md` section 14 (History).
 
 - **Earth elevation uses average resampling** (fixed 2026-10-12). MOLA's
   463 m pixels are averages, so Earth must be averaged too; rasterio's default
@@ -233,7 +246,7 @@ grid (Prompt 3) covers Egypt and Africa.
   pass NDVI, each export under a cost cap. Terrain is computed on the laptop
   from AWS with the validated code, one resumable file per 1 degree square in
   `data/processed/earth_grid/terrain/`. Egypt cost 0.2 EECU-hours. Details,
-  costs and results: `HANDOFF.md` section 7.
+  costs and results: `HANDOFF.md` sections 2 and 14.
 
 - **Done:** the `analog` environment is built on **two** Windows laptops and
   every import passes on both: Python 3.11.16, GDAL 3.12.3, rasterio 1.4.4,
@@ -248,6 +261,8 @@ grid (Prompt 3) covers Egypt and Africa.
 - **Earth Engine works on Marwan's laptop** (`earthengine authenticate` done
   and `src/check_ee.py` passing, 2026-10-10). The second laptop still needs
   it. Inviting the remaining teammates is not done.
-- **Next:** Prompt 4 in `docs/ENGINE_PROMPTS.md` (discoveries list and
-  interface data), more continents for the grid (each estimated from a test
-  country and run under a cost cap), and the known-analog validation.
+- **Next:** the website (`docs/WEBSITE_SPEC.md`), bringing `main`'s website
+  data into `feature/website`, then the submission. Later: Prompt 4 in
+  `docs/ENGINE_PROMPTS.md` (discoveries list), more continents for the grid
+  (each estimated from a test country and run under a cost cap), and the
+  known-analog validation.

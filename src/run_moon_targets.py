@@ -6,7 +6,7 @@ one row per tile to data/processed/moon_artemis_v1.parquet: mean slope,
 slope spread and relief. That file is an input of build_web_data.py.
 
 Terrain only: there is no Moon albedo feature yet. Diviner thermal and LOLA
-albedo are later upgrades (HANDOFF.md section 7).
+albedo are later upgrades (HANDOFF.md section 4).
 
 Box size. The regions are small (most 20 x 20 km, Haworth 30 km, Mons Mouton
 Plateau 67 km), and a tile must stay 20 pixels (9.26 km) to be comparable,
