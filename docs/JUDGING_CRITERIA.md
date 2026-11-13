@@ -61,6 +61,31 @@ a meaningful problem, offer a relevant and feasible solution, make meaningful
 use of NASA resources, demonstrate its potential value and communicate it
 clearly.
 
+## How submission and judging work (Cairo guide book, page 19)
+
+Translated from the Arabic of the participants' guide book.
+
+- **There is no live pitching.** Every team, on-site or virtual, is judged
+  on its demo, which is **one** of:
+  - **a video of 30 seconds** that explains the idea quickly and in an
+    inspiring way, or
+  - **exactly 7 slides**: the challenge, the solution, why it matters, and
+    how it is built.
+- Judges are experts in different fields. Each judges the projects that fit
+  their expertise, with the same criteria NASA uses worldwide (above).
+- **Upload twice, on time:**
+  1. the local Cairo form: the video link, the slides, and any links such as
+     GitHub or the project website;
+  2. then the same files on the official NASA Space Apps website, to enter
+     global judging.
+- The guide's advice: split the work from the first moment, watch the clock,
+  keep the idea clear, and make the video enjoyable for someone who is not a
+  specialist.
+
+What this means for us: judges see the 30 second video or the 7 slides
+first, not a live demo, so those are the main deliverable. The website and
+the repository count only as links, which judges must be able to open.
+
 ## Before submitting
 
 - [ ] Selected and addressed a NASA challenge.
@@ -84,7 +109,7 @@ Our own reading of the project against each criterion, from the code and
 | Creativity | Searches all of a continent instead of hand-picking sites; matches against NASA's own 38 Mars Exploration Zones and 9 Artemis regions; same 463 m pixel and averaging on all three worlds. | Image engine (DINOv2) is optional and not started. |
 | Validity | Blind validation: V1 sends 92.5% of Mars matches to Atacama and Death Valley without being told about them; Nile Delta control; the failed percentile method is documented; known-answer tests (Olympus Mons, Shackleton depth). Moon limits stated honestly. | Known-analog rank chart (`figures/known_analogs_rank.png`) not built; Earth grid covers Africa only, so the known analogs cannot appear as matches yet. |
 | Relevance | NASA data throughout: MOLA, TES and THEMIS (Mars), LOLA (Moon), MODIS (Earth); NASA's own target sites. Copernicus DEM (ESA) is also on the challenge list. | Diviner is named on the challenge page and not used. List every NASA source on the project page (`docs/CHALLENGE_RESOURCES.md`). |
-| Presentation | Validation charts in `figures/`; website data in `web/public/data/`. | No website yet; no demo script or backup video. |
+| Presentation | Validation charts in `figures/`; website data in `web/public/data/`. | Neither the 30 second video nor the 7 slides exist yet, and these are what judges see. No website yet (submitted as a link only). |
 
 Two checklist items need action:
 
