@@ -9,7 +9,9 @@ Three stages, so expensive work only happens where it can matter:
   A. ndvi      Earth Engine, every land tile: lat, lon, country, ndvi, from
                MODIS's coarse 0.05 degree NDVI (MOD13C1). Cheap.
   B. surface   Earth Engine, only tiles with ndvi below NDVI_MAX: permanent
-               water fraction (JRC, 30 m) and albedo (MCD43C3, 0.05 degree).
+               water fraction (JRC, 30 m), albedo (MCD43C3, 0.05 degree) and
+               permanent snow and ice fraction (MCD12Q1, 500 m; areas run
+               from 13 November 2026 on).
                Water is the expensive layer, so it never touches ocean or
                green land.
   C. terrain   This laptop, no Earth Engine quota: mean slope, slope spread
@@ -45,6 +47,9 @@ import terrain as t
 ALBEDO = "MODIS/061/MCD43C3"          # 0.05 degree daily albedo
 NDVI = "MODIS/061/MOD13C1"            # 0.05 degree 16-day NDVI
 WATER = "JRC/GSW1_4/GlobalSurfaceWater"
+LAND_COVER = "MODIS/061/MCD12Q1"        # 500 m yearly land cover
+ICE_CLASS = 15                          # IGBP: permanent snow and ice
+ICE_START = "2021-01-01"                # five yearly maps (2021-2025), mode
 COUNTRIES = "USDOS/LSIB_SIMPLE/2017"
 
 FINE_DEG = 1.0 / 240.0                  # 463 m at the equator, as MOLA
@@ -60,6 +65,13 @@ GRID_DIR = config.PROCESSED / "earth_grid"
 AREAS = {
     "egypt": ("country_na", ["Egypt"], [24.5, 21.5, 37.5, 32.0]),
     "africa": ("wld_rgn", ["Africa"], [-26.0, -47.0, 64.0, 38.0]),
+    # Test area for the Americas: coast and sea, the Andes and the Atacama.
+    "chile": ("country_na", ["Chile"], [-76.0, -56.5, -66.0, -17.0]),
+    # The Americas south of 50 N (Death Valley, Utah, Mexico, the Andes,
+    # Atacama, Patagonia). Further north, snow makes median NDVI near zero,
+    # so the filter would let in tundra and ice. Hawaii is outside the box.
+    "americas": ("wld_rgn", ["North America", "Central America", "Caribbean",
+                             "South America"], [-125.0, -56.5, -34.0, 50.0]),
 }
 
 FEATURE_COLUMNS = ["mean_slope", "slope_spread", "relief", "albedo"]
@@ -125,12 +137,19 @@ def surface_table(ee, area):
                           .reproject(_grid(ee, FINE_DEG)))).rename("water")
     albedo = _to_tile(ee, _median(ee, ALBEDO, "Albedo_WSA_shortwave", 0.001)
                       ).rename("albedo")
+    # Permanent snow and ice fraction: the land cover class each 500 m pixel
+    # has most often over the recent years, 1 where it is ice, averaged into
+    # the tile. 500 m to 9 km is about 400 pixels, within one averaging step.
+    lc = (ee.ImageCollection(LAND_COVER).filterDate(ICE_START, s.DATE_END)
+          .select("LC_Type1"))
+    ice = _to_tile(ee, lc.mode().eq(ICE_CLASS)
+                   .setDefaultProjection(lc.first().projection())).rename("ice")
     # tileScale=16 (the maximum) keeps each block of work small enough: the
     # 30 m water layer overflows Earth Engine's 2^31-pixel limit otherwise.
-    return (ee.Image.cat([water, albedo]).toFloat()
+    return (ee.Image.cat([water, albedo, ice]).toFloat()
             .sampleRegions(collection=passed, projection=_grid(ee, TILE_DEG),
                            tileScale=16, geometries=True)
-            .select(["lat", "lon", "water", "albedo"]))
+            .select(["lat", "lon", "water", "albedo", "ice"]))
 
 
 def _ensure_folder(ee):
@@ -219,11 +238,11 @@ def run_earth_engine(area: str, cap_hours: float) -> pd.DataFrame:
           f"{a['eecu_hours'] + b['eecu_hours']:.4f} EECU-hours", flush=True)
 
     ndvi = _read(ee, f"{ASSET_FOLDER}/{area}_ndvi")[["lat", "lon", "country", "ndvi"]]
-    surf = _read(ee, f"{ASSET_FOLDER}/{area}_surface")[["lat", "lon", "water", "albedo"]]
+    surf = _read(ee, f"{ASSET_FOLDER}/{area}_surface")
+    surf = surf[[c for c in ("lat", "lon", "water", "albedo", "ice") if c in surf]]
     ndvi["k"], surf["k"] = _key(ndvi), _key(surf)
     df = ndvi.merge(surf.drop(columns=["lat", "lon"]), on="k", how="left")
-    df["mars_possible"] = ((df["ndvi"] < s.NDVI_MAX)
-                           & (df["water"] < s.WATER_MAX))
+    df["mars_possible"] = s.mars_possible(df)
     GRID_DIR.mkdir(parents=True, exist_ok=True)
     df.drop(columns="k").to_parquet(GRID_DIR / f"{area}_surface.parquet")
     return df.drop(columns="k")
