@@ -1,0 +1,9 @@
+# Packages for hosting the chatbot (src/chat_app.py) on Streamlit Community
+# Cloud. It looks for a requirements file next to the app's main file before
+# the repository root, so it uses this one instead of environment.yml, which
+# holds the whole GDAL stack the chatbot does not need.
+#
+# The minimums are the versions tested on 13 November 2026.
+# Locally, use the analog conda environment instead (environment.yml).
+google-genai>=3.3.0
+streamlit>=1.67.0
