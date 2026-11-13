@@ -32,6 +32,9 @@ exceeded its estimate cost 14.7 EECU-hours on 10 October; see HANDOFF.md.
     python src/earth_grid.py run americas --cap 6 --reuse-ndvi
                                                     B on the saved A, then C
     python src/earth_grid.py terrain africa         C only (resumable)
+    python src/earth_grid.py fetch americas         read the finished A and B
+                                                    tables in latitude bands
+                                                    (no new compute), then C
     python src/earth_grid.py status                 tasks and compute used
 """
 
@@ -227,6 +230,69 @@ def _read(ee, asset_id) -> pd.DataFrame:
     })
 
 
+FETCH_BAND_DEG = 5.0          # one request per 5 degrees of latitude
+FETCH_DEADLINE_MS = 180_000   # give up on a request after 3 minutes
+FETCH_RETRIES = 3
+
+
+def _read_banded(ee, asset_id: str, south: float, north: float) -> pd.DataFrame:
+    """A finished table, read in latitude bands with progress.
+
+    Reading the 396,555-row Americas table in one request hung for over an
+    hour on 13 November with no error. Bands keep each request small, and a
+    deadline turns a hang into a retry. Only reads: no export, no batch task.
+    """
+    ee.data.setDeadline(FETCH_DEADLINE_MS)
+    table = ee.FeatureCollection(asset_id)
+    name = asset_id.split("/")[-1]
+    edges = np.arange(math.floor(south), north, FETCH_BAND_DEG)
+    parts = []
+    for i, lo in enumerate(edges, 1):
+        band = table.filter(ee.Filter.And(ee.Filter.gte("lat", float(lo)),
+                                          ee.Filter.lt("lat", float(lo + FETCH_BAND_DEG))))
+        for attempt in range(1, FETCH_RETRIES + 1):
+            t0 = time.time()
+            try:
+                df = ee.data.computeFeatures({"expression": band,
+                                              "fileFormat": "PANDAS_DATAFRAME"})
+                break
+            except Exception as exc:  # deadline or network error
+                print(f"  {name} {lo:+.0f} to {lo + FETCH_BAND_DEG:+.0f}: try "
+                      f"{attempt} failed after {time.time() - t0:.0f} s: "
+                      f"{str(exc)[:100]}", flush=True)
+                if attempt == FETCH_RETRIES:
+                    raise
+                time.sleep(10 * attempt)
+        parts.append(df)
+        print(f"  {name} {lo:+.0f} to {lo + FETCH_BAND_DEG:+.0f}: {len(df):,} rows "
+              f"({i}/{len(edges)}, {time.time() - t0:.0f} s)", flush=True)
+    parts = [p for p in parts if len(p)]
+    return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame()
+
+
+def _join_and_save(area: str, ndvi: pd.DataFrame, surf: pd.DataFrame) -> pd.DataFrame:
+    """Stage A and stage B tables joined, filter applied, saved locally."""
+    ndvi = ndvi[["lat", "lon", "country", "ndvi"]].copy()
+    surf = surf[[c for c in ("lat", "lon", "water", "albedo", "ice") if c in surf]].copy()
+    ndvi["k"], surf["k"] = _key(ndvi), _key(surf)
+    df = ndvi.merge(surf.drop(columns=["lat", "lon"]), on="k", how="left")
+    df["mars_possible"] = s.mars_possible(df)
+    GRID_DIR.mkdir(parents=True, exist_ok=True)
+    df.drop(columns="k").to_parquet(GRID_DIR / f"{area}_surface.parquet")
+    return df.drop(columns="k")
+
+
+def fetch(area: str) -> pd.DataFrame:
+    """Read an area's finished stage A and B tables (no new compute) and save
+    the joined table, as `run` does after its exports."""
+    ee = config.init_ee()
+    _, _, box = AREAS[area]
+    south, north = max(box[1], -LAT_LIMIT), min(box[3], LAT_LIMIT)
+    ndvi = _read_banded(ee, f"{ASSET_FOLDER}/{area}_ndvi", south, north)
+    surf = _read_banded(ee, f"{ASSET_FOLDER}/{area}_surface", south, north)
+    return _join_and_save(area, ndvi, surf)
+
+
 def _key(df: pd.DataFrame) -> pd.Series:
     """Tile key from its centre, robust to float noise."""
     return (np.floor(df["lat"] / TILE_DEG).astype(int).astype(str) + "_"
@@ -267,15 +333,8 @@ def run_earth_engine(area: str, cap_hours: float, ndvi_only: bool = False,
     print(f"Earth Engine total for {area}: "
           f"{a['eecu_hours'] + b['eecu_hours']:.4f} EECU-hours", flush=True)
 
-    ndvi = _read(ee, f"{ASSET_FOLDER}/{area}_ndvi")[["lat", "lon", "country", "ndvi"]]
-    surf = _read(ee, f"{ASSET_FOLDER}/{area}_surface")
-    surf = surf[[c for c in ("lat", "lon", "water", "albedo", "ice") if c in surf]]
-    ndvi["k"], surf["k"] = _key(ndvi), _key(surf)
-    df = ndvi.merge(surf.drop(columns=["lat", "lon"]), on="k", how="left")
-    df["mars_possible"] = s.mars_possible(df)
-    GRID_DIR.mkdir(parents=True, exist_ok=True)
-    df.drop(columns="k").to_parquet(GRID_DIR / f"{area}_surface.parquet")
-    return df.drop(columns="k")
+    return _join_and_save(area, _read(ee, f"{ASSET_FOLDER}/{area}_ndvi"),
+                          _read(ee, f"{ASSET_FOLDER}/{area}_surface"))
 
 
 # ============================================================ local terrain
@@ -360,6 +419,7 @@ def main() -> int:
     run.add_argument("--reuse-ndvi", action="store_true",
                      help="skip stage A and use the saved stage A table")
     sub.add_parser("terrain").add_argument("area", choices=list(AREAS))
+    sub.add_parser("fetch").add_argument("area", choices=list(AREAS))
     sub.add_parser("status")
     args = parser.parse_args()
 
@@ -377,6 +437,11 @@ def main() -> int:
               flush=True)
         run_terrain(args.area)
     elif args.cmd == "terrain":
+        run_terrain(args.area)
+    elif args.cmd == "fetch":
+        df = fetch(args.area)
+        print(f"{len(df):,} land tiles, {int(df.mars_possible.sum()):,} "
+              f"Mars-possible", flush=True)
         run_terrain(args.area)
     else:
         print(status().to_string(index=False))
