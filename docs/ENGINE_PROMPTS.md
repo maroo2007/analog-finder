@@ -79,7 +79,7 @@ used differs from the original prompt, which asked for heat and brightness
 as percentiles within each world. That failed: the Nile Delta box rose from
 13% to 29% of Mars matches, because the Mars sites are typical Mars while
 Earth's analogs are extreme Earth. The full story is in `HANDOFF.md`
-section 7.
+section 3.
 
 The method in use, called V1:
 
@@ -173,15 +173,18 @@ validated method.
 
 Status, 12 October 2026: built as src/earth_grid.py, which differs from the
 plan below because the first Africa export burned 14.7 EECU-hours (see
-HANDOFF.md section 7). Earth Engine does only coarse NDVI (MOD13C1) for
+HANDOFF.md section 14). Earth Engine does only coarse NDVI (MOD13C1) for
 every land tile, then water (JRC) and albedo (MCD43C3) for tiles that pass
 NDVI, each export under a cost cap. Terrain is computed on the laptop from
 the Copernicus DEM on AWS, with terrain.earth_patch (average resampling)
-and report_cards, so the grid uses exactly the validated code. Egypt and
-Africa are done; run other areas with:
-    python src/earth_grid.py run <area> --cap <EECU-hours>
-after adding the area to AREAS and estimating its cost from a similar
-country first.
+and report_cards, so the grid uses exactly the validated code. Egypt,
+Africa and (13 November, with an ice filter from MCD12Q1) the Americas south
+of 50 N are done. Run other areas after adding them to AREAS and estimating
+the cost from a similar country first, stage A alone, then stage B:
+    python src/earth_grid.py run <area> --cap <EECU-hours> --ndvi-only
+    python src/earth_grid.py run <area> --cap <EECU-hours> --reuse-ndvi
+and, if reading the finished tables back hangs, without new compute:
+    python src/earth_grid.py fetch <area>
 
 Original plan:
 - Terrain: resample Copernicus DEM (verify the ID, likely

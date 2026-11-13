@@ -55,6 +55,12 @@ import terrain as t
 # and never just to pass a test: they are what we explain to the judges.
 NDVI_MAX = 0.15          # median NDVI below this: little or no vegetation
 WATER_MAX = 0.05         # under 5% of the tile is permanent water
+# Under 50% of the tile is permanent snow and ice (MODIS MCD12Q1, IGBP class
+# 15). NDVI cannot tell ice from bare rock (both are near zero), so without
+# this the Patagonian ice fields would count as Mars-possible. Applied where
+# a grid has an `ice` column (from 13 November 2026, the Americas on); the
+# Africa grid has none and almost no permanent ice.
+ICE_MAX = 0.5
 
 # Three full years of MODIS, fixed so results are repeatable.
 DATE_START = "2023-01-01"
@@ -154,8 +160,12 @@ def earth_layers(lat: float, lon: float, out_px: int = 240
 
 
 def mars_possible(cards: pd.DataFrame) -> pd.Series:
-    """True where an Earth tile is bare and dry enough to stand in for Mars."""
-    return (cards["ndvi"] < NDVI_MAX) & (cards["water"] < WATER_MAX)
+    """True where an Earth tile is bare and dry enough to stand in for Mars,
+    and, where the table has an `ice` column, not mostly permanent ice."""
+    ok = (cards["ndvi"] < NDVI_MAX) & (cards["water"] < WATER_MAX)
+    if "ice" in cards:
+        ok &= cards["ice"].fillna(0) < ICE_MAX
+    return ok
 
 
 def earth_reference() -> pd.DataFrame:

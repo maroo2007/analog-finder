@@ -9,7 +9,9 @@ Three stages, so expensive work only happens where it can matter:
   A. ndvi      Earth Engine, every land tile: lat, lon, country, ndvi, from
                MODIS's coarse 0.05 degree NDVI (MOD13C1). Cheap.
   B. surface   Earth Engine, only tiles with ndvi below NDVI_MAX: permanent
-               water fraction (JRC, 30 m) and albedo (MCD43C3, 0.05 degree).
+               water fraction (JRC, 30 m), albedo (MCD43C3, 0.05 degree) and
+               permanent snow and ice fraction (MCD12Q1, 500 m; areas run
+               from 13 November 2026 on).
                Water is the expensive layer, so it never touches ocean or
                green land.
   C. terrain   This laptop, no Earth Engine quota: mean slope, slope spread
@@ -24,7 +26,15 @@ POLL_SECONDS and cancelled the moment its compute passes the cap. A run that
 exceeded its estimate cost 14.7 EECU-hours on 10 October; see HANDOFF.md.
 
     python src/earth_grid.py run egypt --cap 1      A and B, capped, then C
+    python src/earth_grid.py run americas --cap 0.5 --ndvi-only
+                                                    A only, prints stage B's
+                                                    workload to estimate it
+    python src/earth_grid.py run americas --cap 6 --reuse-ndvi
+                                                    B on the saved A, then C
     python src/earth_grid.py terrain africa         C only (resumable)
+    python src/earth_grid.py fetch americas         read the finished A and B
+                                                    tables in latitude bands
+                                                    (no new compute), then C
     python src/earth_grid.py status                 tasks and compute used
 """
 
@@ -45,6 +55,9 @@ import terrain as t
 ALBEDO = "MODIS/061/MCD43C3"          # 0.05 degree daily albedo
 NDVI = "MODIS/061/MOD13C1"            # 0.05 degree 16-day NDVI
 WATER = "JRC/GSW1_4/GlobalSurfaceWater"
+LAND_COVER = "MODIS/061/MCD12Q1"        # 500 m yearly land cover
+ICE_CLASS = 15                          # IGBP: permanent snow and ice
+ICE_START = "2021-01-01"                # five yearly maps (2021-2025), mode
 COUNTRIES = "USDOS/LSIB_SIMPLE/2017"
 
 FINE_DEG = 1.0 / 240.0                  # 463 m at the equator, as MOLA
@@ -60,6 +73,13 @@ GRID_DIR = config.PROCESSED / "earth_grid"
 AREAS = {
     "egypt": ("country_na", ["Egypt"], [24.5, 21.5, 37.5, 32.0]),
     "africa": ("wld_rgn", ["Africa"], [-26.0, -47.0, 64.0, 38.0]),
+    # Test area for the Americas: coast and sea, the Andes and the Atacama.
+    "chile": ("country_na", ["Chile"], [-76.0, -56.5, -66.0, -17.0]),
+    # The Americas south of 50 N (Death Valley, Utah, Mexico, the Andes,
+    # Atacama, Patagonia). Further north, snow makes median NDVI near zero,
+    # so the filter would let in tundra and ice. Hawaii is outside the box.
+    "americas": ("wld_rgn", ["North America", "Central America", "Caribbean",
+                             "South America"], [-125.0, -56.5, -34.0, 50.0]),
 }
 
 FEATURE_COLUMNS = ["mean_slope", "slope_spread", "relief", "albedo"]
@@ -125,12 +145,19 @@ def surface_table(ee, area):
                           .reproject(_grid(ee, FINE_DEG)))).rename("water")
     albedo = _to_tile(ee, _median(ee, ALBEDO, "Albedo_WSA_shortwave", 0.001)
                       ).rename("albedo")
+    # Permanent snow and ice fraction: the land cover class each 500 m pixel
+    # has most often over the recent years, 1 where it is ice, averaged into
+    # the tile. 500 m to 9 km is about 400 pixels, within one averaging step.
+    lc = (ee.ImageCollection(LAND_COVER).filterDate(ICE_START, s.DATE_END)
+          .select("LC_Type1"))
+    ice = _to_tile(ee, lc.mode().eq(ICE_CLASS)
+                   .setDefaultProjection(lc.first().projection())).rename("ice")
     # tileScale=16 (the maximum) keeps each block of work small enough: the
     # 30 m water layer overflows Earth Engine's 2^31-pixel limit otherwise.
-    return (ee.Image.cat([water, albedo]).toFloat()
+    return (ee.Image.cat([water, albedo, ice]).toFloat()
             .sampleRegions(collection=passed, projection=_grid(ee, TILE_DEG),
                            tileScale=16, geometries=True)
-            .select(["lat", "lon", "water", "albedo"]))
+            .select(["lat", "lon", "water", "albedo", "ice"]))
 
 
 def _ensure_folder(ee):
@@ -203,30 +230,111 @@ def _read(ee, asset_id) -> pd.DataFrame:
     })
 
 
+FETCH_BAND_DEG = 5.0          # one request per 5 degrees of latitude
+FETCH_DEADLINE_MS = 180_000   # give up on a request after 3 minutes
+FETCH_RETRIES = 3
+
+
+def _read_banded(ee, asset_id: str, south: float, north: float) -> pd.DataFrame:
+    """A finished table, read in latitude bands with progress.
+
+    Reading the 396,555-row Americas table in one request hung for over an
+    hour on 13 November with no error. Bands keep each request small, and a
+    deadline turns a hang into a retry. Only reads: no export, no batch task.
+    """
+    ee.data.setDeadline(FETCH_DEADLINE_MS)
+    table = ee.FeatureCollection(asset_id)
+    name = asset_id.split("/")[-1]
+    edges = np.arange(math.floor(south), north, FETCH_BAND_DEG)
+    parts = []
+    for i, lo in enumerate(edges, 1):
+        band = table.filter(ee.Filter.And(ee.Filter.gte("lat", float(lo)),
+                                          ee.Filter.lt("lat", float(lo + FETCH_BAND_DEG))))
+        for attempt in range(1, FETCH_RETRIES + 1):
+            t0 = time.time()
+            try:
+                df = ee.data.computeFeatures({"expression": band,
+                                              "fileFormat": "PANDAS_DATAFRAME"})
+                break
+            except Exception as exc:  # deadline or network error
+                print(f"  {name} {lo:+.0f} to {lo + FETCH_BAND_DEG:+.0f}: try "
+                      f"{attempt} failed after {time.time() - t0:.0f} s: "
+                      f"{str(exc)[:100]}", flush=True)
+                if attempt == FETCH_RETRIES:
+                    raise
+                time.sleep(10 * attempt)
+        parts.append(df)
+        print(f"  {name} {lo:+.0f} to {lo + FETCH_BAND_DEG:+.0f}: {len(df):,} rows "
+              f"({i}/{len(edges)}, {time.time() - t0:.0f} s)", flush=True)
+    parts = [p for p in parts if len(p)]
+    return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame()
+
+
+def _join_and_save(area: str, ndvi: pd.DataFrame, surf: pd.DataFrame) -> pd.DataFrame:
+    """Stage A and stage B tables joined, filter applied, saved locally."""
+    ndvi = ndvi[["lat", "lon", "country", "ndvi"]].copy()
+    surf = surf[[c for c in ("lat", "lon", "water", "albedo", "ice") if c in surf]].copy()
+    ndvi["k"], surf["k"] = _key(ndvi), _key(surf)
+    df = ndvi.merge(surf.drop(columns=["lat", "lon"]), on="k", how="left")
+    df["mars_possible"] = s.mars_possible(df)
+    GRID_DIR.mkdir(parents=True, exist_ok=True)
+    df.drop(columns="k").to_parquet(GRID_DIR / f"{area}_surface.parquet")
+    return df.drop(columns="k")
+
+
+def fetch(area: str) -> pd.DataFrame:
+    """Read an area's finished stage A and B tables (no new compute) and save
+    the joined table, as `run` does after its exports."""
+    ee = config.init_ee()
+    _, _, box = AREAS[area]
+    south, north = max(box[1], -LAT_LIMIT), min(box[3], LAT_LIMIT)
+    ndvi = _read_banded(ee, f"{ASSET_FOLDER}/{area}_ndvi", south, north)
+    surf = _read_banded(ee, f"{ASSET_FOLDER}/{area}_surface", south, north)
+    return _join_and_save(area, ndvi, surf)
+
+
 def _key(df: pd.DataFrame) -> pd.Series:
     """Tile key from its centre, robust to float noise."""
     return (np.floor(df["lat"] / TILE_DEG).astype(int).astype(str) + "_"
             + np.floor(df["lon"] / TILE_DEG).astype(int).astype(str))
 
 
-def run_earth_engine(area: str, cap_hours: float) -> pd.DataFrame:
-    """Stages A and B under one total cap; returns the joined table."""
+def ndvi_counts(ee, area) -> dict:
+    """After stage A: land tiles, tiles that pass NDVI (stage B's workload,
+    which sets its cost), and the passing tiles per country. Small
+    interactive queries on the finished table, not an export."""
+    table = ee.FeatureCollection(f"{ASSET_FOLDER}/{area}_ndvi")
+    passed = table.filter(ee.Filter.lt("ndvi", s.NDVI_MAX))
+    return ee.Dictionary({
+        "land_tiles": table.size(), "pass_ndvi": passed.size(),
+        "pass_by_country": passed.aggregate_histogram("country"),
+    }).getInfo()
+
+
+def run_earth_engine(area: str, cap_hours: float, ndvi_only: bool = False,
+                     reuse_ndvi: bool = False) -> pd.DataFrame | dict:
+    """Stages A and B under one total cap; returns the joined table.
+
+    ndvi_only: run stage A alone and return its counts, so stage B's cost
+    can be estimated from its real workload before it runs.
+    reuse_ndvi: skip stage A and use the stage A table already saved.
+    """
     ee = config.init_ee()
-    a = run_capped(ee, ndvi_table(ee, area), f"{area}_ndvi", cap_hours)
+    if reuse_ndvi:
+        ee.data.getAsset(f"{ASSET_FOLDER}/{area}_ndvi")   # fails if missing
+        a = {"eecu_hours": 0.0}
+        print(f"reusing {area}_ndvi from an earlier stage A", flush=True)
+    else:
+        a = run_capped(ee, ndvi_table(ee, area), f"{area}_ndvi", cap_hours)
+    if ndvi_only:
+        return {"eecu_hours": a["eecu_hours"], **ndvi_counts(ee, area)}
     b = run_capped(ee, surface_table(ee, area), f"{area}_surface",
                    cap_hours - a["eecu_hours"])
     print(f"Earth Engine total for {area}: "
           f"{a['eecu_hours'] + b['eecu_hours']:.4f} EECU-hours", flush=True)
 
-    ndvi = _read(ee, f"{ASSET_FOLDER}/{area}_ndvi")[["lat", "lon", "country", "ndvi"]]
-    surf = _read(ee, f"{ASSET_FOLDER}/{area}_surface")[["lat", "lon", "water", "albedo"]]
-    ndvi["k"], surf["k"] = _key(ndvi), _key(surf)
-    df = ndvi.merge(surf.drop(columns=["lat", "lon"]), on="k", how="left")
-    df["mars_possible"] = ((df["ndvi"] < s.NDVI_MAX)
-                           & (df["water"] < s.WATER_MAX))
-    GRID_DIR.mkdir(parents=True, exist_ok=True)
-    df.drop(columns="k").to_parquet(GRID_DIR / f"{area}_surface.parquet")
-    return df.drop(columns="k")
+    return _join_and_save(area, _read(ee, f"{ASSET_FOLDER}/{area}_ndvi"),
+                          _read(ee, f"{ASSET_FOLDER}/{area}_surface"))
 
 
 # ============================================================ local terrain
@@ -305,16 +413,35 @@ def main() -> int:
     run.add_argument("area", choices=list(AREAS))
     run.add_argument("--cap", type=float, required=True,
                      help="EECU-hours; Earth Engine tasks are cancelled above it")
+    run.add_argument("--ndvi-only", action="store_true",
+                     help="stage A only, then print the counts stage B's "
+                          "cost depends on")
+    run.add_argument("--reuse-ndvi", action="store_true",
+                     help="skip stage A and use the saved stage A table")
     sub.add_parser("terrain").add_argument("area", choices=list(AREAS))
+    sub.add_parser("fetch").add_argument("area", choices=list(AREAS))
     sub.add_parser("status")
     args = parser.parse_args()
 
-    if args.cmd == "run":
-        df = run_earth_engine(args.area, args.cap)
+    if args.cmd == "run" and args.ndvi_only:
+        c = run_earth_engine(args.area, args.cap, ndvi_only=True,
+                             reuse_ndvi=args.reuse_ndvi)
+        print(f"stage A: {c['eecu_hours']:.4f} EECU-hours, {c['land_tiles']:,} "
+              f"land tiles, {c['pass_ndvi']:,} pass NDVI "
+              f"({c['pass_ndvi'] / max(c['land_tiles'], 1):.0%})")
+        for name, n in sorted(c["pass_by_country"].items(), key=lambda x: -x[1]):
+            print(f"  {name:32s} {n:7,}")
+    elif args.cmd == "run":
+        df = run_earth_engine(args.area, args.cap, reuse_ndvi=args.reuse_ndvi)
         print(f"{len(df)} land tiles, {int(df.mars_possible.sum())} Mars-possible",
               flush=True)
         run_terrain(args.area)
     elif args.cmd == "terrain":
+        run_terrain(args.area)
+    elif args.cmd == "fetch":
+        df = fetch(args.area)
+        print(f"{len(df):,} land tiles, {int(df.mars_possible.sum()):,} "
+              f"Mars-possible", flush=True)
         run_terrain(args.area)
     else:
         print(status().to_string(index=False))

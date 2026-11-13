@@ -117,6 +117,16 @@ def test_published_twins_are_25_km_apart(tid):
     ranks = [r["rank"] for r in rows]
     assert ranks[0] == 1 and ranks == sorted(ranks) and len(set(ranks)) == len(ranks)
     assert len({r["of"] for r in rows}) == 1 and rows[0]["of"] > 100_000
+    # rank_continent: the same order counted within the tile's continent, so
+    # it is never worse than the overall rank and rises in order per continent
+    for cont in {r["continent"] for r in rows}:
+        mine = [r for r in rows if r["continent"] == cont]
+        rc = [r["rank_continent"] for r in mine]
+        assert rc == sorted(rc) and len(set(rc)) == len(rc)
+        assert all(r["rank_continent"] <= r["rank"] for r in mine)
+        assert all(r["of_continent"] <= r["of"] for r in mine)
+    best = rows[0]
+    assert best["rank_continent"] == 1
 
 
 # ------------------------------------------------------------- the targets
@@ -152,10 +162,18 @@ def test_gale_and_jezero_centres():
     assert by_id["jezero"]["lon"] == pytest.approx(77.5, abs=1.0)
 
 
-def test_jezero_best_twin_is_in_egypts_eastern_desert():
-    best = _json(WEB / "matches" / "jezero.json")[0]
-    assert best["country"] == "Egypt"
+def test_jezero_best_twin_in_africa_is_in_egypts_eastern_desert():
+    """The headline: Africa's closest tile to Jezero is in Egypt's Eastern
+    Desert. Counted within Africa, so it holds as continents are added."""
+    best = next(e for e in _json(WEB / "egypt.json") if e["target"] == "jezero")
+    assert best["rank_continent"] == 1     # Egypt's best is Africa's best
     assert m.haversine_km(best["lat"], best["lon"], 25.13, 34.54) < 15
+
+
+def test_egypt_rows_rank_within_africa():
+    for e in _json(WEB / "egypt.json"):
+        assert 1 <= e["rank_continent"] <= e["rank"] <= e["of"]
+        assert e["of_continent"] <= e["of"]
 
 
 # ------------------------------------------------------------------ the Moon
@@ -211,3 +229,22 @@ def test_moon_targets_in_web_data_are_terrain_only():
         rows = _json(WEB / "matches" / f"{x['id']}.json")
         assert all(set(r["closeness"]) == set(t.FEATURES) for r in rows)
         assert (WEB / "shade" / "moon" / f"{x['id']}.png").exists()
+
+
+# ------------------------------------------------------------ shaded relief
+
+def test_every_twin_has_its_shaded_relief():
+    """render_shades.py --twins: one WebP per twin (numbered by its place in
+    matches/<id>.json), per Egypt row and per target. A rebuild of the web
+    data that is not followed by a render fails here."""
+    egypt = {e["target"] for e in _json(WEB / "egypt.json")}
+    shade = WEB / "shade"
+    for x in _targets():
+        tid = x["id"]
+        rows = _json(WEB / "matches" / f"{tid}.json")
+        names = [f"{tid}_{n}.webp" for n in range(1, len(rows) + 1)]
+        names += [f"{tid}_egypt.webp"] if tid in egypt else []
+        missing = [n for n in names if not (shade / "earth" / n).exists()]
+        assert not missing, missing
+        assert (shade / x["world"] / f"{tid}.webp").exists(), tid
+    assert not list(shade.rglob("*.part"))              # no half-written file
