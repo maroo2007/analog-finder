@@ -2,23 +2,30 @@
 
     streamlit run src/chat_app.py
 
-The Gemini API key is read from the GEMINI_API_KEY environment variable, or
-from .streamlit/secrets.toml (gitignored) as GEMINI_API_KEY = "...", which is
-also where Streamlit Community Cloud and Hugging Face Spaces store secrets.
-It is never shown on the page.
+One key for everyone. The team's Gemini API key is read from the
+GEMINI_API_KEY environment variable, or from Streamlit secrets
+(.streamlit/secrets.toml locally, gitignored; the Secrets box on Streamlit
+Community Cloud or Hugging Face Spaces when hosted). It stays on the server:
+visitors never see it and need no key of their own.
+
+Sharing the free tier. Every visitor uses the same free Gemini quota. There
+is deliberately no per-visitor limit (the team decided on 13 November to
+watch usage instead). When Google's own free limit is reached, visitors are
+told to try again in a minute instead of seeing the raw error.
 """
 
 from __future__ import annotations
 
 import os
 import sys
+import traceback
 from pathlib import Path
 
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import chat_data  # noqa: E402
-from chatbot import Bot  # noqa: E402
+from chatbot import Bot, Busy  # noqa: E402
 
 EXAMPLES = [
     "Where on Earth is the best twin of Jezero, and why?",
@@ -27,6 +34,8 @@ EXAMPLES = [
     "How do you know the method works?",
     "What is Jezero crater, and why does NASA care about it?",
 ]
+BUSY_TEXT = ("The chatbot runs on Gemini's free tier and has reached its "
+             "limit for the moment. Please try again in a minute.")
 
 st.set_page_config(page_title="Planetary Twin Finder chat", page_icon="🪐")
 
@@ -48,14 +57,15 @@ st.caption("Ask about NASA's Mars and Moon sites and their twins on Earth. "
 
 key = api_key()
 if not key:
-    st.error("No Gemini API key. Set the GEMINI_API_KEY environment variable, "
-             "or put GEMINI_API_KEY in .streamlit/secrets.toml (gitignored), "
-             "then reload.")
+    st.error("The chatbot is not set up: no Gemini API key on the server. "
+             "Set GEMINI_API_KEY as an environment variable or a Streamlit "
+             "secret, then reload.")
     st.stop()
 
-if "bot" not in st.session_state:
-    st.session_state.bot = Bot(api_key=key)
-    st.session_state.messages = []
+state = st.session_state
+if "bot" not in state:
+    state.bot = Bot(api_key=key)
+    state.messages = []
 
 with st.sidebar:
     cov = chat_data.coverage()
@@ -68,27 +78,32 @@ with st.sidebar:
     st.markdown("**Try asking**")
     for example in EXAMPLES:
         if st.button(example, use_container_width=True):
-            st.session_state.pending = example
+            state.pending = example
     if st.button("New conversation"):
-        st.session_state.clear()
+        for k in ("bot", "messages", "pending"):
+            state.pop(k, None)
         st.rerun()
-    if st.session_state.bot.model:
-        st.caption(f"Model: {st.session_state.bot.model}")
+    if state.bot.model:
+        st.caption(f"Model: {state.bot.model}")
 
-for msg in st.session_state.messages:
+for msg in state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["text"])
 
-question = st.chat_input("Ask a question") or st.session_state.pop("pending", None)
+question = st.chat_input("Ask a question") or state.pop("pending", None)
 if question:
-    st.session_state.messages.append({"role": "user", "text": question})
+    state.messages.append({"role": "user", "text": question})
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant"):
         with st.spinner("Looking it up..."):
             try:
-                answer = st.session_state.bot.ask(question)
-            except Exception as exc:  # show it, keep the page alive
-                answer = f"Sorry, the chatbot failed: {exc}"
+                answer = state.bot.ask(question)
+            except Busy:
+                answer = BUSY_TEXT
+            except Exception:             # never show internals to visitors
+                traceback.print_exc()     # the team sees it in the server log
+                answer = ("Sorry, something went wrong answering that. "
+                          "Please try again.")
         st.markdown(answer)
-    st.session_state.messages.append({"role": "assistant", "text": answer})
+    state.messages.append({"role": "assistant", "text": answer})

@@ -267,7 +267,12 @@ grid (Prompt 3) covers Egypt and Africa.
   often overloaded (503), hence the model fallback list; thinking "low"
   took replies from ~50 s to ~4 s. Tests: `tests/test_chat_data.py`
   (offline). `environment-lock.yml` does not have `google-genai` and
-  `streamlit` yet; regenerate it on a Windows laptop.
+  `streamlit` yet; regenerate it on a Windows laptop. For the website, one
+  team key (free tier) serves every visitor from the host's secrets;
+  visitors need no key. **No per-visitor question limit, by team decision**
+  (2026-11-13: "we'll be careful"); don't add one without asking. When the
+  free quota runs out, visitors see "try again in a minute"
+  (`chatbot.Busy`).
 - **Next:** Prompt 4 in `docs/ENGINE_PROMPTS.md` (discoveries list and
   interface data), more continents for the grid (each estimated from a test
   country and run under a cost cap), and the known-analog validation.

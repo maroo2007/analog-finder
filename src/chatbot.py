@@ -89,6 +89,12 @@ def system_prompt() -> str:
     ])
 
 
+class Busy(RuntimeError):
+    """Every model refused for a reason that passes with time: overloaded,
+    or the free tier's per-minute or per-day limit reached. Shown to
+    visitors as "try again later", not as an error."""
+
+
 def _worth_retrying(exc: Exception) -> bool:
     """True for errors another model may not have: busy, rate limited,
     retired, or too slow (a timeout raises httpx's ReadTimeout, which has
@@ -145,7 +151,8 @@ class Bot:
             self._history = chat.get_history()
             self.model = model
             return reply.text or "(no answer)"
-        raise RuntimeError(f"Every model failed; the last error was: {last}")
+        raise Busy(f"Every model is busy or at its free limit; the last "
+                   f"error was: {last}")
 
 
 def main() -> int:
