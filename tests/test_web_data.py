@@ -229,3 +229,22 @@ def test_moon_targets_in_web_data_are_terrain_only():
         rows = _json(WEB / "matches" / f"{x['id']}.json")
         assert all(set(r["closeness"]) == set(t.FEATURES) for r in rows)
         assert (WEB / "shade" / "moon" / f"{x['id']}.png").exists()
+
+
+# ------------------------------------------------------------ shaded relief
+
+def test_every_twin_has_its_shaded_relief():
+    """render_shades.py --twins: one WebP per twin (numbered by its place in
+    matches/<id>.json), per Egypt row and per target. A rebuild of the web
+    data that is not followed by a render fails here."""
+    egypt = {e["target"] for e in _json(WEB / "egypt.json")}
+    shade = WEB / "shade"
+    for x in _targets():
+        tid = x["id"]
+        rows = _json(WEB / "matches" / f"{tid}.json")
+        names = [f"{tid}_{n}.webp" for n in range(1, len(rows) + 1)]
+        names += [f"{tid}_egypt.webp"] if tid in egypt else []
+        missing = [n for n in names if not (shade / "earth" / n).exists()]
+        assert not missing, missing
+        assert (shade / x["world"] / f"{tid}.webp").exists(), tid
+    assert not list(shade.rglob("*.part"))              # no half-written file
