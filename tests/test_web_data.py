@@ -22,9 +22,13 @@ sys.path.insert(0, str(ROOT / "src"))
 
 import build_web_data as w  # noqa: E402
 import match_grid as m  # noqa: E402
+import run_moon_targets as rm  # noqa: E402
+import terrain as t  # noqa: E402
 
 WEB = ROOT / "web" / "public" / "data"
 MARS_EZ = ROOT / "src" / "targets" / "mars_human_ez.json"
+MOON = ROOT / "src" / "targets" / "moon_artemis.json"
+MOON_KM_PER_DEG = math.pi * t.MOON_RADIUS_M / 180 / 1000
 
 
 def _json(path: Path):
@@ -108,6 +112,11 @@ def test_published_twins_are_25_km_apart(tid):
     scores = [r["score"] for r in rows]
     assert scores == sorted(scores, reverse=True)
     assert all(0 <= s <= 100 for s in scores)
+    # rank is the position among all `of` ranked tiles: the best twin is the
+    # closest tile of all, and later twins rank lower but never out of order
+    ranks = [r["rank"] for r in rows]
+    assert ranks[0] == 1 and ranks == sorted(ranks) and len(set(ranks)) == len(ranks)
+    assert len({r["of"] for r in rows}) == 1 and rows[0]["of"] > 100_000
 
 
 # ------------------------------------------------------------- the targets
@@ -147,3 +156,58 @@ def test_jezero_best_twin_is_in_egypts_eastern_desert():
     best = _json(WEB / "matches" / "jezero.json")[0]
     assert best["country"] == "Egypt"
     assert m.haversine_km(best["lat"], best["lon"], 25.13, 34.54) < 15
+
+
+# ------------------------------------------------------------------ the Moon
+
+def test_moon_file_is_labelled_with_sources():
+    doc = _json(MOON)
+    assert "Artemis III" in doc["title"] and "Artemis IV" in doc["caveat"]
+    assert all(str(v).count("https://") >= 1 for v in doc["sources"].values())
+    assert len(doc["regions"]) == 9
+    assert len({r["id"] for r in doc["regions"]}) == 9
+
+
+@pytest.mark.parametrize("region", _json(MOON)["regions"], ids=lambda r: r["id"])
+def test_moon_region_agrees_with_nasa_table(region):
+    """Centre within 5 km of the latitude in NASA's LEMS-A3 table (we agreed
+    to flag anything further), area within 1%, centre inside its outline."""
+    from shapely.geometry import Point, Polygon
+    assert region["lat"] < t.MOON_SOUTH_LIMIT
+    dlat_km = abs(region["lat"] - region["nasa_centre_lat"]) * MOON_KM_PER_DEG
+    assert dlat_km < 5, f"{dlat_km:.1f} km from NASA's centre latitude"
+    assert region["area_km2"] == pytest.approx(region["nasa_area_km2"], rel=0.01)
+    poly = Polygon([t.moon_xy(lat, lon) for lon, lat in region["outline"]])
+    assert poly.contains(Point(t.moon_xy(region["lat"], region["lon"])))
+
+
+def test_moon_xy_matches_proj():
+    """The hand-written projection must equal the DEM's own (PROJ)."""
+    from pyproj import Transformer
+    proj = Transformer.from_crs(
+        f"+proj=longlat +R={t.MOON_RADIUS_M} +no_defs",
+        f"+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R={t.MOON_RADIUS_M} +units=m",
+        always_xy=True)
+    for lat, lon in [(-89.67, 129.78), (-83.6, -68.7), (-88.2, -64.6), (-80, 180)]:
+        assert t.moon_xy(lat, lon) == pytest.approx(proj.transform(lon, lat), abs=0.01)
+
+
+def test_moon_boxes_follow_the_rule_and_avoid_the_pole():
+    """Extent + 15 km a side, at least 120 px, whole tiles, never the pole."""
+    boxes = {r["id"]: rm.box_px(r) for r in rm.load_regions()}
+    assert all(px >= rm.MIN_BOX_PX and px % t.TILE_PX == 0 for px in boxes.values())
+    assert boxes["mons_mouton_plateau"] == 240      # 67 km region
+    assert boxes["haworth"] == 140                  # 30 km region
+    for r in rm.load_regions():
+        assert not rm.box_reaches_pole(r, boxes[r["id"]]), r["id"]
+
+
+def test_moon_targets_in_web_data_are_terrain_only():
+    moon = [x for x in _targets() if x["world"] == "moon"]
+    assert len(moon) == 9
+    for x in moon:
+        assert x["matched_on"] == t.FEATURES
+        assert "albedo" in x["note"]
+        rows = _json(WEB / "matches" / f"{x['id']}.json")
+        assert all(set(r["closeness"]) == set(t.FEATURES) for r in rows)
+        assert (WEB / "shade" / "moon" / f"{x['id']}.png").exists()

@@ -1,7 +1,8 @@
 """Phase 1: compare the shape of the ground on Mars with the shape of the ground on Earth.
 
-Nothing here needs an account or an API key. Both data sources are open:
+Nothing here needs an account or an API key. All data sources are open:
   Mars  - MOLA global elevation, 463 m per pixel, USGS Astropedia (public domain)
+  Moon  - LOLA south pole elevation, 80 m per pixel, NASA PGDA (80 S to the pole)
   Earth - Copernicus DEM 30 m, 1 degree tiles, AWS Open Data
 
 Both are read straight from the internet with GDAL's /vsicurl, so only the small
@@ -50,6 +51,61 @@ def mars_patch(lat: float, lon: float, size_px: int = 400) -> np.ndarray:
         half = size_px // 2
         window = Window(col - half, row - half, size_px, size_px)
         return src.read(1, window=window).astype("float32")
+
+
+# ---------------------------------------------------------------- Moon
+
+# LOLA south pole DEM from NASA PGDA (Barker et al. 2023, PSJ 4, 183;
+# doi:10.60903/gsfcpgda-lola-spole): 80 S to the pole, 80 m pixels, polar
+# stereographic on a 1,737,400 m sphere with true scale at the pole. A
+# cloud-optimized GeoTIFF, so only the window we ask for is downloaded.
+# Every Artemis region is south of 80 S, where an equirectangular map is
+# badly stretched, which is why this map is used instead of the global LDEM.
+MOON_SOUTH_DEM = ("/vsicurl/https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/"
+                  "LDEM_80S_80MPP_ADJ.TIF")
+MOON_RADIUS_M = 1737400.0
+MOON_PIXEL_M = 463.0          # the same ground pixel as Mars and Earth
+MOON_SOUTH_LIMIT = -80.0
+
+
+def moon_xy(lat: float, lon: float) -> tuple[float, float]:
+    """Latitude and longitude to the DEM's south polar stereographic metres.
+
+    rho is the distance from the pole on the map. x points to longitude 90 E
+    and y to longitude 0, the convention of the PGDA south pole products.
+    """
+    rho = 2 * MOON_RADIUS_M * math.tan(math.pi / 4 + math.radians(lat) / 2)
+    return rho * math.sin(math.radians(lon)), rho * math.cos(math.radians(lon))
+
+
+def moon_scale(lat: float) -> float:
+    """How much the map stretches distances at a latitude (1 at the pole).
+    At 84 S a map metre is 0.3% shorter on the ground than it looks."""
+    return 2 / (1 + math.sin(math.radians(-lat)))
+
+
+def moon_patch(lat: float, lon: float, size_px: int = 120) -> np.ndarray:
+    """Cut a square of lunar ground near the south pole, 463 m per pixel.
+
+    The DEM's 80 m pixels are averaged to 463 m (Resampling.average), as
+    MOLA's pixels are averages and Earth is averaged the same way, so a tile
+    is the same 20 x 20 pixels, about 9.3 km, on all three worlds. The pixel
+    size on the map is stretched by moon_scale so it is 463 m on the ground.
+    The square is aligned with the map, not with north; slope, roughness and
+    relief do not depend on direction.
+    """
+    if lat > MOON_SOUTH_LIMIT:
+        raise ValueError(f"latitude {lat} is north of the south pole DEM "
+                         f"({MOON_SOUTH_LIMIT})")
+    x, y = moon_xy(lat, lon)
+    half = size_px * MOON_PIXEL_M * moon_scale(lat) / 2
+    # PGDA sometimes answers a block request with 0 bytes; retrying fixes it.
+    with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR",
+                      GDAL_HTTP_MAX_RETRY=3, GDAL_HTTP_RETRY_DELAY=2):
+        with rasterio.open(MOON_SOUTH_DEM) as src:
+            window = src.window(x - half, y - half, x + half, y + half)
+            return src.read(1, window=window, out_shape=(size_px, size_px),
+                            resampling=Resampling.average).astype("float32")
 
 
 # ---------------------------------------------------------------- Earth

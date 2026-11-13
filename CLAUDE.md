@@ -101,6 +101,14 @@ couple of minutes to propagate.
   `pip install earthengine-api`. Plain `--upgrade` does not work, because the
   system package has no RECORD file for pip to uninstall from. This recurs in
   every new container.
+- **`MKL_THREADING_LAYER=SEQUENTIAL` on Windows.** Without it, conda-forge's
+  MKL kills Python with exit code -1066598273 (0xC06D007F, a failed delayed
+  DLL load) and no Python error at all. It hit `terrain.moon_patch` on
+  2026-11-13 and the `video` environment before. `environment.yml` sets it
+  on `conda activate analog`; when calling `python.exe` directly without
+  activating, set `$env:MKL_THREADING_LAYER = "SEQUENTIAL"` first. For an
+  existing environment: `conda env config vars set -n analog
+  MKL_THREADING_LAYER=SEQUENTIAL`.
 - **Smart App Control (Windows 11) must be off.** When it is on, it blocks
   unsigned compiled Python files at random, for example
   `ImportError: DLL load failed ... An Application Control policy has blocked
@@ -177,8 +185,28 @@ Set up on 2026-09-23. It does **not** share Marwan's quirks: there is no stray
 
 *Update this section whenever the status changes.*
 
-As of 2026-10-12, Phase 1 has passed, Prompt 1 of Phase 2 is done, and the
-global Earth grid (Prompt 3) is being built continent by continent.
+As of 2026-11-13 (hackathon 14 to 15 November), Phase 1 has passed, Prompts
+1 and 2 are done (Prompt 2 on branch `feature/targets`), and the global Earth
+grid (Prompt 3) covers Egypt and Africa.
+
+- **Targets are NASA's own sites** (Prompt 2, 2026-11-13). Mars: the 38
+  candidate human Exploration Zones (`src/targets/mars_human_ez.json`).
+  Moon: the nine Artemis III candidate regions of October 2024
+  (`src/targets/moon_artemis.json`, outlines from USGS DOI 10.5066/P1MEQ6UK,
+  checked against NASA's own table). Artemis III is now an Earth-orbit test
+  flight and the first landing is Artemis IV; the file says so.
+- **The Moon is matched on terrain only**, from the LOLA south pole DEM on
+  NASA PGDA (`terrain.moon_patch`, averaged to 463 m like Mars and Earth),
+  with its own scaler. Moon scores are low (best 15) because the pole is far
+  rougher than dry African land, and are not comparable with Mars scores;
+  every match also stores its rank (`rank` of `of`, e.g. 1 of 130,060), which
+  the website should show. Code: `src/run_moon_targets.py`,
+  `src/build_web_data.py`.
+- **Website data** is committed in `web/public/data/` (about 6 MB): targets,
+  top 25 twins per target at least 25 km apart (true distance,
+  `match_grid.top_spread`), the best Egyptian tile per target, shaded relief
+  pairs. Rebuild with `python src/build_web_data.py`, then
+  `python src/render_shades.py`.
 
 - **Matching method is V1** (decided 2026-10-10): terrain + the Mars-possible
   filter (NDVI below 0.15, under 5% permanent water) + absolute albedo. Heat is
@@ -220,5 +248,6 @@ global Earth grid (Prompt 3) is being built continent by continent.
 - **Earth Engine works on Marwan's laptop** (`earthengine authenticate` done
   and `src/check_ee.py` passing, 2026-10-10). The second laptop still needs
   it. Inviting the remaining teammates is not done.
-- **Next:** Prompts 2 and 3 in `docs/ENGINE_PROMPTS.md` (real target sites
-  and the Moon; the global Earth grid, which also picks the Egypt site).
+- **Next:** Prompt 4 in `docs/ENGINE_PROMPTS.md` (discoveries list and
+  interface data), more continents for the grid (each estimated from a test
+  country and run under a cost cap), and the known-analog validation.

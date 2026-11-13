@@ -1,6 +1,7 @@
 """Render the hillshade pairs the interface's twin view swipes between.
 
-Each Mars zone and each of its Earth twins is drawn the same way: elevation
+Each Mars zone or Moon region, and each of its Earth twins, is drawn the
+same way: elevation
 at 463 m per pixel (the resolution the matching uses), a 65 km square, the
 same sun (azimuth 315, elevation 45) and no vertical exaggeration. So any
 difference you see is in the ground, not in how it was drawn.
@@ -73,15 +74,22 @@ def earth_window(lat: float, lon: float) -> tuple[np.ndarray, float, float]:
 
 
 def main() -> int:
+    """python src/render_shades.py [--world mars|moon]   (default: both)"""
     data = config.ROOT / "web" / "public" / "data"
-    targets = json.loads((data / "targets.json").read_text())["targets"]
-    egypt = {e["target"]: e for e in json.loads((data / "egypt.json").read_text())}
-    mars_tint, earth_tint = (255, 214, 180), (205, 225, 230)
+    targets = json.loads((data / "targets.json").read_text(encoding="utf-8"))["targets"]
+    if "--world" in sys.argv:
+        world = sys.argv[sys.argv.index("--world") + 1]
+        targets = [x for x in targets if x["world"] == world]
+    egypt = {e["target"]: e for e in
+             json.loads((data / "egypt.json").read_text(encoding="utf-8"))}
+    tints = {"mars": (255, 214, 180), "moon": (225, 225, 225)}
+    earth_tint = (205, 225, 230)
     for tgt in targets:
-        tid = tgt["id"]
-        z = t.mars_patch(tgt["lat"], tgt["lon"], SIZE_PX)
-        to_png(hillshade(z, t.MARS_PIXEL_M, t.MARS_PIXEL_M), mars_tint,
-               OUT / "mars" / f"{tid}.png")
+        tid, world = tgt["id"], tgt["world"]
+        patch = t.moon_patch if world == "moon" else t.mars_patch
+        z = patch(tgt["lat"], tgt["lon"], SIZE_PX)
+        to_png(hillshade(z, t.MARS_PIXEL_M, t.MARS_PIXEL_M), tints[world],
+               OUT / world / f"{tid}.png")
         top = json.loads((data / "matches" / f"{tid}.json").read_text())[0]
         for kind, pt in (("top", top), ("egypt", egypt.get(tid))):
             if pt is None:

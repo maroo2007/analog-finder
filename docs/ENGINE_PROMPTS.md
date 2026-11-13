@@ -10,7 +10,7 @@ Order:
 |---|---|---|---|
 | 0 | Save Phase 1, set up the test suite | nothing | done 10 Oct |
 | 1 | Heat, brightness, and the "could this be Mars" filter | 0 | done 10 Oct |
-| 2 | Real target sites: NASA's Mars landing zones and Artemis Moon regions | 0 | Mars/Moon person |
+| 2 | Real target sites: NASA's Mars landing zones and Artemis Moon regions | 0 | done 13 Nov (`docs/PROMPT_targets_moon.md`) |
 | 3 | Score the whole Earth | 1 | Earth person |
 | 4 | Discoveries list and the data the interface reads | 2 and 3 | either |
 | 5 | Image AI (optional) | 0 | anyone with spare time |
