@@ -1,0 +1,11 @@
+# Netlify: the site lives in web/. Secrets (GEMINI_API_KEY) are set in the
+# Netlify UI, never here: variables declared in this file are not available
+# to functions anyway, and this file is committed.
+[build]
+  base = "web"
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
