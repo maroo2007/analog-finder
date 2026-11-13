@@ -400,8 +400,60 @@ Phase 1 is the gate. Everything else waits on it.
      Mars-possible tile has terrain: 1,155 1 degree squares computed locally
      in about 22 minutes, none failed.
    - **Next:** the other continents, each estimated from a test country and
-     run under a cap; then rank against NASA's target zones once Prompt 2
-     exists, and run the known-analog validation.
+     run under a cap, and the known-analog validation. NASA's target zones
+     are now in place (Prompt 2, below).
+
+   **NASA's own target sites (Prompt 2, done 13 November 2026, branch
+   `feature/targets`).**
+
+   - **Mars:** NASA's 38 candidate human Exploration Zones, from the
+     georeferencing of the USGS CTX_EZs mosaics (`src/targets/
+     mars_human_ez.json`, built in a cloud session and reproduced here
+     exactly). Every zone is matched against the Mars-possible Africa grid
+     with V1 (`src/build_web_data.py`). Jezero's best twin is in Egypt's
+     Eastern Desert, 25.125 N, 34.54 E, the dark ground the albedo finding
+     predicted.
+   - **Moon:** the nine Artemis III candidate regions of October 2024, still
+     NASA's latest list (Peak near Cabeus B, Haworth, Malapert Massif, Mons
+     Mouton Plateau, Mons Mouton, Nobile Rim 1 and 2, de Gerlache Rim 2,
+     Slater Plain). NASA publishes no coordinates in its releases; outlines
+     come from the USGS data release DOI 10.5066/P1MEQ6UK (from LROC
+     QuickMap). Checked against the centre latitudes and areas in a NASA
+     LEMS-A3 presentation (NTRS 20250007692): every centre within 5 km,
+     every area within 0.1%. A third check against the 2022 region DEMs on
+     Zenodo could not run (HTTP 429). Caveat: Artemis III is now an
+     Earth-orbit test flight; the first crewed landing is Artemis IV (2028),
+     whose site NASA has not chosen.
+   - **Moon DEM:** LOLA south pole, 80 m, polar stereographic, from NASA PGDA
+     (Barker et al. 2023), averaged to 463 m (`terrain.moon_patch`). Known
+     answer: Shackleton crater comes out 4.06 km deep from its median rim
+     crest (published 4.2 km), rim radius 10.5 km. The highest single rim
+     point gives 4.55 km; published depths use the average rim, so the test
+     does too.
+   - **Moon boxes:** each region's extent plus 15 km a side, at least 120
+     pixels, whole tiles: 36 tiles for most regions, 49 for Haworth, 144 for
+     Mons Mouton Plateau (67 km across). No box reaches the pole. Ten nearest
+     tiles are kept, as on Mars, which is a larger share of a Moon box.
+   - **Moon result, honestly:** terrain only, own scaler. Best scores are 1
+     to 15 against 54 to 97 for Mars: the south pole is far rougher than
+     almost any dry African land, and only volcanic mountains come close
+     (Tibesti in Chad, Afar in Djibouti, the Atlas in Morocco). Ranking still
+     works, so every match also stores `rank` of `of` (Malapert's best twin
+     is 1 of 130,060; its best Egyptian tile is 30 of 130,060).
+   - **Twin spacing** is now a true distance of at least 25 km
+     (`match_grid.top_spread`, shared by both tools). The old 0.25 degree box
+     let twins sit 24 km apart in 9 zones.
+   - **Windows crash:** `MKL_THREADING_LAYER=SEQUENTIAL` is needed in
+     `analog` too (see CLAUDE.md, Known issues).
+
+   **Moon features, later upgrades.** The Moon is matched on terrain only
+   (slope, roughness, relief) because there is no Moon albedo feature yet.
+   Two upgrades, both open NASA data: Diviner thermal (LRO's radiometer:
+   rock abundance and night-time temperature, the Moon's version of the
+   THEMIS heat layer) and LOLA albedo (LOLA's 1064 nm normal albedo, which
+   exists for the polar regions). Either would need the same caution as Mars
+   heat: check it measures the same thing on both worlds before matching on
+   it.
 3. **Visual engine.** Image tiles, DINOv2 on Colab, compare with the physical
    engine.
 4. **Application.** Clickable globe, Earth heatmap, passport cards, reverse

@@ -25,6 +25,8 @@ import terrain as t  # noqa: E402
 # Olympus Mons caldera, and the middle of Jezero crater's floor.
 OLYMPUS_MONS = (18.65, -133.8)
 JEZERO_FLOOR = (18.38, 77.58)
+# Shackleton crater, IAU centre, next to the lunar south pole.
+SHACKLETON = (-89.67, 129.78)
 
 
 @pytest.mark.network
@@ -43,6 +45,32 @@ def test_jezero_crater_floor_is_deep():
     patch = t.mars_patch(*JEZERO_FLOOR, size_px=30)
     floor = float(np.nanmedian(patch))
     assert floor < -2_000, f"floor {floor:.0f} m"
+
+
+@pytest.mark.network
+def test_shackleton_crater_depth_and_size():
+    """Known answer for the Moon DEM and moon_patch: Shackleton crater, at
+    the south pole, is about 21 km across and 4.2 km deep (Zuber et al. 2012,
+    rim crest to floor). The depth is measured from the median rim crest (the
+    highest point in each of 36 compass sectors of the rim), not from the
+    single highest rim point, which is always above the average crest."""
+    z = t.moon_patch(*SHACKLETON, size_px=60)
+    assert not np.isnan(z).any()
+    r0, c0 = np.unravel_index(np.argmin(z), z.shape)
+    yy, xx = np.mgrid[:60, :60]
+    dist_km = np.hypot(yy - r0, xx - c0) * t.MOON_PIXEL_M / 1000
+    assert np.hypot(r0 - 29.5, c0 - 29.5) * t.MOON_PIXEL_M / 1000 < 3, \
+        "the lowest point should be near the crater centre"
+    ang = np.degrees(np.arctan2(yy - r0, xx - c0)) % 360
+    ring = (dist_km > 7) & (dist_km < 14)
+    crest, radius = [], []
+    for a in range(0, 360, 10):
+        sector = ring & (ang >= a) & (ang < a + 10)
+        crest.append(z[sector].max())
+        radius.append(dist_km[sector][np.argmax(z[sector])])
+    depth_km = (np.median(crest) - z.min()) / 1000
+    assert 3.5 <= depth_km <= 4.5, f"depth {depth_km:.2f} km"
+    assert 9.5 <= np.median(radius) <= 11.5, f"rim radius {np.median(radius):.1f} km"
 
 
 @pytest.fixture(scope="module")

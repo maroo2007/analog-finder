@@ -1,0 +1,362 @@
+{
+ "title": "Artemis III candidate landing regions (October 2024), NASA's latest official list",
+ "caveat": "NASA chose these nine regions for Artemis III. Artemis III is now planned as a crewed test flight in Earth orbit (mid-2027), and the first crewed landing moved to Artemis IV (2028). NASA says the nine regions do not decide where Artemis IV and later missions land; those may open up more of the south polar region. No Artemis IV site had been chosen as of November 2026.",
+ "format": "Each region has the keys of mars_human_ez.json (id, name, lat, lon, bbox as [west, south, east, north] in degrees, longitude east positive) plus its outline (lon, lat corners), area, and NASA's published centre latitude and area used as checks. The centre is the centroid of the outline in south polar stereographic projection on a 1,737,400 m sphere.",
+ "sources": {
+  "regions": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/",
+  "regions_2026_confirmation": "https://ntrs.nasa.gov/citations/20250011660",
+  "outlines": "McClernan, M. T. (2024), Down Selected Artemis III Candidate Landing Site Navigational Grids, USGS data release, https://doi.org/10.5066/P1MEQ6UK, file A3_9regions-lonlat-simplified.zip (regions sourced from LROC QuickMap, https://quickmap.lroc.asu.edu/)",
+  "outlines_page": "https://www.sciencebase.gov/catalog/item/671a6fa8d34efed5620f89f8",
+  "check_table": "NASA LEMS-A3 thermal presentation, TFAWS 2025, page 6 (centre latitude and area of each region), https://ntrs.nasa.gov/api/citations/20250007692/downloads/PDFpresentation.pdf",
+  "mission_status": "https://spacepolicyonline.com/news/nasa-is-full-steam-ahead-on-artemis-iii-iv-and-v/"
+ },
+ "checks": {
+  "nasa_latitude": "every centre within 5 km of NASA's table (largest difference 4.1 km, Mons Mouton Plateau, the 67 km region where the centre depends on how it is defined; all others within 2 km)",
+  "nasa_area": "every area within 0.1% of NASA's table",
+  "zenodo_2022": "not done: Zenodo (record 17954508) answered HTTP 429 Too Many Requests on 13 November 2026"
+ },
+ "regions": [
+  {
+   "id": "peak_near_cabeus_b",
+   "name": "Peak Near Cabeus B",
+   "lat": -83.6375,
+   "lon": -68.7495,
+   "bbox": [
+    -72.4735,
+    -84.06,
+    -64.7999,
+    -83.2095
+   ],
+   "code": "CB",
+   "area_km2": 397.3,
+   "outline": [
+    [
+     -67.16672,
+     -83.2095
+    ],
+    [
+     -72.47353,
+     -83.43644
+    ],
+    [
+     -70.55948,
+     -84.06005
+    ],
+    [
+     -64.79989,
+     -83.81001
+    ],
+    [
+     -67.16672,
+     -83.2095
+    ]
+   ],
+   "nasa_centre_lat": -83.6,
+   "nasa_area_km2": 397.3
+  },
+  {
+   "id": "nobile_rim_2",
+   "name": "Nobile Rim 2",
+   "lat": -83.9541,
+   "lon": 58.8215,
+   "bbox": [
+    54.4618,
+    -84.4047,
+    63.0242,
+    -83.5016
+   ],
+   "code": "N2",
+   "area_km2": 397.8,
+   "outline": [
+    [
+     54.46178,
+     -84.04797
+    ],
+    [
+     59.96161,
+     -84.40465
+    ],
+    [
+     63.02425,
+     -83.82638
+    ],
+    [
+     57.8402,
+     -83.50158
+    ],
+    [
+     54.46178,
+     -84.04797
+    ]
+   ],
+   "nasa_centre_lat": -83.9,
+   "nasa_area_km2": 397.8
+  },
+  {
+   "id": "mons_mouton_plateau",
+   "name": "Mons Mouton Plateau",
+   "lat": -84.3347,
+   "lon": 30.5923,
+   "bbox": [
+    15.4942,
+    -85.7556,
+    46.612,
+    -82.8467
+   ],
+   "code": "MP",
+   "area_km2": 4429.3,
+   "outline": [
+    [
+     15.49417,
+     -83.9502
+    ],
+    [
+     22.39284,
+     -85.75564
+    ],
+    [
+     46.61204,
+     -84.28934
+    ],
+    [
+     35.44246,
+     -82.84671
+    ],
+    [
+     15.49417,
+     -83.9502
+    ]
+   ],
+   "nasa_centre_lat": -84.2,
+   "nasa_area_km2": 4428.4
+  },
+  {
+   "id": "mons_mouton",
+   "name": "Mons Mouton",
+   "lat": -85.4266,
+   "lon": 31.7428,
+   "bbox": [
+    27.288,
+    -85.7883,
+    36.3666,
+    -85.0633
+   ],
+   "code": "MM",
+   "area_km2": 255.2,
+   "outline": [
+    [
+     27.28799,
+     -85.32705
+    ],
+    [
+     30.57923,
+     -85.78834
+    ],
+    [
+     36.36658,
+     -85.49737
+    ],
+    [
+     32.73523,
+     -85.0633
+    ],
+    [
+     27.28799,
+     -85.32705
+    ]
+   ],
+   "nasa_centre_lat": -85.4,
+   "nasa_area_km2": 255.2
+  },
+  {
+   "id": "nobile_rim_1",
+   "name": "Nobile Rim 1",
+   "lat": -85.4364,
+   "lon": 37.347,
+   "bbox": [
+    31.6437,
+    -85.8975,
+    43.2066,
+    -84.9746
+   ],
+   "code": "N1",
+   "area_km2": 398.7,
+   "outline": [
+    [
+     31.64367,
+     -85.3514
+    ],
+    [
+     36.47997,
+     -85.89749
+    ],
+    [
+     43.20664,
+     -85.47479
+    ],
+    [
+     38.05472,
+     -84.9746
+    ],
+    [
+     31.64367,
+     -85.3514
+    ]
+   ],
+   "nasa_centre_lat": -85.4,
+   "nasa_area_km2": 398.7
+  },
+  {
+   "id": "malapert_massif",
+   "name": "Malapert Massif",
+   "lat": -85.9948,
+   "lon": -0.2358,
+   "bbox": [
+    -5.6595,
+    -86.3259,
+    5.1479,
+    -85.6339
+   ],
+   "code": "MA",
+   "area_km2": 439.9,
+   "outline": [
+    [
+     -4.76364,
+     -85.63394
+    ],
+    [
+     -5.65948,
+     -86.32279
+    ],
+    [
+     5.14788,
+     -86.32589
+    ],
+    [
+     4.33231,
+     -85.63656
+    ],
+    [
+     -4.76364,
+     -85.63394
+    ]
+   ],
+   "nasa_centre_lat": -86.0,
+   "nasa_area_km2": 439.9
+  },
+  {
+   "id": "haworth",
+   "name": "Haworth",
+   "lat": -86.7639,
+   "lon": -22.777,
+   "bbox": [
+    -34.9818,
+    -87.3935,
+    -12.3618,
+    -86.1124
+   ],
+   "code": "HW",
+   "area_km2": 886.6,
+   "outline": [
+    [
+     -26.65196,
+     -86.1124
+    ],
+    [
+     -34.98185,
+     -86.95784
+    ],
+    [
+     -16.99082,
+     -87.39353
+    ],
+    [
+     -12.36178,
+     -86.44277
+    ],
+    [
+     -26.65196,
+     -86.1124
+    ]
+   ],
+   "nasa_centre_lat": -86.7,
+   "nasa_area_km2": 886.6
+  },
+  {
+   "id": "slater_plain",
+   "name": "Slater Plain",
+   "lat": -87.1637,
+   "lon": 125.5377,
+   "bbox": [
+    116.5672,
+    -87.6222,
+    134.9976,
+    -86.7032
+   ],
+   "code": "SP",
+   "area_km2": 399.3,
+   "outline": [
+    [
+     123.69062,
+     -87.62216
+    ],
+    [
+     134.99761,
+     -87.20229
+    ],
+    [
+     126.86961,
+     -86.70324
+    ],
+    [
+     116.5672,
+     -87.05106
+    ],
+    [
+     123.69062,
+     -87.62216
+    ]
+   ],
+   "nasa_centre_lat": -87.1,
+   "nasa_area_km2": 399.3
+  },
+  {
+   "id": "de_gerlache_rim_2",
+   "name": "de Gerlache Rim 2",
+   "lat": -88.23,
+   "lon": -64.6284,
+   "bbox": [
+    -77.4712,
+    -88.66,
+    -49.3987,
+    -87.7853
+   ],
+   "code": "G2",
+   "area_km2": 399.8,
+   "outline": [
+    [
+     -60.57254,
+     -87.78529
+    ],
+    [
+     -77.47119,
+     -88.02393
+    ],
+    [
+     -71.34211,
+     -88.65999
+    ],
+    [
+     -49.39871,
+     -88.32789
+    ],
+    [
+     -60.57254,
+     -87.78529
+    ]
+   ],
+   "nasa_centre_lat": -88.2,
+   "nasa_area_km2": 399.8
+  }
+ ]
+}

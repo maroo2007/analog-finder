@@ -30,7 +30,13 @@ from run_phase1 import MARS_SITES
 from run_thermal import FEATURES_V1
 
 NEIGHBOURS = 10
-MIN_SPACING_DEG = 0.25     # about 25 km between listed tiles
+# Listed tiles are at least this far apart on the ground, so a list is not
+# five neighbours of one spot. Measured as a true great-circle distance: a
+# 0.25 degree box, used before 8 November, let tiles sit 22.8 km apart at
+# 35 S (degrees of longitude shrink away from the equator) and wrongly
+# blocked tiles 25 km away on the diagonal. build_web_data uses this too.
+SPACING_KM = 25.0
+EARTH_RADIUS_KM = 6371.0
 
 
 def mars_cards() -> pd.DataFrame:
@@ -63,18 +69,29 @@ def rank(grid: pd.DataFrame, mars: pd.DataFrame, site: str) -> pd.DataFrame:
     return earth.sort_values("distance").reset_index(drop=True)
 
 
+def haversine_km(lat1, lon1, lat2, lon2):
+    """Great-circle distance in km between points given in degrees."""
+    lat1, lon1, lat2, lon2 = map(np.radians, (lat1, lon1, lat2, lon2))
+    a = (np.sin((lat2 - lat1) / 2) ** 2
+         + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2) ** 2)
+    return 2 * EARTH_RADIUS_KM * np.arcsin(np.sqrt(np.clip(a, 0, 1)))
+
+
 def top_spread(ranked: pd.DataFrame, n: int = 5,
-               spacing: float = MIN_SPACING_DEG) -> pd.DataFrame:
-    """The n best tiles, skipping any within `spacing` degrees of one already
-    picked, so the list is not five neighbours of the same spot."""
-    picked = []
+               spacing_km: float = SPACING_KM) -> pd.DataFrame:
+    """The n best rows of an already sorted table, skipping any row closer
+    than spacing_km to one already picked. Column `idx` holds each row's
+    index label in `ranked`."""
+    picked, lats, lons = [], [], []
     for row in ranked.itertuples():
-        if all(max(abs(row.lat - p.lat), abs(row.lon - p.lon)) >= spacing
-               for p in picked):
+        if not picked or haversine_km(row.lat, row.lon, np.array(lats),
+                                      np.array(lons)).min() >= spacing_km:
             picked.append(row)
+            lats.append(row.lat)
+            lons.append(row.lon)
             if len(picked) == n:
                 break
-    return pd.DataFrame(picked).drop(columns="Index")
+    return pd.DataFrame(picked).rename(columns={"Index": "idx"})
 
 
 def maps_link(lat: float, lon: float) -> str:

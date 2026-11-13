@@ -40,6 +40,17 @@ dependencies:
   # Known-answer tests (tests/), run with: pytest -m network
   - pytest
 
+  # Reading text out of NASA PDFs. NASA publishes no coordinate table for
+  # the Artemis III candidate landing regions in its releases; the one we
+  # use is a table inside an NTRS presentation (see src/targets/).
+  - pypdf
+
   # Data fetching: OpenTopography and AppEEARS (Plan B), Earth Engine (Plan A)
   - requests
   - earthengine-api
+
+# Set on `conda activate analog`. Without it, conda-forge's MKL crashes the
+# process on Windows with 0xC06D007F (a failed delayed DLL load) and no
+# Python error, for example while reading the Moon DEM (terrain.moon_patch).
+variables:
+  MKL_THREADING_LAYER: SEQUENTIAL
