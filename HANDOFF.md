@@ -256,9 +256,9 @@ Source: the licence PDF on the Copernicus Data Space Ecosystem,
 ## 6. The website data (already built)
 
 All in `web/public/data/`, committed, rebuilt with
-`python src/build_web_data.py`, then `python src/render_shades.py` and
-`python src/render_shades.py --twins` (about 50 minutes; skips files that
-exist, so delete `shade/` first after a data rebuild).
+`python src/build_web_data.py`, then `python src/render_shades.py` (about
+50 minutes; skips files that exist, so delete `shade/` first after a data
+rebuild).
 
 | File | Contents |
 |---|---|
@@ -266,9 +266,8 @@ exist, so delete `shade/` first after a data rebuild).
 | `matches/<id>.json` | Top 25 Earth twins for that target: `lat`, `lon`, `country`, `continent`, `score`, `rank`, `of`, `rank_continent`, `of_continent`, `features`, `closeness` per feature. |
 | `egypt.json` | Best Egyptian tile per target: `target`, `lat`, `lon`, `score`, `rank`, `of`, `rank_continent`, `of_continent` (Africa). |
 | `likeness.png`, `likeness_americas.png` + `likeness.json` | The "how Mars-like" map per continent. `likeness.json` lists `maps` (`area`, `image`, `bounds`) and keeps `bounds` for Africa ([[-35, -18], [38, 52]], lat/lon); the Americas are [[-56.5, -125], [50, -34]]. |
-| `shade/mars/<id>.png`, `shade/moon/<id>.png` | Shaded relief of each target, 65 km across. |
-| `shade/earth/<id>_top.png`, `<id>_egypt.png` | Shaded relief of its best twin and its best Egyptian tile, drawn the same way. |
-| `shade/earth/<id>_<n>.webp`, `<id>_egypt.webp`, `shade/<world>/<id>.webp` | The same, 200 px WebP, for every twin: `n` is the twin's place (1 to 25) in `matches/<id>.json`, so `_1` is `_top`. 1,269 files, 1.7 MB. |
+| `shade/<world>/<id>.webp` | Shaded relief of each target, 65 km across, 200 px WebP. |
+| `shade/earth/<id>_<n>.webp`, `<id>_egypt.webp` | Shaded relief of every twin and of the best Egyptian tile, drawn the same way: `n` is the twin's place (1 to 25) in `matches/<id>.json`. 1,269 files in all, 1.7 MB. The older 280 px PNG pairs (`_top`, `_egypt`, targets) were dropped on 2026-11-14; the website reads only the WebP. |
 | `web/public/img/mars.jpg` | Mars global colour map (Viking). |
 
 **Missing for the site:** a Moon south pole base map image (can be rendered

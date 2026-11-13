@@ -190,7 +190,7 @@ As of 2026-11-14 (hackathon 14 to 15 November), Phase 1 has passed, Prompts
 1 and 2 are done and merged, and the global Earth grid (Prompt 3) covers
 Africa and the Americas south of 50 N (merged in pull request #5). Every
 twin has a shaded relief image (`shade/earth/<id>_<n>.webp`, n = place 1 to
-25 in `matches/<id>.json`; `python src/render_shades.py --twins`). The website is being built on `feature/website`, in a git
+25 in `matches/<id>.json`; `python src/render_shades.py`). The website is being built on `feature/website`, in a git
 worktree at `C:\Users\Marwan\Desktop\analog-finder-website` (Marwan's
 laptop); open Claude Code on that folder so the Impeccable design hooks run.
 
@@ -215,7 +215,7 @@ laptop); open Claude Code on that folder so the Impeccable design hooks run.
   148,925) and its rank within its continent (`rank_continent` of
   `of_continent`), which the website should show. Code: `src/run_moon_targets.py`,
   `src/build_web_data.py`.
-- **Website data** is committed in `web/public/data/` (about 6 MB): targets,
+- **Website data** is committed in `web/public/data/` (about 2.6 MB): targets,
   top 25 twins per target at least 25 km apart (true distance,
   `match_grid.top_spread`), the best Egyptian tile per target, shaded relief
   pairs. Rebuild with `python src/build_web_data.py`, then
