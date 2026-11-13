@@ -258,6 +258,16 @@ grid (Prompt 3) covers Egypt and Africa.
   repository is private, so judges cannot open its link until it is made
   public; the submission needs an AI-use disclosure. The final demo is
   planned for later.
+- **Gemini chatbot** (2026-11-13): `src/chatbot.py` (Gemini, terminal mode),
+  `src/chat_app.py` (Streamlit page), `src/chat_data.py` (lookups in
+  `web/public/data/`, handed to Gemini as tools so it never invents a
+  number), `src/chatbot_knowledge.md` (method facts it is given). Key in
+  `GEMINI_API_KEY`, also set on the Claude cloud environment; never in a
+  file. `gemini-2.5-*` is closed to new users and `gemini-3.8-flash` was
+  often overloaded (503), hence the model fallback list; thinking "low"
+  took replies from ~50 s to ~4 s. Tests: `tests/test_chat_data.py`
+  (offline). `environment-lock.yml` does not have `google-genai` and
+  `streamlit` yet; regenerate it on a Windows laptop.
 - **Next:** Prompt 4 in `docs/ENGINE_PROMPTS.md` (discoveries list and
   interface data), more continents for the grid (each estimated from a test
   country and run under a cost cap), and the known-analog validation.

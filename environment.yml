@@ -49,6 +49,12 @@ dependencies:
   - requests
   - earthengine-api
 
+  # Chatbot (src/chatbot.py, src/chat_app.py): Gemini API and the chat page.
+  # The key goes in the GEMINI_API_KEY environment variable, never a file
+  # in the repository.
+  - google-genai
+  - streamlit
+
 # Set on `conda activate analog`. Without it, conda-forge's MKL crashes the
 # process on Windows with 0xC06D007F (a failed delayed DLL load) and no
 # Python error, for example while reading the Moon DEM (terrain.moon_patch).
