@@ -1046,6 +1046,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 171.5,
+      "mean": 280.1,
+      "highest": 337.6
+     },
+     "c": {
+      "lowest": -101.7,
+      "mean": 6.9,
+      "highest": 64.5
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 56.8,
+      "mean": 143.0,
+      "highest": 200.9
+     },
+     "c": {
+      "lowest": -216.4,
+      "mean": -130.2,
+      "highest": -72.2
+     }
+    },
+    "cold_trap_share": 0.0,
+    "ice_stable_surface_share": 0.0,
+    "ice_stable_within_2_9m_share": 0.2987,
+    "triangles": 3120,
+    "area_km2": 423.2,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
@@ -1095,6 +1135,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 57.5,
+      "mean": 234.4,
+      "highest": 318.9
+     },
+     "c": {
+      "lowest": -215.7,
+      "mean": -38.8,
+      "highest": 45.7
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 43.6,
+      "mean": 118.0,
+      "highest": 181.9
+     },
+     "c": {
+      "lowest": -229.6,
+      "mean": -155.2,
+      "highest": -91.2
+     }
+    },
+    "cold_trap_share": 0.0799,
+    "ice_stable_surface_share": 0.0171,
+    "ice_stable_within_2_9m_share": 0.4108,
+    "triangles": 3081,
+    "area_km2": 404.1,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
@@ -1144,6 +1224,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 51.1,
+      "mean": 258.3,
+      "highest": 342.5
+     },
+     "c": {
+      "lowest": -222.0,
+      "mean": -14.9,
+      "highest": 69.3
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 40.1,
+      "mean": 138.8,
+      "highest": 200.4
+     },
+     "c": {
+      "lowest": -233.0,
+      "mean": -134.4,
+      "highest": -72.7
+     }
+    },
+    "cold_trap_share": 0.0035,
+    "ice_stable_surface_share": 0.0011,
+    "ice_stable_within_2_9m_share": 0.2064,
+    "triangles": 34542,
+    "area_km2": 4545.5,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
@@ -1193,6 +1313,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 61.0,
+      "mean": 249.7,
+      "highest": 314.9
+     },
+     "c": {
+      "lowest": -212.2,
+      "mean": -23.4,
+      "highest": 41.8
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 40.9,
+      "mean": 117.3,
+      "highest": 173.5
+     },
+     "c": {
+      "lowest": -232.3,
+      "mean": -155.8,
+      "highest": -99.6
+     }
+    },
+    "cold_trap_share": 0.0105,
+    "ice_stable_surface_share": 0.0014,
+    "ice_stable_within_2_9m_share": 0.4815,
+    "triangles": 2048,
+    "area_km2": 271.4,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
@@ -1242,6 +1402,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 62.9,
+      "mean": 268.6,
+      "highest": 331.2
+     },
+     "c": {
+      "lowest": -210.2,
+      "mean": -4.5,
+      "highest": 58.1
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 45.3,
+      "mean": 131.3,
+      "highest": 189.7
+     },
+     "c": {
+      "lowest": -227.9,
+      "mean": -141.9,
+      "highest": -83.4
+     }
+    },
+    "cold_trap_share": 0.0025,
+    "ice_stable_surface_share": 0.0009,
+    "ice_stable_within_2_9m_share": 0.3529,
+    "triangles": 3120,
+    "area_km2": 422.7,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
@@ -1291,6 +1491,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 131.8,
+      "mean": 275.1,
+      "highest": 342.1
+     },
+     "c": {
+      "lowest": -141.4,
+      "mean": 2.0,
+      "highest": 68.9
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 53.6,
+      "mean": 144.3,
+      "highest": 201.4
+     },
+     "c": {
+      "lowest": -219.5,
+      "mean": -128.8,
+      "highest": -71.8
+     }
+    },
+    "cold_trap_share": 0.0,
+    "ice_stable_surface_share": 0.0,
+    "ice_stable_within_2_9m_share": 0.2195,
+    "triangles": 3486,
+    "area_km2": 472.1,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
@@ -1340,6 +1580,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 62.8,
+      "mean": 242.4,
+      "highest": 305.9
+     },
+     "c": {
+      "lowest": -210.4,
+      "mean": -30.8,
+      "highest": 32.8
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 40.8,
+      "mean": 106.9,
+      "highest": 180.8
+     },
+     "c": {
+      "lowest": -232.4,
+      "mean": -166.2,
+      "highest": -92.3
+     }
+    },
+    "cold_trap_share": 0.007,
+    "ice_stable_surface_share": 0.0009,
+    "ice_stable_within_2_9m_share": 0.6471,
+    "triangles": 6962,
+    "area_km2": 909.8,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
@@ -1389,6 +1669,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 52.2,
+      "mean": 229.7,
+      "highest": 319.0
+     },
+     "c": {
+      "lowest": -221.0,
+      "mean": -43.4,
+      "highest": 45.9
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 38.1,
+      "mean": 105.7,
+      "highest": 179.0
+     },
+     "c": {
+      "lowest": -235.1,
+      "mean": -167.4,
+      "highest": -94.2
+     }
+    },
+    "cold_trap_share": 0.0197,
+    "ice_stable_surface_share": 0.0016,
+    "ice_stable_within_2_9m_share": 0.5807,
+    "triangles": 3121,
+    "area_km2": 405.7,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
@@ -1438,6 +1758,46 @@
     ]
    ],
    "note": "Matched on terrain only (slope, roughness, relief): there is no Moon albedo source yet.",
+   "diviner": {
+    "annual_max_surface": {
+     "k": {
+      "lowest": 100.4,
+      "mean": 258.4,
+      "highest": 320.1
+     },
+     "c": {
+      "lowest": -172.8,
+      "mean": -14.7,
+      "highest": 47.0
+     }
+    },
+    "annual_mean_2cm": {
+     "k": {
+      "lowest": 57.9,
+      "mean": 132.0,
+      "highest": 177.2
+     },
+     "c": {
+      "lowest": -215.2,
+      "mean": -141.1,
+      "highest": -96.0
+     }
+    },
+    "cold_trap_share": 0.0038,
+    "ice_stable_surface_share": 0.0044,
+    "ice_stable_within_2_9m_share": 0.2432,
+    "triangles": 3121,
+    "area_km2": 411.0,
+    "source": "LRO Diviner Polar Resource Product, south (Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726), PDS Geosciences node, bundle urn:nasa:pds:lro_diviner_derived1",
+    "files": [
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+     "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.xml"
+    ],
+    "md5": "80cdfe83592a3419c74b1b55b636711e",
+    "grid_spacing_m": 506,
+    "cold_trap_k": 110.0,
+    "note": "Context, not used for matching. Cold trap: annual maximum surface temperature below 110 K, where surface water ice can survive (Paige et al. 2010); a temperature test, not permanent shadow. The product has no winter minimum."
+   },
    "world": "moon",
    "matched_on": [
     "mean_slope",
