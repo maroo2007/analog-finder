@@ -46,7 +46,7 @@
     "relief": 135.0,
     "albedo": 0.268
    },
-   "best_score": 93.5
+   "best_score": 94.9
   },
   {
    "id": "acidalia_plantia",
@@ -72,7 +72,7 @@
     "relief": 69.0,
     "albedo": 0.179
    },
-   "best_score": 92.0
+   "best_score": 93.8
   },
   {
    "id": "arabia_terra",
@@ -98,7 +98,7 @@
     "relief": 151.5,
     "albedo": 0.208
    },
-   "best_score": 91.0
+   "best_score": 92.7
   },
   {
    "id": "aram_chaos",
@@ -124,7 +124,7 @@
     "relief": 527.0,
     "albedo": 0.16
    },
-   "best_score": 68.6
+   "best_score": 75.7
   },
   {
    "id": "arcadia",
@@ -150,7 +150,7 @@
     "relief": 67.0,
     "albedo": 0.179
    },
-   "best_score": 95.0
+   "best_score": 95.9
   },
   {
    "id": "arcadia_planitia",
@@ -176,7 +176,7 @@
     "relief": 25.0,
     "albedo": 0.245
    },
-   "best_score": 96.6
+   "best_score": 97.4
   },
   {
    "id": "ausonia",
@@ -202,7 +202,7 @@
     "relief": 147.0,
     "albedo": 0.139
    },
-   "best_score": 90.8
+   "best_score": 92.8
   },
   {
    "id": "cerberus",
@@ -228,7 +228,7 @@
     "relief": 398.5,
     "albedo": 0.264
    },
-   "best_score": 95.2
+   "best_score": 96.2
   },
   {
    "id": "columbus_crater",
@@ -254,7 +254,7 @@
     "relief": 348.0,
     "albedo": 0.158
    },
-   "best_score": 81.4
+   "best_score": 84.8
   },
   {
    "id": "copernicus_crater",
@@ -280,7 +280,7 @@
     "relief": 80.0,
     "albedo": 0.154
    },
-   "best_score": 91.7
+   "best_score": 93.6
   },
   {
    "id": "coprates_emelas_chasm",
@@ -306,7 +306,7 @@
     "relief": 1056.0,
     "albedo": 0.154
    },
-   "best_score": 72.2
+   "best_score": 78.3
   },
   {
    "id": "deuteronilus1_2",
@@ -332,7 +332,7 @@
     "relief": 274.5,
     "albedo": 0.203
    },
-   "best_score": 82.4
+   "best_score": 85.3
   },
   {
    "id": "erebus_montes",
@@ -358,7 +358,7 @@
     "relief": 29.0,
     "albedo": 0.244
    },
-   "best_score": 96.6
+   "best_score": 97.7
   },
   {
    "id": "gale",
@@ -384,7 +384,7 @@
     "relief": 653.5,
     "albedo": 0.237
    },
-   "best_score": 73.4
+   "best_score": 78.8
   },
   {
    "id": "gusev",
@@ -410,7 +410,7 @@
     "relief": 294.5,
     "albedo": 0.259
    },
-   "best_score": 88.4
+   "best_score": 90.6
   },
   {
    "id": "hadriacus",
@@ -436,7 +436,7 @@
     "relief": 428.5,
     "albedo": 0.139
    },
-   "best_score": 83.0
+   "best_score": 86.6
   },
   {
    "id": "hale_crater",
@@ -462,7 +462,7 @@
     "relief": 608.0,
     "albedo": 0.139
    },
-   "best_score": 79.6
+   "best_score": 84.2
   },
   {
    "id": "hebrus",
@@ -488,7 +488,7 @@
     "relief": 78.5,
     "albedo": 0.219
    },
-   "best_score": 91.6
+   "best_score": 93.2
   },
   {
    "id": "hellas3",
@@ -514,7 +514,7 @@
     "relief": 148.0,
     "albedo": 0.164
    },
-   "best_score": 90.6
+   "best_score": 92.5
   },
   {
    "id": "hellas_hellas2",
@@ -540,7 +540,7 @@
     "relief": 319.0,
     "albedo": 0.184
    },
-   "best_score": 89.3
+   "best_score": 91.5
   },
   {
    "id": "huygens",
@@ -566,7 +566,7 @@
     "relief": 123.0,
     "albedo": 0.129
    },
-   "best_score": 88.5
+   "best_score": 90.0
   },
   {
    "id": "hypanis_delta",
@@ -592,7 +592,7 @@
     "relief": 168.0,
     "albedo": 0.229
    },
-   "best_score": 89.0
+   "best_score": 91.4
   },
   {
    "id": "ismenius_cavus",
@@ -618,7 +618,7 @@
     "relief": 322.0,
     "albedo": 0.251
    },
-   "best_score": 84.1
+   "best_score": 87.3
   },
   {
    "id": "jezero",
@@ -644,7 +644,7 @@
     "relief": 427.5,
     "albedo": 0.151
    },
-   "best_score": 67.9
+   "best_score": 73.3
   },
   {
    "id": "kasei_valles",
@@ -670,7 +670,7 @@
     "relief": 323.5,
     "albedo": 0.258
    },
-   "best_score": 85.9
+   "best_score": 88.5
   },
   {
    "id": "mawrth_valles",
@@ -696,7 +696,7 @@
     "relief": 349.5,
     "albedo": 0.172
    },
-   "best_score": 78.1
+   "best_score": 81.5
   },
   {
    "id": "mclaughlin_crater",
@@ -722,7 +722,7 @@
     "relief": 422.0,
     "albedo": 0.161
    },
-   "best_score": 73.7
+   "best_score": 78.7
   },
   {
    "id": "ne_marineris_crater",
@@ -748,7 +748,7 @@
     "relief": 665.5,
     "albedo": 0.159
    },
-   "best_score": 83.7
+   "best_score": 87.3
   },
   {
    "id": "newton_crater",
@@ -774,7 +774,7 @@
     "relief": 260.5,
     "albedo": 0.129
    },
-   "best_score": 83.3
+   "best_score": 87.1
   },
   {
    "id": "nili",
@@ -800,7 +800,7 @@
     "relief": 473.5,
     "albedo": 0.139
    },
-   "best_score": 71.4
+   "best_score": 77.1
   },
   {
    "id": "noachis",
@@ -826,7 +826,7 @@
     "relief": 157.5,
     "albedo": 0.159
    },
-   "best_score": 91.0
+   "best_score": 92.9
   },
   {
    "id": "noactis_landing",
@@ -852,7 +852,7 @@
     "relief": 1587.5,
     "albedo": 0.213
    },
-   "best_score": 54.5
+   "best_score": 63.4
   },
   {
    "id": "protonilus",
@@ -878,7 +878,7 @@
     "relief": 790.0,
     "albedo": 0.259
    },
-   "best_score": 75.9
+   "best_score": 79.9
   },
   {
    "id": "se_marineris",
@@ -904,7 +904,7 @@
     "relief": 184.5,
     "albedo": 0.137
    },
-   "best_score": 90.9
+   "best_score": 92.7
   },
   {
    "id": "s_meridiani_sinus_planium",
@@ -930,7 +930,7 @@
     "relief": 112.0,
     "albedo": 0.136
    },
-   "best_score": 91.3
+   "best_score": 93.0
   },
   {
    "id": "s_nectaris_fossae",
@@ -956,7 +956,7 @@
     "relief": 212.5,
     "albedo": 0.115
    },
-   "best_score": 84.1
+   "best_score": 87.8
   },
   {
    "id": "viking",
@@ -982,7 +982,7 @@
     "relief": 58.0,
     "albedo": 0.218
    },
-   "best_score": 95.0
+   "best_score": 96.0
   },
   {
    "id": "zephyria",
@@ -1008,7 +1008,7 @@
     "relief": 95.0,
     "albedo": 0.278
    },
-   "best_score": 97.2
+   "best_score": 98.0
   },
   {
    "id": "peak_near_cabeus_b",
@@ -1057,7 +1057,7 @@
     "slope_spread": 4.69,
     "relief": 1907.427
    },
-   "best_score": 3.8
+   "best_score": 13.7
   },
   {
    "id": "nobile_rim_2",
@@ -1106,7 +1106,7 @@
     "slope_spread": 4.421,
     "relief": 1426.693
    },
-   "best_score": 11.6
+   "best_score": 26.7
   },
   {
    "id": "mons_mouton_plateau",
@@ -1155,7 +1155,7 @@
     "slope_spread": 4.697,
     "relief": 2053.349
    },
-   "best_score": 15.2
+   "best_score": 32.5
   },
   {
    "id": "mons_mouton",
@@ -1204,7 +1204,7 @@
     "slope_spread": 4.168,
     "relief": 2301.771
    },
-   "best_score": 1.7
+   "best_score": 9.1
   },
   {
    "id": "nobile_rim_1",
@@ -1253,7 +1253,7 @@
     "slope_spread": 4.74,
     "relief": 2040.88
    },
-   "best_score": 0.8
+   "best_score": 5.1
   },
   {
    "id": "malapert_massif",
@@ -1302,7 +1302,7 @@
     "slope_spread": 4.434,
     "relief": 2051.557
    },
-   "best_score": 1.2
+   "best_score": 11.8
   },
   {
    "id": "haworth",
@@ -1351,7 +1351,7 @@
     "slope_spread": 3.849,
     "relief": 1862.499
    },
-   "best_score": 4.1
+   "best_score": 17.8
   },
   {
    "id": "slater_plain",
@@ -1400,7 +1400,7 @@
     "slope_spread": 4.05,
     "relief": 1113.928
    },
-   "best_score": 11.3
+   "best_score": 26.3
   },
   {
    "id": "de_gerlache_rim_2",
@@ -1449,7 +1449,7 @@
     "slope_spread": 4.504,
     "relief": 1419.503
    },
-   "best_score": 5.2
+   "best_score": 16.7
   }
  ]
 }
