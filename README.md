@@ -33,6 +33,34 @@ pip install earthengine-api
 
 `check_ee.py` recognises both failures and prints the fix.
 
+## Chatbot
+
+A Gemini chatbot that answers questions about our results (which places on
+Earth match which NASA site, and why) and general background, which it
+labels "General background". Every number it gives comes from
+`web/public/data/`, through the lookups in `src/chat_data.py`.
+
+Get a Gemini API key from Google AI Studio and put it in an environment
+variable, never in a file in this repository. Windows PowerShell:
+
+```powershell
+$env:GEMINI_API_KEY = "<your key>"
+```
+
+Mac and Linux: `export GEMINI_API_KEY=...`. Then, in the `analog`
+environment (or `conda install -n analog google-genai streamlit` on an
+environment built before 13 November):
+
+```bash
+streamlit run src/chat_app.py    # chat page in the browser
+python src/chatbot.py            # or chat in the terminal
+```
+
+What the bot knows about the method is in `src/chatbot_knowledge.md`; edit
+that file to correct or extend it. `GEMINI_MODEL` forces one model; by
+default it tries `gemini-3.8-flash`, then `gemini-3.5-flash`, then
+`gemini-3.5-flash-lite`, moving on when one is busy.
+
 ## Daily workflow
 
 Every time you start working (Windows PowerShell shown; quote the path, it has

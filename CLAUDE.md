@@ -261,8 +261,33 @@ laptop); open Claude Code on that folder so the Impeccable design hooks run.
 - **Earth Engine works on Marwan's laptop** (`earthengine authenticate` done
   and `src/check_ee.py` passing, 2026-10-10). The second laptop still needs
   it. Inviting the remaining teammates is not done.
+- **Judging and submission rules are in `docs/JUDGING_CRITERIA.md`**, and
+  the challenge's official data list is in `docs/CHALLENGE_RESOURCES.md`
+  (both added 2026-11-13). Read them before planning the final demo. In
+  short: there is no live pitching; judges see only a **30 second video or
+  exactly 7 slides**, uploaded first to the local Cairo form and then to the
+  global Space Apps site. Still open: the Cairo PDF gives the event as
+  **13 to 14 November** while this file says 14 to 15 (confirm); the GitHub
+  repository is private, so judges cannot open its link until it is made
+  public; the submission needs an AI-use disclosure. The final demo is
+  planned for later.
+- **Gemini chatbot** (2026-11-13): `src/chatbot.py` (Gemini, terminal mode),
+  `src/chat_app.py` (Streamlit page), `src/chat_data.py` (lookups in
+  `web/public/data/`, handed to Gemini as tools so it never invents a
+  number), `src/chatbot_knowledge.md` (method facts it is given). Key in
+  `GEMINI_API_KEY`, also set on the Claude cloud environment; never in a
+  file. `gemini-2.5-*` is closed to new users and `gemini-3.8-flash` was
+  often overloaded (503), hence the model fallback list; thinking "low"
+  took replies from ~50 s to ~4 s. Tests: `tests/test_chat_data.py`
+  (offline). `environment-lock.yml` does not have `google-genai` and
+  `streamlit` yet; regenerate it on a Windows laptop. For the website, one
+  team key (free tier) serves every visitor from the host's secrets;
+  visitors need no key. **No per-visitor question limit, by team decision**
+  (2026-11-13: "we'll be careful"); don't add one without asking. When the
+  free quota runs out, visitors see "try again in a minute"
+  (`chatbot.Busy`).
 - **Next:** the website (`docs/WEBSITE_SPEC.md`), bringing `main`'s website
   data into `feature/website`, then the submission. Later: Prompt 4 in
-  `docs/ENGINE_PROMPTS.md` (discoveries list), more continents for the grid
-  (each estimated from a test country and run under a cost cap), and the
-  known-analog validation.
+  `docs/ENGINE_PROMPTS.md` (discoveries list and interface data), more
+  continents for the grid (each estimated from a test country and run under
+  a cost cap), and the known-analog validation.
