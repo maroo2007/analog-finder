@@ -26,6 +26,11 @@ POLL_SECONDS and cancelled the moment its compute passes the cap. A run that
 exceeded its estimate cost 14.7 EECU-hours on 10 October; see HANDOFF.md.
 
     python src/earth_grid.py run egypt --cap 1      A and B, capped, then C
+    python src/earth_grid.py run americas --cap 0.5 --ndvi-only
+                                                    A only, prints stage B's
+                                                    workload to estimate it
+    python src/earth_grid.py run americas --cap 6 --reuse-ndvi
+                                                    B on the saved A, then C
     python src/earth_grid.py terrain africa         C only (resumable)
     python src/earth_grid.py status                 tasks and compute used
 """
@@ -228,10 +233,35 @@ def _key(df: pd.DataFrame) -> pd.Series:
             + np.floor(df["lon"] / TILE_DEG).astype(int).astype(str))
 
 
-def run_earth_engine(area: str, cap_hours: float) -> pd.DataFrame:
-    """Stages A and B under one total cap; returns the joined table."""
+def ndvi_counts(ee, area) -> dict:
+    """After stage A: land tiles, tiles that pass NDVI (stage B's workload,
+    which sets its cost), and the passing tiles per country. Small
+    interactive queries on the finished table, not an export."""
+    table = ee.FeatureCollection(f"{ASSET_FOLDER}/{area}_ndvi")
+    passed = table.filter(ee.Filter.lt("ndvi", s.NDVI_MAX))
+    return ee.Dictionary({
+        "land_tiles": table.size(), "pass_ndvi": passed.size(),
+        "pass_by_country": passed.aggregate_histogram("country"),
+    }).getInfo()
+
+
+def run_earth_engine(area: str, cap_hours: float, ndvi_only: bool = False,
+                     reuse_ndvi: bool = False) -> pd.DataFrame | dict:
+    """Stages A and B under one total cap; returns the joined table.
+
+    ndvi_only: run stage A alone and return its counts, so stage B's cost
+    can be estimated from its real workload before it runs.
+    reuse_ndvi: skip stage A and use the stage A table already saved.
+    """
     ee = config.init_ee()
-    a = run_capped(ee, ndvi_table(ee, area), f"{area}_ndvi", cap_hours)
+    if reuse_ndvi:
+        ee.data.getAsset(f"{ASSET_FOLDER}/{area}_ndvi")   # fails if missing
+        a = {"eecu_hours": 0.0}
+        print(f"reusing {area}_ndvi from an earlier stage A", flush=True)
+    else:
+        a = run_capped(ee, ndvi_table(ee, area), f"{area}_ndvi", cap_hours)
+    if ndvi_only:
+        return {"eecu_hours": a["eecu_hours"], **ndvi_counts(ee, area)}
     b = run_capped(ee, surface_table(ee, area), f"{area}_surface",
                    cap_hours - a["eecu_hours"])
     print(f"Earth Engine total for {area}: "
@@ -324,12 +354,25 @@ def main() -> int:
     run.add_argument("area", choices=list(AREAS))
     run.add_argument("--cap", type=float, required=True,
                      help="EECU-hours; Earth Engine tasks are cancelled above it")
+    run.add_argument("--ndvi-only", action="store_true",
+                     help="stage A only, then print the counts stage B's "
+                          "cost depends on")
+    run.add_argument("--reuse-ndvi", action="store_true",
+                     help="skip stage A and use the saved stage A table")
     sub.add_parser("terrain").add_argument("area", choices=list(AREAS))
     sub.add_parser("status")
     args = parser.parse_args()
 
-    if args.cmd == "run":
-        df = run_earth_engine(args.area, args.cap)
+    if args.cmd == "run" and args.ndvi_only:
+        c = run_earth_engine(args.area, args.cap, ndvi_only=True,
+                             reuse_ndvi=args.reuse_ndvi)
+        print(f"stage A: {c['eecu_hours']:.4f} EECU-hours, {c['land_tiles']:,} "
+              f"land tiles, {c['pass_ndvi']:,} pass NDVI "
+              f"({c['pass_ndvi'] / max(c['land_tiles'], 1):.0%})")
+        for name, n in sorted(c["pass_by_country"].items(), key=lambda x: -x[1]):
+            print(f"  {name:32s} {n:7,}")
+    elif args.cmd == "run":
+        df = run_earth_engine(args.area, args.cap, reuse_ndvi=args.reuse_ndvi)
         print(f"{len(df)} land tiles, {int(df.mars_possible.sum())} Mars-possible",
               flush=True)
         run_terrain(args.area)
