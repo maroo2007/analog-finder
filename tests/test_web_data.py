@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 import build_web_data as w  # noqa: E402
+import run_diviner as dv  # noqa: E402
 import match_grid as m  # noqa: E402
 import run_moon_targets as rm  # noqa: E402
 import terrain as t  # noqa: E402
@@ -229,6 +230,47 @@ def test_moon_targets_in_web_data_are_terrain_only():
         rows = _json(WEB / "matches" / f"{x['id']}.json")
         assert all(set(r["closeness"]) == set(t.FEATURES) for r in rows)
         assert (WEB / "shade" / "moon" / f"{x['id']}.png").exists()
+
+
+# ------------------------------------------------------------------ Diviner
+
+def test_diviner_projection_matches_moon_xy():
+    lat = np.array([-84.0, -86.5, -89.9])
+    lon = np.array([-170.0, 12.5, 128.0])
+    x, y = dv.stereo_xy(lat, lon)
+    for i in range(3):
+        ex, ey = t.moon_xy(lat[i], lon[i])
+        assert x[i] == pytest.approx(ex) and y[i] == pytest.approx(ey)
+
+
+def test_diviner_region_test_finds_its_own_centre():
+    regions = rm.load_regions()
+    for r in regions:
+        assert dv.inside(r, np.array([r["lat"]]), np.array([r["lon"]]))[0], r["id"]
+    far = np.array([-80.5]), np.array([180.0])
+    assert not any(dv.inside(r, *far)[0] for r in regions)
+
+
+def test_moon_targets_carry_diviner_context():
+    """Diviner is context on every Moon card, never a matching feature."""
+    moon = [x for x in _targets() if x["world"] == "moon"]
+    for x in moon:
+        d = x["diviner"]
+        assert x["matched_on"] == t.FEATURES          # still terrain only
+        assert "doi:10.1126/science.1187726" in d["source"]
+        assert all(f.startswith("https://pds-geosciences.wustl.edu/") for f in d["files"])
+        assert "not permanent shadow" in d["note"]
+        for key in ("annual_max_surface", "annual_mean_2cm"):
+            k, c = d[key]["k"], d[key]["c"]
+            assert 20 < k["lowest"] <= k["mean"] <= k["highest"] < 420, x["id"]
+            assert c["mean"] == pytest.approx(k["mean"] - 273.15, abs=0.11)
+        # an annual mean can never beat the annual maximum
+        assert d["annual_mean_2cm"]["k"]["mean"] < d["annual_max_surface"]["k"]["mean"]
+        shares = [d["ice_stable_surface_share"], d["ice_stable_within_2_9m_share"]]
+        assert 0 <= shares[0] <= shares[1] <= 1
+        assert 0 <= d["cold_trap_share"] <= 1
+        # the triangles found cover the region NASA describes
+        assert 0.8 < d["area_km2"] / x["area_km2"] < 1.25, x["id"]
 
 
 # ------------------------------------------------------------ shaded relief

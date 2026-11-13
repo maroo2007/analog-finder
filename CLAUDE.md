@@ -201,6 +201,12 @@ laptop); open Claude Code on that folder so the Impeccable design hooks run.
   tables with `python src/earth_grid.py fetch <area>`: one big read hung for
   an hour. Jezero's closest twin is still the Egyptian tile, #1 of 148,925.
 
+- **Diviner temperatures** (2026-11-14) are context on the Moon cards, not a
+  matching feature: `src/run_diviner.py` (LRO Diviner south Polar Resource
+  Product from PDS, MD5 checked) writes each region's temperatures and
+  cold-trap and ice-stability shares, which `build_web_data.py` adds to
+  `targets.json` as `diviner`. Never call the shares permanent shadow.
+
 - **Targets are NASA's own sites** (Prompt 2, 2026-11-13). Mars: the 38
   candidate human Exploration Zones (`src/targets/mars_human_ez.json`).
   Moon: the nine Artemis III candidate regions of October 2024

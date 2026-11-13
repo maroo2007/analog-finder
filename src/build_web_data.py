@@ -7,6 +7,8 @@ Inputs (all gitignored, built by earlier steps):
                                          Artemis III regions (run_moon_targets)
   data/processed/earth_grid/             the Earth grid areas built so far
                                          (EARTH_AREAS: Africa, the Americas)
+  data/processed/moon_diviner.json       optional, run_diviner.py: Diviner
+                                         temperatures per Moon region
 
 Outputs (committed, small): web/public/data/
   targets.json            every Mars zone and Moon region ("world": "mars"
@@ -46,6 +48,7 @@ from sklearn.preprocessing import StandardScaler
 
 import config
 import earth_grid as g
+import run_diviner
 import run_moon_targets
 import terrain as t
 from match_grid import top_spread
@@ -162,10 +165,21 @@ def match_world(targets: list[dict], cards: pd.DataFrame, earth: pd.DataFrame,
 
 
 def moon_targets() -> list[dict]:
-    """The Artemis regions, with the keys the website needs."""
+    """The Artemis regions, with the keys the website needs. With
+    data/processed/moon_diviner.json (run_diviner.py), each also gets a
+    "diviner" object: temperature context, never used for matching."""
     keep = ("id", "name", "lat", "lon", "bbox", "code", "area_km2", "outline")
-    return [{**{k: r[k] for k in keep}, "note": MOON_NOTE}
-            for r in run_moon_targets.load_regions()]
+    diviner = (json.loads(run_diviner.OUT.read_text(encoding="utf-8"))
+               if run_diviner.OUT.exists() else None)
+    out = []
+    for r in run_moon_targets.load_regions():
+        tgt = {**{k: r[k] for k in keep}, "note": MOON_NOTE}
+        if diviner:
+            shared = {k: diviner[k] for k in ("source", "files", "md5",
+                                              "grid_spacing_m", "cold_trap_k", "note")}
+            tgt["diviner"] = {**diviner["regions"][r["id"]], **shared}
+        out.append(tgt)
+    return out
 
 
 def main() -> int:
