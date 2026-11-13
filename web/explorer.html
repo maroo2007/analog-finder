@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Twin Finder · Planetary Twin Finder</title>
+  <meta name="description" content="Pick a NASA site on Mars or the Moon and see its closest places on Earth, ranked, with what matches and what doesn't.">
+  <meta name="theme-color" content="#06080b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='%23e0703a'/%3E%3C/svg%3E">
+  <script type="module" src="/src/explorer/main.js"></script>
+</head>
+<body class="explorer">
+  <header class="ex-header">
+    <a class="wordmark" href="index.html">Planetary Twin Finder</a>
+    <div class="world-switch" role="radiogroup" aria-label="World">
+      <button role="radio" aria-checked="true" data-world="mars">Mars</button>
+      <button role="radio" aria-checked="false" data-world="moon">Moon</button>
+    </div>
+    <div class="view-tabs" role="tablist" aria-label="View">
+      <button role="tab" aria-selected="true" data-view="twins">Twins</button>
+      <button role="tab" aria-selected="false" data-view="egypt">Egypt</button>
+    </div>
+    <button type="button" class="analyst-open" data-analyst-open aria-controls="analyst" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>
+      Ask the analyst
+    </button>
+  </header>
+
+  <main class="ex-main">
+    <!-- Target world -->
+    <section class="pane pane-world" aria-labelledby="world-heading">
+      <h1 id="world-heading" class="pane-title" data-world-heading>Mars · 38 Exploration Zones</h1>
+      <div class="globe-box globe-world" data-world-globe></div>
+      <div class="target-head">
+        <p class="target-kind" data-target-kind>Exploration Zone</p>
+        <h2 class="target-name" data-target-name>Jezero</h2>
+        <dl class="target-feats" data-target-feats></dl>
+      </div>
+      <label class="search">
+        <span class="visually-hidden">Find a site</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+        <input type="search" placeholder="Find a site" autocomplete="off" data-target-search>
+      </label>
+      <ul class="target-list" data-target-list aria-label="Sites"></ul>
+    </section>
+
+    <!-- Earth -->
+    <section class="pane pane-earth" aria-labelledby="earth-heading">
+      <div class="earth-bar">
+        <div>
+          <h2 id="earth-heading" class="pane-title" data-earth-heading>Closest places on Earth</h2>
+          <p class="pane-note" data-earth-note></p>
+        </div>
+        <div class="earth-switches">
+          <div class="seg" role="radiogroup" aria-label="Earth layer">
+            <button role="radio" aria-checked="true" data-earth-layer="satellite">Satellite</button>
+            <button role="radio" aria-checked="false" data-earth-layer="map">Map</button>
+            <button role="radio" aria-checked="false" data-earth-layer="terrain">Terrain</button>
+          </div>
+          <div class="seg" role="radiogroup" aria-label="Projection">
+            <button role="radio" aria-checked="true" data-earth-mode="globe">Globe</button>
+            <button role="radio" aria-checked="false" data-earth-mode="mercator">Flat</button>
+          </div>
+        </div>
+      </div>
+      <div class="earth-stage">
+        <div class="earth-view" data-earth-view aria-label="Earth with the twins. Drag to move, scroll or use the plus and minus buttons to zoom."></div>
+        <div class="map map-earth" data-earth-map hidden></div>
+        <div class="zoom-ctl" aria-label="Zoom">
+          <button type="button" data-zoom="in" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button type="button" data-zoom="out" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="twin-tools">
+        <label class="sort">
+          <span>Sort</span>
+          <select data-sort>
+            <option value="rank">Closest match</option>
+            <option value="distance">Nearest to a city</option>
+          </select>
+        </label>
+        <label class="sort" data-city-wrap hidden>
+          <span>From</span>
+          <select data-city></select>
+        </label>
+        <p class="kbd-hint"><kbd>←</kbd><kbd>→</kbd> step through twins</p>
+      </div>
+      <ol class="twin-strip" data-twin-list aria-label="Twins"></ol>
+    </section>
+
+    <!-- Twin card -->
+    <aside class="pane pane-card" aria-live="polite" aria-labelledby="card-heading" data-card>
+      <p class="card-loading">Loading the data</p>
+    </aside>
+
+    <!-- Ask the analyst: slides over the card column -->
+    <section class="analyst" id="analyst" data-analyst hidden aria-labelledby="analyst-title">
+      <div class="analyst-head">
+        <div>
+          <h2 id="analyst-title" class="pane-title">Ask the analyst</h2>
+          <p class="analyst-tag">AI assistant · answers only from the data on screen and can make mistakes</p>
+          <p class="analyst-tag">Questions go to Google Gemini's free tier, which Google may use to improve its products. Don't share personal details.</p>
+        </div>
+        <button type="button" class="analyst-close" data-analyst-close aria-label="Close the analyst">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="analyst-log" data-analyst-log role="log" aria-live="polite"></div>
+      <div class="analyst-chips" data-analyst-chips aria-label="Suggested questions"></div>
+      <form class="analyst-form" data-analyst-form>
+        <label class="visually-hidden" for="analyst-input">Your question</label>
+        <textarea id="analyst-input" rows="2" dir="auto" placeholder="Ask about this site and its twins" data-analyst-input maxlength="500"></textarea>
+        <button type="submit" class="analyst-send" data-analyst-send aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
