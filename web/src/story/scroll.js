@@ -84,19 +84,18 @@ const BODIES = [
   { show: ['moonO'], place: ['moonX', 'moonY', 'moonS', 'moonTilt'], size: 'moonS', y: 'moonY' },
 ];
 const vis = (s, keys) => Math.max(...keys.map((k) => s[k]));
-const PLACE_KEYS = new Set(BODIES.flatMap((b) => b.place));
 
 /**
- * Mars turning into the dotted Earth, in two steps on one body:
+ * Mars turning into the dotted Earth, in two separate steps on one body:
  * 1. (u 0 to 0.45) Mars glides from the screen edge to Earth's place and
- *    lights up fully, so the whole globe is on screen before anything changes;
- * 2. (u 0.4 to 0.95) in that same place Mars's surface dissolves while the
- *    dots of Earth appear on the same sphere.
+ *    lights up fully, then comes to a complete stop;
+ * 2. (u 0.55 to 1) only once it is still, Mars's surface dissolves in that
+ *    same place while the dots of Earth appear on the same sphere.
  * Nothing arrives from the side, and scrolling back runs it in reverse.
  */
 function morphMarsToEarth(a, b, u) {
   const move = easeInOut(clamp01(u / 0.45));
-  const change = smooth(clamp01((u - 0.35) / 0.5));
+  const change = smooth(clamp01((u - 0.55) / 0.4));
   const out = {};
   for (const k of Object.keys(a)) out[k] = a[k] + (b[k] - a[k]) * change;
   const lerp = (x, y, t) => x + (y - x) * t;
@@ -107,9 +106,9 @@ function morphMarsToEarth(a, b, u) {
     marsX: x, marsY: y, marsS: s, dotsX: x, dotsY: y, dotsS: s,
     marsLight: lerp(a.marsLight, 1, move),
     // Once the dissolve is done, Mars is gone: no remnant lingers.
-    marsO: 1 - smooth(clamp01((u - 0.8) / 0.15)),
+    marsO: 1 - smooth(clamp01((u - 0.78) / 0.22)),
     marsDissolve: change,
-    dotsO: smooth(clamp01((u - 0.35) / 0.6)) * b.dotsO,
+    dotsO: smooth(clamp01((u - 0.55) / 0.45)) * b.dotsO,
     earthO: b.earthO * change,
     earthTilt: b.earthTilt,
   });
@@ -247,6 +246,29 @@ const SCRUBS = {
   },
 };
 
+/**
+ * Drive an animation from a ScrollTrigger's progress, softly and never
+ * faster than minDur seconds for the whole of it (faster only when far
+ * behind). Like scrub: true it follows the scroll both ways, but a fast
+ * scroll can't squeeze it into a frame or two: it always plays through.
+ */
+function followScroll(anim, st, minDur) {
+  let p = st.progress;
+  anim.progress(p);
+  gsap.ticker.add((time, deltaMs) => {
+    const target = st.progress;
+    const d = target - p;
+    if (Math.abs(d) < 1e-4) {
+      if (p !== target) { p = target; anim.progress(p); }
+      return;
+    }
+    const dt = Math.min(deltaMs, 50) / 1000;
+    const cap = (dt / minDur) * Math.max(1, Math.abs(d) * 2);
+    p += Math.sign(d) * Math.min(Math.abs(d) * 0.12, cap);
+    anim.progress(p);
+  });
+}
+
 export function initScroll({ stage, data }) {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const phoneQuery = window.matchMedia('(max-width: 760px)');
@@ -303,7 +325,7 @@ export function initScroll({ stage, data }) {
     if (PINNED.includes(name)) {
       let scrubTl;
       if (SCRUBS[name]) {
-        scrubTl = gsap.timeline({ defaults: { ease: 'none' } });
+        scrubTl = gsap.timeline({ paused: true, defaults: { ease: 'none' } });
         SCRUBS[name](scrubTl, el);
         // The move takes the first ~55% of the hold; then the scene rests.
         scrubTl.to({}, { duration: scrubTl.duration() * 0.8 });
@@ -315,8 +337,8 @@ export function initScroll({ stage, data }) {
         pin: true,
         pinSpacing: true,
         invalidateOnRefresh: true,
-        ...(scrubTl ? { animation: scrubTl, scrub: true } : {}),
       });
+      if (scrubTl) followScroll(scrubTl, triggers[name], 1.2);
       // As the scene leaves, its content fades with the scroll, so the old
       // text never sits on top of the new one.
       const pinST = triggers[name];
@@ -347,15 +369,29 @@ export function initScroll({ stage, data }) {
     const target = Number(n.textContent.replace(/[^0-9]/g, '')) || 0;
     const proxy = { v: 0 };
     n.textContent = '0';
-    gsap.to(proxy, {
-      v: target, ease: 'power2.out',
+    const count = gsap.to(proxy, {
+      v: target, ease: 'power2.out', paused: true,
       onUpdate: () => { n.textContent = Math.round(proxy.v).toLocaleString('en-US'); },
-      scrollTrigger: { trigger: n, start: 'top 95%', end: 'top 45%', scrub: true },
     });
+    followScroll(count, ScrollTrigger.create({ trigger: n, start: 'top 95%', end: 'top 45%' }), 0.9);
   });
 
   // ---- Planet keyframes, positioned from the pinned ranges ----
+  // The planets run on a "story clock" rather than on the raw scroll. The
+  // clock counts transitions: 0 to 1 is the first change between two planet
+  // states, 1 to 2 the next, and so on; stretches where nothing changes take
+  // no clock time. Each frame the clock moves toward where the scroll is,
+  // but never faster than MIN_TRANSITION seconds per transition (quicker
+  // only when it has several transitions to catch up). So however fast you
+  // scroll, down or up, every transition plays through in order, frame by
+  // frame, and every planet value always comes from one consistent moment
+  // of one transition: Mars cannot change while it is still moving, and
+  // nothing jumps or flickers.
+  const MIN_TRANSITION = 0.7; // seconds, at the least, for one transition
   let keys = [];
+  let trans = [];   // transitions: { a, b, pos0, pos1 }
+  let clock = null; // story clock, in transitions
+  const sameState = (a, b) => Object.keys(a).every((k) => Math.abs(a[k] - b[k]) < 1e-6);
   function buildKeys() {
     const table = planetKeys(phoneQuery.matches);
     keys = [];
@@ -368,44 +404,49 @@ export function initScroll({ stage, data }) {
       for (const [t, state] of list) keys.push({ pos: start + (end - start) * t, state });
     }
     keys.sort((a, b) => a.pos - b.pos);
+    trans = [];
+    for (let i = 1; i < keys.length; i++) {
+      const a = keys[i - 1]; const b = keys[i];
+      if (b.pos > a.pos && !sameState(a.state, b.state)) trans.push({ a: a.state, b: b.state, pos0: a.pos, pos1: b.pos });
+    }
+    clock = scrollClock(window.scrollY); // a new layout: start in step
   }
   ScrollTrigger.addEventListener('refresh', buildKeys);
 
-  function applyPlanets() {
-    if (!keys.length) return;
-    const y = window.scrollY;
-    let i = keys.findIndex((k) => k.pos > y);
-    if (i === -1) i = keys.length;
-    const a = keys[Math.max(0, i - 1)];
-    const b = keys[Math.min(keys.length - 1, i)];
-    const span = b.pos - a.pos;
-    const u = span > 0 ? Math.min(1, Math.max(0, (y - a.pos) / span)) : 1;
-    const goal = blendStates(a.state, b.state, u);
-    // Ease toward the scroll's target rather than snapping to it, so the
-    // planets glide even when the wheel moves in jumps.
-    // Everything eases toward the scroll's target, so even a very fast
-    // scroll never jumps a value in one frame. Positions follow three rules:
-    // a planet that is hidden jumps (unseen) to its place; a planet that is
-    // fading out stays exactly where it is; only a visible planet moves.
-    const p = stage.params;
-    const ease = (k, rate) => {
-      const d = goal[k] - p[k];
-      p[k] = Math.abs(d) < 1e-4 ? goal[k] : p[k] + d * rate;
-    };
-    // Fading out is quicker than fading in, so a planet is fully gone before
-    // it is moved to its next place.
-    for (const k of Object.keys(p)) if (!PLACE_KEYS.has(k)) ease(k, goal[k] < p[k] ? 0.3 : 0.16);
-    for (const body of BODIES) {
-      const shown = vis(p, body.show);
-      const far = Math.max(...body.place.map((k) => Math.abs(goal[k] - p[k])));
-      if (shown < 0.02) for (const k of body.place) p[k] = goal[k];
-      else if (vis(goal, body.show) < 0.02) continue;
-      else if (body.y === 'dotsY' && far > 0.3 && (p.dotsS > 1.5) !== (goal.dotsS > 1.5)) {
-        // Earth showing as a horizon but due to be a globe (or the reverse):
-        // never fly between the two. Hide it in place, then it reappears.
-        for (const k of body.show) p[k] += (0 - p[k]) * 0.4;
-      } else for (const k of body.place) ease(k, 0.1);
+  /** Where the scroll position is on the story clock. */
+  function scrollClock(y) {
+    let c = 0;
+    for (const t of trans) {
+      if (y >= t.pos1) { c += 1; continue; }
+      if (y > t.pos0) c += (y - t.pos0) / (t.pos1 - t.pos0);
+      break;
     }
+    return c;
+  }
+
+  /** The planets at a moment of the story clock. */
+  function stateAt(c) {
+    if (!trans.length) return keys[0]?.state;
+    const k = Math.min(trans.length - 1, Math.max(0, Math.floor(c)));
+    const u = clamp01(c - k);
+    return blendStates(trans[k].a, trans[k].b, u);
+  }
+
+  function applyPlanets(time, deltaMs) {
+    if (!keys.length) return;
+    const target = scrollClock(window.scrollY);
+    if (clock === null) clock = target;
+    const d = target - clock;
+    if (Math.abs(d) > 1e-5) {
+      // A soft follow (eases to a stop), capped to the minimum duration per
+      // transition; the cap rises when several transitions are behind, so
+      // the planets never trail far behind the page.
+      const dt = Math.min(deltaMs, 50) / 1000;
+      const cap = (dt / MIN_TRANSITION) * Math.max(1, Math.abs(d));
+      const step = Math.min(Math.abs(d) * 0.12, cap);
+      clock = Math.abs(d) < 1e-4 ? target : clock + Math.sign(d) * Math.max(step, Math.min(Math.abs(d), 1e-4));
+    }
+    Object.assign(stage.params, stateAt(clock));
   }
   gsap.ticker.add(applyPlanets);
 
