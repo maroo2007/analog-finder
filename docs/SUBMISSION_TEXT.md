@@ -7,7 +7,7 @@ into its field as plain text. Every number here was checked against
 
 **Before pasting, check three things:**
 
-1. **Demo link:** upload `video/planetary-twin-finder-30s.mp4` (29.5 s) to
+1. **Demo link:** upload `video/planetary-twin-finder-30s.mp4` (29.8 s) to
    YouTube as *Unlisted* or *Public*, then paste its link. Open it in a
    private window to be sure it plays without a login.
 2. **GitHub link:** make `maroo2007/analog-finder` public first, or remove
@@ -47,7 +47,7 @@ cheaper and more varied places to rehearse for the Moon and Mars.
 
 (paste the YouTube link here)
 
-A 29.5 second video with English narration and English subtitles.
+A 29.8 second video with English narration and English subtitles. It opens with "We are Team Duplica."
 
 ---
 
