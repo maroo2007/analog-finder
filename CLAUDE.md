@@ -271,12 +271,15 @@ laptop); open Claude Code on that folder so the Impeccable design hooks run.
   the challenge's official data list is in `docs/CHALLENGE_RESOURCES.md`
   (both added 2026-11-13). Read them before planning the final demo. In
   short: there is no live pitching; judges see only a **30 second video or
-  exactly 7 slides**, uploaded first to the local Cairo form and then to the
-  global Space Apps site. Still open: the Cairo PDF gives the event as
-  **13 to 14 November** while this file says 14 to 15 (confirm); the GitHub
-  repository is private, so judges cannot open its link until it is made
-  public; the submission needs an AI-use disclosure. The final demo is
-  planned for later.
+  at most 7 slides including title and intro** (over the limit means no
+  Global Judging), uploaded first to the local Cairo form and then to the
+  global Space Apps site. **Submission closes Sunday 15 November, 11:59
+  p.m. Cairo time** (opened Saturday 9:00 a.m.); only the last saved
+  submission counts. Still open: the GitHub repository is private, so
+  judges cannot open its link until it is made public; the AI disclosure
+  (AI code acknowledged in text and metadata, AI images and videos
+  watermarked); and the China-affiliation eligibility check for Egyptian
+  Chinese University (see the doc). The final demo is planned for later.
 - **Gemini chatbot** (2026-11-13): `src/chatbot.py` (Gemini, terminal mode),
   `src/chat_app.py` (Streamlit page), `src/chat_data.py` (lookups in
   `web/public/data/`, handed to Gemini as tools so it never invents a

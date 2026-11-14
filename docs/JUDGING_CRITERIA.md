@@ -86,6 +86,125 @@ What this means for us: judges see the 30 second video or the 7 slides
 first, not a live demo, so those are the main deliverable. The website and
 the repository count only as links, which judges must be able to open.
 
+## Official global rules (Space Apps guides, 13 November 2026)
+
+From the *Project Submission Guide* and the *Judging & Awards Guide* on
+spaceappschallenge.org/resources, both dated 13 November 2026. Where they
+differ from the Cairo guide book above, these are the global rules.
+
+### Deadline
+
+- Submission opens **Saturday 14 November, 9:00 a.m.** and closes **Sunday
+  15 November, 11:59 p.m.**, in the time zone of our Local Event (Cairo).
+  The "Project" tab on the team page appears only once it opens.
+- Edit, save and resubmit as often as needed before the deadline; **only the
+  last saved submission is judged**. Click "Submit for Judging" before the
+  deadline: anything saved or submitted later is not judged.
+- Use the edit **Lock** on the project page so two teammates do not
+  overwrite each other.
+- Ask the Cairo Local Lead for local judging and award times, which may
+  differ.
+
+### The project page (what judges review)
+
+The project page is what judges mostly score; the demo counts too, mainly
+for Presentation. All of it **in English**. Required fields:
+
+- **Project name.**
+- **High-level summary:** what we built, how it addresses the challenge, why
+  it matters.
+- **Link to project demo:** 7 slides at most, **including the title and
+  intro slides**, or a video of **30 seconds or less**. Slides in English; a
+  video may be in Arabic only with **English subtitles**. Hosted outside the
+  Space Apps site (YouTube, Google Drive, GitHub, ...). **Projects over these
+  limits are not eligible for Global Judging.**
+- **Link to final project:** for example the website or repository.
+- **Detailed description:** what it does, how it works, benefits, goals, and
+  the tools, languages and software used.
+- **Use of AI** (the guides call it "Super Intelligence", SI): see below.
+- **NASA data:** which NASA data and resources we used. At least one is
+  required for a Global Award.
+- **Space agency partner data and other references:** every data set,
+  resource, tool, piece of code, text and image used, even open ones. ESA
+  (Copernicus DEM) and JAXA are among this year's partners.
+
+### Links and files
+
+- Every link must open **with no login, password, permission or
+  registration**. If judges cannot open it, it is not judged. Set files to
+  public and test each link in a private browser window. **Our GitHub
+  repository is private**, so it fails this until it is made public.
+- The project page accepts images (JPG, PNG, GIF up to 10 MB), not videos
+  or documents.
+- For a new website, the guide recommends asking for a FortiGuard Web Filter
+  Classification (category such as education or web-based application;
+  company name "N/A"), so judges' networks do not block it. Not required.
+
+### AI disclosure
+
+- AI tools are allowed to speed up the work, but not to come up with the
+  idea for solving the challenge.
+- We must say clearly **where and how** AI was used:
+  - **images and videos** made with AI need a **visible watermark**;
+  - **audio** made with AI must be acknowledged in text and metadata;
+  - **code and data** made with AI must be acknowledged **in descriptive text
+    and metadata**. This covers code written with Claude Code, and the Gemini
+    chatbot and analyst.
+- AI-generated content may not use or modify NASA branding (logos, flags,
+  mission identifiers).
+- The SI question on the form is not shown to judges, but the watermarks,
+  text and metadata in the project are.
+
+### Other conditions
+
+- Every team member registered for the same Local Event (Cairo), on the
+  Members tab; at most six members. Members cannot be added after
+  submission closes.
+- No images, video, audio or likeness of anyone under 18.
+- Tick both boxes: the Terms and Conditions, and "all work is original, all
+  external resources are listed in References, no copyrighted material used
+  without permission".
+- **Check before submitting:** under NASA's China funding restriction,
+  teams are reviewed for "prohibited bilateral activity with China, or a
+  Chinese-owned entity", which the guide defines to include any university
+  incorporated under the laws of China. Our team is from Egyptian Chinese
+  University. Whether that applies is NASA's decision, based on what the
+  team declares; read the Terms and Conditions clause or ask the Local Lead.
+
+### Judging and awards
+
+- Each criterion (Impact, Creativity, Validity, Relevance, Presentation) is
+  scored 1 to 5 at every level. Relevance at 5 means NASA data is "integral
+  to the project's success", not "a superficial addition". Validity also
+  weighs usability.
+- Local judges pick the **Global Nominees** (announced 3 December 2026);
+  then **Global Finalists** and Honorable Mentions (17 December); then
+  **Global Winners** (26 January 2027).
+- Ten Global Awards. The ones that fit us best: **Best Use of Data** (makes
+  space data accessible or uses it in a unique application), **Best Use of
+  Science** (best use of the scientific method; our blind validation),
+  **Local Impact** (the Egypt sites).
+- Everyone who submits by the deadline gets a participant certificate,
+  downloadable from the profile as a PDF. The name comes from "Full Name" in
+  the profile.
+
+### Global Offers (free tools from collaborators)
+
+Reviewed on 14 November 2026:
+
+- **Use:** the free domain and SSL from GoDaddy Registry and Porkbun
+  (spaceapps.earth), if we want a custom address for the website. File the
+  FortiGuard classification above if we do; the free Netlify address avoids
+  that question.
+- **Backup only:** Microsoft Planetary Computer (no account; includes the
+  Copernicus DEM and MODIS), if Earth Engine quota runs out. Switching
+  sources would mean re-checking the validated method.
+- **Optional:** the Miro hackathon template boards, for planning the slides.
+- **Skip:** Google Cloud and Azure credits (both need a card and a billing
+  account, against the team's no-billing rule, and we do not need them),
+  Meteomatics weather, and Microsoft and GitHub Copilot and Teams (anything
+  used still goes in the AI disclosure).
+
 ## Before submitting
 
 - [ ] Selected and addressed a NASA challenge.
