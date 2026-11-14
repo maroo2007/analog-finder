@@ -149,6 +149,12 @@ function analystContext() {
     target: target && {
       id: target.id, name: target.name, world: target.world, lat: target.lat, lon: target.lon,
       matched_on: target.matched_on, features: round(target.features), best_score: target.best_score,
+      diviner: target.diviner ? {
+        annual_mean_2cm: target.diviner.annual_mean_2cm,
+        cold_trap_share: target.diviner.cold_trap_share,
+        ice_stable_within_2_9m_share: target.diviner.ice_stable_within_2_9m_share,
+        note: target.diviner.note,
+      } : undefined,
     },
     feature_labels: Object.fromEntries(T.features.map((f) => [f.key, `${f.label}${f.unit ? ` (${f.unit})` : ''}`])),
     twins: twins.map((x, i) => ({
