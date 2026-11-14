@@ -56,8 +56,8 @@ body.explorer { font-size: 15px; height: 100vh; overflow: hidden; }
 /* Left: target world */
 .pane-world { display: flex; flex-direction: column; gap: 14px; }
 .globe-world { aspect-ratio: 1; margin: -6px -10px 0; }
-.target-kind { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
-.target-name { margin-top: 4px; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; text-wrap: balance; }
+.target-kind { margin-top: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
+.target-name { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; text-wrap: balance; }
 .target-note { margin-top: 8px; font-size: 12px; line-height: 1.5; color: var(--ink-2); max-width: 46ch; }
 .target-feats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; margin-top: 14px; }
 .target-feats div { display: grid; gap: 2px; }
@@ -413,7 +413,7 @@ kbd {
   .earth-switches { justify-content: space-between; }
   .earth-stage { flex: none; height: 58vh; min-height: 340px; }
   .zoom-ctl { right: 12px; bottom: 12px; }
-  .earth-view .maplibregl-ctrl.maplibregl-ctrl-attrib { max-width: calc(100% - 64px); margin: 0 0 8px 8px; font-size: 9.5px; line-height: 1.35; }
+  .earth-view .maplibregl-ctrl.maplibregl-ctrl-attrib { max-width: calc(100% - 64px); margin: 0 0 8px 8px; font-size: 11px; line-height: 1.4; }
   .twin-tools { padding: 0 16px; gap: 10px; }
   .kbd-hint { display: none; }
   .twin-strip button { width: 132px; padding: 10px 12px; }

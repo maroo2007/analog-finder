@@ -56,8 +56,11 @@ Jezero crater's closest twin.
 - Twin Finder workflow: pick Mars or the Moon, click a target site on a 3D
   globe, see its 25 closest Earth twins as numbered pins and a list, open a
   twin card (two shaded relief images, rank, score, per-feature closeness,
-  what matches best and worst, the gravity/air/radiation caveat, Google Maps
-  link). An Egypt tab lists the best Egyptian tile per target.
+  what matches best and worst, what Earth can't copy (gravity, air,
+  radiation; on the Moon also Diviner temperatures as context), and links to
+  Google Maps, NASA Worldview and the Copernicus Browser). An Egypt tab lists
+  the best Egyptian tile per target. "Ask the analyst" (Gemini, labelled AI)
+  answers from the data on screen once a key is set.
 
 ## Capabilities and Constraints
 
@@ -74,22 +77,21 @@ Jezero crater's closest twin.
 - **Data lives in `web/public/data/`** and the site must read whatever is
   there: `targets.json` (features, targets), `matches/<id>.json` (top 25
   twins at least 25 km apart), `egypt.json`, `likeness.json` and its PNG
-  maps, `shade/{mars,moon,earth}/` relief images. Today it covers Africa only
-  (130,060 places). When `feature/americas` merges, the same files gain
-  `continent`, `rank_continent`, `of_continent`, more `maps` in
-  `likeness.json`, and `of` becomes 148,925. Code must fall back gracefully
-  (for example `rank_continent ?? rank`) and never hardcode a count or a
-  closeness value that the data provides.
+  maps, `shade/{mars,moon,earth}/` WebP relief images (one per twin). It
+  covers Africa and the Americas south of 50 N: 148,925 places (130,060 in
+  Africa, 18,865 in the Americas), each match with `continent`,
+  `rank_continent` and `of_continent`. More continents may come with the same
+  files. Code must fall back gracefully (for example `rank_continent ?? rank`)
+  and never hardcode a count or a closeness value that the data provides.
 - **Competition rule:** no NASA logos anywhere. Writing "NASA" in text is
   fine.
 - **Performance:** one renderer, textures at most 4096 x 2048, rendering paused
   when the tab is hidden, aim for 60 fps on a laptop, works at 390 px wide.
 - **Input:** mouse wheel, trackpad, touch and keyboard all work.
 - **Assets:** only public domain or clearly open-licensed (Blue Marble, Viking
-  Mars mosaic, MOLA, LROC colour, LOLA, Natural Earth). No 3D models needed.
+  Mars mosaic, MOLA, LROC colour, LOLA). No 3D models needed.
   Any missing asset is requested from the team, never improvised.
-- **Undecided:** deploy host; GitHub, YouTube and Method link URLs for the
-  footer; the exact "How we used AI" line.
+- **Undecided:** deploy host and the YouTube link for the footer.
 
 ## Brand Commitments
 
@@ -104,15 +106,17 @@ Jezero crater's closest twin.
 
 ## Evidence on Hand
 
-- Jezero crater's #1 twin in Africa: Egypt's Eastern Desert, 25.13°N,
-  34.54°E (`matches/jezero.json`), with per-feature closeness in the file.
+- Jezero crater's #1 twin, #1 in Africa and #1 of 148,925 overall: Egypt's
+  Eastern Desert, 25.13°N, 34.54°E (`matches/jezero.json`), with per-feature closeness in the file.
 - Phase 1 blind validation (2026-10-10): 73% of Mars matches went to Atacama
   and Death Valley on elevation alone; with V1 (terrain + albedo) it is
   92.5%. Figures in `figures/validation_*.png`.
-- Moon's closest twins are volcanic mountains in Chad.
-- Datasets used: MOLA, TES, LRO LOLA, MODIS, Copernicus DEM, JRC Water, USGS.
-- Shaded relief pairs for every target (`shade/`), a Mars-likeness map of
-  Africa (`likeness.png`).
+- The Moon's closest twins are in the Americas: the #1 twin of each Artemis
+  region is in Chile (3), Argentina (3), Bolivia (2) or the United States (1).
+- Datasets used: MOLA, TES, LRO LOLA, LRO Diviner (context only), MODIS,
+  Copernicus DEM, JRC Water, USGS, via NASA PDS and Earthdata.
+- Shaded relief for every target and twin (`shade/`), Mars-likeness maps of
+  Africa and the Americas (`likeness.png`, `likeness_americas.png`).
 - **Absent, must not be fabricated:** testimonials, endorsements, partner or
   customer logos, usage numbers, press, any claim of NASA involvement or
   approval.

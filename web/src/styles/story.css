@@ -458,14 +458,14 @@ main { overflow-x: clip; }
 .footer-name { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
 .footer-links { display: flex; gap: 28px; align-items: start; }
 .footer-links a { color: var(--ink); }
-.footer-credits, .footer-ai { max-width: 80ch; font-size: 13px; line-height: 1.6; }
+.footer-credits, .footer-ai { max-width: 60ch; font-size: 13px; line-height: 1.6; }
 .footer-ai strong { color: var(--ink); font-weight: 700; }
 /* Credits: every data source and image, grouped by world. */
 .credits { grid-column: 1 / -1; display: grid; gap: 22px; padding-top: 28px; border-top: 1px solid var(--line); scroll-margin-top: 80px; }
 .credits-title { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
 .credits-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 48px; }
 .credits-list dt { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
-.credits-list dd { margin-top: 6px; font-size: 13px; line-height: 1.6; max-width: 70ch; }
+.credits-list dd { margin-top: 6px; font-size: 13px; line-height: 1.6; max-width: 60ch; }
 
 /* Fixed controls */
 .launch-fixed {
