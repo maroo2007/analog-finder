@@ -414,6 +414,17 @@ kbd {
   .earth-stage { flex: none; height: 58vh; min-height: 340px; }
   .zoom-ctl { right: 12px; bottom: 12px; }
   .earth-view .maplibregl-ctrl.maplibregl-ctrl-attrib { max-width: calc(100% - 64px); margin: 0 0 8px 8px; font-size: 11px; line-height: 1.4; }
+  /* The map credits, moved under the map so they no longer cover it. */
+  /* .pane-earth raises specificity above MapLibre's own sheet, which loads
+     after this one. */
+  .pane-earth .earth-attrib.maplibregl-ctrl.maplibregl-ctrl-attrib {
+    margin: -2px 0 0; padding: 0 16px; background: none; box-shadow: none;
+    font-size: 11px; line-height: 1.45; color: var(--ink-3);
+    white-space: normal; max-height: none; overflow: visible;
+  }
+  .pane-earth .earth-attrib .maplibregl-ctrl-attrib-button { display: none; }
+  .pane-earth .earth-attrib .maplibregl-ctrl-attrib-inner { display: block; }
+  .pane-earth .earth-attrib .maplibregl-ctrl-attrib-inner a { color: var(--ink-2); }
   .twin-tools { padding: 0 16px; gap: 10px; }
   .kbd-hint { display: none; }
   .twin-strip button { width: 132px; padding: 10px 12px; }

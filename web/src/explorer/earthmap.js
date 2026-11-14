@@ -12,6 +12,10 @@ import { baseSources, baseLayers, GROUND } from './tiles.js';
 maplibregl.setWorkerUrl(workerUrl);
 
 const DEFAULT_VIEW = { center: [20, 12], zoom: 1.35 };
+const narrow = () => window.matchMedia('(max-width: 760px)').matches;
+// On a globe, the diameter in pixels is about 163 x 2^zoom (512 px world
+// width over pi). The zoom at which the globe fills a given width:
+const fillZoom = (px) => Math.log2(px / 163);
 
 export function createEarthMap(host, { onPick }) {
   let projection = 'globe';
@@ -53,8 +57,18 @@ export function createEarthMap(host, { onPick }) {
   map.touchZoomRotate.disableRotation();
   map.keyboard.disableRotation?.();
   // Credits stay visible: EOX's licence asks for attribution wherever the
-  // imagery is shown, screenshots included.
-  map.addControl(new maplibregl.AttributionControl({ compact: false }), 'bottom-left');
+  // imagery is shown, screenshots included. On a phone the full credit line
+  // covered a third of the map, so there it sits just under the map instead,
+  // still in full and still next to the imagery.
+  const attribution = new maplibregl.AttributionControl({ compact: false });
+  const stage = host.closest('.earth-stage');
+  if (narrow() && stage) {
+    const el = attribution.onAdd(map);
+    el.classList.add('earth-attrib');
+    stage.after(el);
+  } else {
+    map.addControl(attribution, 'bottom-left');
+  }
 
   // A loading veil instead of a black box, until the first Earth tiles land.
   const veil = document.createElement('div');
@@ -137,6 +151,15 @@ export function createEarthMap(host, { onPick }) {
       if (!pins.length) return;
       const b = new maplibregl.LngLatBounds();
       for (const p of pins) b.extend([p.lon, p.lat]);
+      if (narrow() && projection === 'globe') {
+        // Phone: twins spread over two continents made the globe a small
+        // ball in the middle. Never frame it smaller than the map is wide;
+        // the whole globe still fits, so no pin on its near side is lost.
+        const cam = map.cameraForBounds(b, { padding: 24, maxZoom: 3.4 });
+        const zoom = Math.max(cam?.zoom ?? 0, fillZoom(host.clientWidth * 0.94));
+        map.easeTo({ center: cam?.center ?? b.getCenter(), zoom, duration: 1600, essential: true });
+        return;
+      }
       map.fitBounds(b, { padding: 70, maxZoom: 3.4, duration: 1600, essential: true });
     },
     flyTo(lat, lon, zoom = 11) {

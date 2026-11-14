@@ -27,19 +27,30 @@ const PINNED = ['problem', 'idea', 'steps', 'worlds', 'pick', 'measure', 'match'
 
 /** Planet states per scene, keyed by progress through the scene (0..1). */
 function planetKeys(phone) {
-  const k = phone ? 0.55 : 1; // phone: globes smaller and behind the text
+  const k = phone ? 0.55 : 1; // phone: smaller globes
   const hold = (state) => [[0, state], [1, state]];
-  const marsEdge = S({ marsO: 1, marsX: phone ? 1.08 : 1.0, marsY: -0.05, marsS: 0.95, marsLight: 0.4 });
+  // Phone composition: the words sit in the top half of each scene and the
+  // planet sits whole in the free space below them, never behind the text
+  // and never cut off by the screen edge. (On a portrait phone a size of 1
+  // is a globe as wide as the screen; y runs -1 bottom to 1 top.)
+  const marsEdge = S(phone
+    ? { marsO: 1, marsX: 0.28, marsY: -0.56, marsS: 0.72, marsLight: 0.4 }
+    : { marsO: 1, marsX: 1.0, marsY: -0.05, marsS: 0.95, marsLight: 0.4 });
   // Small enough to show the whole globe beside the text, never cut off.
-  const dotsSide = S({ dotsO: 1, dotsX: phone ? 0.2 : 0.46, dotsY: phone ? -0.5 : 0, dotsS: phone ? 0.6 : 0.6 });
-  const worlds = { dotsO: 1, dotsY: 0.24, dotsS: 0.44 * k + 0.08 };
-  const trio = { sMarsO: 1, sMoonO: 1, sMarsX: phone ? -0.72 : -0.46, sMoonX: phone ? 0.72 : 0.46, smallS: phone ? 0.13 : 0.18 };
+  const dotsSide = S({ dotsO: 1, dotsX: phone ? 0.06 : 0.46, dotsY: phone ? -0.54 : 0, dotsS: phone ? 0.64 : 0.6 });
+  // Phone: Earth higher and larger, with Mars and the Moon at its height.
+  const worlds = phone ? { dotsO: 1, dotsY: 0.3, dotsS: 0.44 } : { dotsO: 1, dotsY: 0.24, dotsS: 0.44 * k + 0.08 };
+  const trio = phone
+    ? { sMarsO: 1, sMoonO: 1, sMarsX: -0.71, sMoonX: 0.71, smallS: 0.16, smallY: 0.3 }
+    : { sMarsO: 1, sMoonO: 1, sMarsX: -0.46, sMoonX: 0.46, smallS: 0.18 };
   // Earth tilted forward so the horizon shows Africa rather than the Arctic.
-  const horizon = (y) => ({ earthO: 1, earthTilt: -1.1, dotsY: phone ? y * 0.56 : y, dotsS: phone ? 1.4 : 2.2 });
-  const moonAt = { moonO: 1, moonX: phone ? 0 : 0.36, moonY: phone ? -0.82 : 0, moonS: phone ? 0.7 : 0.72 * k + 0.1 };
+  // Phone: a wide horizon filling the lower part of the screen (it used to
+  // sit almost entirely below the screen, a 9% sliver).
+  const horizon = (y, phoneY) => ({ earthO: 1, earthTilt: -1.1, dotsY: phone ? phoneY : y, dotsS: phone ? 1.5 : 2.2 });
+  const moonAt = { moonO: 1, moonX: phone ? 0 : 0.36, moonY: phone ? -0.46 : 0, moonS: phone ? 0.6 : 0.72 * k + 0.1 };
   return {
     hero: [
-      [0, S({ marsO: 1, marsX: phone ? 0.3 : 0.42, marsY: phone ? 0.42 : 0, marsS: phone ? 0.95 : 0.78 })],
+      [0, S({ marsO: 1, marsX: phone ? 0.1 : 0.42, marsY: phone ? 0.36 : 0, marsS: phone ? 0.9 : 0.78 })],
       [1, S({ marsO: 1, marsX: 0.12, marsY: phone ? -1.55 : -2.8, marsS: phone ? 1.6 : 2.32 })],
     ],
     problem: hold(marsEdge),
@@ -53,9 +64,9 @@ function planetKeys(phone) {
     ],
     pick: hold(S({ starsO: 0 })),
     measure: hold(S({ starsO: 0.45 })),
-    match: hold(S(horizon(-2.62))),
-    finder: hold(S({ ...horizon(-2.95), starsO: 0.6 })),
-    promises: hold(S({ dotsO: phone ? 0.28 : 0.6, dotsY: phone ? -0.35 : 0, dotsS: 0.78 * k + 0.1 })),
+    match: hold(S(horizon(-2.62, -0.8))),
+    finder: hold(S({ ...horizon(-2.95, -1.06), starsO: 0.6 })),
+    promises: hold(S(phone ? { dotsO: 0.5, dotsY: -0.64, dotsS: 0.5 } : { dotsO: 0.6, dotsY: 0, dotsS: 0.78 * k + 0.1 })),
     egypt: hold(S({ starsO: 0.35 })),
     counter: hold(S({ starsO: 0.35 })),
     moon: [
@@ -63,7 +74,7 @@ function planetKeys(phone) {
       [0.7, S({ ...moonAt, moonTilt: -1.22, regionsO: 1 })],
       [1, S({ ...moonAt, moonTilt: -1.22, regionsO: 1 })],
     ],
-    limits: hold(S({ moonO: 1, moonY: phone ? -1.55 : -2.75, moonS: phone ? 1.4 : 2.25, moonTilt: -0.35, starsO: 0.8 })),
+    limits: hold(S({ moonO: 1, moonY: phone ? -1.1 : -2.75, moonS: phone ? 1.4 : 2.25, moonTilt: -0.35, starsO: 0.8 })),
     cta: [[0, S({})]],
   };
 }
@@ -80,7 +91,7 @@ const BODIES = [
   // and only resets once Mars is fully hidden (no Mars re-forming).
   { show: ['marsO'], place: ['marsX', 'marsY', 'marsS', 'marsLight', 'marsDissolve'], size: 'marsS', y: 'marsY' },
   { show: ['dotsO', 'earthO'], place: ['dotsX', 'dotsY', 'dotsS', 'earthTilt'], size: 'dotsS', y: 'dotsY' },
-  { show: ['sMarsO', 'sMoonO'], place: ['sMarsX', 'sMoonX', 'smallS'], size: 'smallS' },
+  { show: ['sMarsO', 'sMoonO'], place: ['sMarsX', 'sMoonX', 'smallS', 'smallY'], size: 'smallS' },
   { show: ['moonO'], place: ['moonX', 'moonY', 'moonS', 'moonTilt'], size: 'moonS', y: 'moonY' },
 ];
 const vis = (s, keys) => Math.max(...keys.map((k) => s[k]));

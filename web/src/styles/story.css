@@ -546,7 +546,12 @@ main { overflow-x: clip; }
   .measure-steps li { font-size: 1.05rem; }
   .finder-captions { grid-template-columns: 1fr; gap: 6px; font-size: 1rem; }
   .finder-captions li:nth-child(2), .finder-captions li:nth-child(3) { text-align: left; }
-  .finder-shot { width: 100%; }
+  /* The words take the top of the screen; the planet sits below them. */
+  .scene-statement { align-content: start; padding-top: max(96px, 13vh); }
+  /* A desktop screenshot shrunk to a phone is unreadable: show its left
+     part (the Mars globe and the map with the twins) at a useful size. */
+  .finder-shot { width: 100%; aspect-ratio: 1 / 1; }
+  .finder-shot img { object-position: 0 0; }
   .scene-moon { align-content: start; }
   .moon-copy p { margin-top: 18px; }
   .promise-line { font-size: 11px; }
