@@ -7,12 +7,14 @@
 // (gemini-3.8-flash: stable Flash model) and the generateContent reference.
 
 const API = 'https://generativelanguage.googleapis.com/v1beta/models';
-// Tried in order. gemini-3.8-flash is often overloaded (it refuses with 503
-// or hangs until the time limit), so it comes last: on 14 November every
-// question that started with it waited for it first.
-const MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+// Tried in order, fastest first. Measured on the live site on 14 November:
+// gemini-3.5-flash-lite answered in 1.6 to 1.9 s, while gemini-3.5-flash
+// and gemini-3.8-flash were overloaded (503, or a hang until the time
+// limit). The answers here come from the data on screen, which the lite
+// model handles well.
+const MODELS = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash'];
 // Each model gets this long to answer before the next is tried.
-const MODEL_TIMEOUT_MS = Number(process.env.ANALYST_MODEL_TIMEOUT_MS || 12_000);
+const MODEL_TIMEOUT_MS = Number(process.env.ANALYST_MODEL_TIMEOUT_MS || 8_000);
 // A model that just refused or timed out is skipped for this long, so the
 // next questions don't wait on it again (kept in this instance's memory).
 const BUSY_PAUSE_MS = 5 * 60_000;
