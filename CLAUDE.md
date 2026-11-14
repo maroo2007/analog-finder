@@ -320,8 +320,14 @@ still open is making the repository public and the final submission (see
   on 2026-11-14 that Egyptian Chinese University is not affiliated with
   China (see the doc).
 - **The 30 second demo video is done** (2026-11-14, approved by the team):
-  1920x1080, 30 fps, exactly 30.0 s, English narration with captions burned
-  in plus an `.srt`. It is on Marwan's laptop in the worktree's `video/`
+  1920x1080, 30 fps, 29.5 s (the official guide's limit is "30 seconds or
+  less" and over it means no Global Judging, so we keep half a second of
+  margin), English narration with captions burned in plus an `.srt`. It is
+  the only video the final submission takes: the 88 second Arabic video was
+  for registration and is done. Remaining form fields (official Project
+  Submission Guide, 13 November): project name, high-level summary, demo
+  link (public, e.g. YouTube), final project link, detailed description,
+  use of AI, NASA data, partner data and references. It is on Marwan's laptop in the worktree's `video/`
   folder, which git ignores (about 24 MB); share it by hand or upload it,
   never commit it. Footage is frame-exact screen capture of the live site;
   no AI images or video, no NASA logos. Narration: HeyGen free stock voice
