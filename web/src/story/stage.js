@@ -126,7 +126,10 @@ export async function createStage(canvas, { moonTargets = [] } = {}) {
   // (uDissolve 0..1) in a noise pattern with a thin blue edge, which is how
   // Mars turns into the dotted Earth instead of being swapped for it.
   const mars = new THREE.Group();
-  const marsMat = new THREE.MeshStandardMaterial({ map: marsTex, roughness: 1, metalness: 0, transparent: true });
+  // depthWrite off: a nearly transparent Mars must never hide the Earth dots
+  // drawn after it in the same place (it made Earth vanish for a moment just
+  // after the change). One convex sphere needs no depth of its own.
+  const marsMat = new THREE.MeshStandardMaterial({ map: marsTex, roughness: 1, metalness: 0, transparent: true, depthWrite: false });
   const dissolve = { value: 0 };
   marsMat.onBeforeCompile = (shader) => {
     shader.uniforms.uDissolve = dissolve;
