@@ -5,6 +5,11 @@ import { initHeader, initChapterBar } from './chrome.js';
 import { createStage, HIDDEN } from './stage.js';
 import { initScroll } from './scroll.js';
 
+// The pinned scenes change the page's length after load, so the browser's
+// own "restore the old scroll position" lands in the wrong scene. The page
+// starts at the top, or at the #section in the address (handled below).
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
 const root = document.documentElement;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 root.classList.toggle('reduced', reduced);
@@ -54,6 +59,20 @@ async function start() {
   };
   idle(warmNext, { timeout: 3000 });
   initChapterBar({ scrollTo: scroller?.scrollTo, onRefresh: scroller?.onRefresh });
+
+  // Arriving with an address like index.html#credits (the Twin Finder links
+  // here): the browser jumped before the pinned scenes added their scroll
+  // length, so it landed in the wrong place. Jump again now the layout is
+  // final.
+  // Wait for the page's load event too, after which ScrollTrigger measures
+  // the layout one last time.
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id && document.getElementById(id);
+  if (target && id !== 'top' && scroller?.scrollTo) {
+    const jump = () => requestAnimationFrame(() => requestAnimationFrame(() => scroller.scrollTo(target, { immediate: true })));
+    if (document.readyState === 'complete') jump();
+    else window.addEventListener('load', jump, { once: true });
+  }
 }
 
 start();

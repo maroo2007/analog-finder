@@ -423,3 +423,7 @@ kbd {
   .analyst-head { padding: 14px 16px 12px; }
   .analyst-log, .analyst-chips, .analyst-form { padding-left: 16px; padding-right: 16px; }
 }
+
+/* Link from the Twin Finder to the story page's full credits. */
+.pane-credits { display: block; font-size: 12px; color: var(--ink-2); text-underline-offset: 3px; }
+.pane-credits:hover { color: var(--ink); }

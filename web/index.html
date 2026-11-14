@@ -184,6 +184,7 @@
       <div class="moon-copy">
         <h2 class="display moon-title">The Moon is harder</h2>
         <p>The lunar south pole is rougher than almost any dry land in <span data-bind="areas">Africa and the Americas</span>. Its closest twins are in <span data-bind="moonPlaces">Chile, Argentina and Bolivia</span>. We show the rank and say plainly how far off it still is.</p>
+        <p class="moon-note">The targets are NASA's <span data-bind="moonCount">9</span> Artemis III candidate regions. Artemis III is now a crewed test flight in Earth orbit; the first landing moved to Artemis IV (2028), and its site is not chosen yet.</p>
       </div>
     </section>
 
@@ -222,6 +223,8 @@
         <li>MOLA</li>
         <li>TES</li>
         <li>LRO LOLA</li>
+        <li>LRO Diviner</li>
+        <li>NASA PDS</li>
         <li>MODIS</li>
         <li>Copernicus DEM</li>
         <li>JRC Water</li>
@@ -241,9 +244,39 @@
       <a href="https://github.com/maroo2007/analog-finder">GitHub</a>
       <a href="#method">Method</a>
       <a href="explorer.html">Twin Finder</a>
+      <a href="#credits">Credits</a>
     </nav>
-    <p class="footer-credits">Images and data: Mars colour mosaic from Viking (NASA/JPL/USGS); MOLA elevation and TES albedo (NASA); LRO LOLA elevation and LROC colour (NASA/GSFC/ASU); Blue Marble (NASA Visible Earth); land outlines from Natural Earth; Copernicus DEM (ESA); JRC Global Surface Water (European Commission); MODIS vegetation, ice and land cover (NASA); Mars Exploration Zones (NASA) and Artemis III regions (NASA, USGS DOI 10.5066/P1MEQ6UK). This site is not affiliated with or endorsed by NASA.</p>
-    <p class="footer-ai">How we used AI: Claude (Anthropic) helped write the data pipeline and this website. Every number shown comes from our own data files.</p>
+    <section class="credits" id="credits" aria-labelledby="credits-title">
+      <h2 class="credits-title" id="credits-title">Data and credits</h2>
+      <dl class="credits-list">
+        <div>
+          <dt>Mars</dt>
+          <dd>MOLA elevation and TES albedo (NASA Mars Global Surveyor), from the NASA Planetary Data System via USGS Astropedia. Exploration Zones: NASA, with USGS CTX mosaics. Colour mosaic: Viking (NASA/JPL/USGS).</dd>
+        </div>
+        <div>
+          <dt>Moon</dt>
+          <dd>LOLA south pole elevation (NASA LRO; NASA PGDA, Barker et al. 2023). Diviner (NASA LRO), Paige et al. 2010, PDS Geosciences. Artemis III regions: NASA, outlines USGS DOI 10.5066/P1MEQ6UK, drawn from LROC QuickMap (Arizona State University). Globe textures: NASA Scientific Visualization Studio, CGI Moon Kit (LROC colour, LOLA elevation).</dd>
+        </div>
+        <div>
+          <dt>Earth</dt>
+          <dd>Copernicus DEM GLO-30 (ESA, via AWS Open Data): produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM-30. MODIS vegetation, albedo and land cover (NASA, via NASA Earthdata and Google Earth Engine). JRC Global Surface Water (European Commission Joint Research Centre). Blue Marble Next Generation (NASA Earth Observatory, Visible Earth).</dd>
+        </div>
+        <div>
+          <dt>Twin Finder maps</dt>
+          <dd>EOxCloudless Sentinel-2 by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2025), CC BY-NC-SA 4.0. We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS): Blue Marble, Landsat WELD and ASTER GDEM relief (ASTER GDEM is a product of METI and NASA). © OpenStreetMap contributors. Terrain Tiles (AWS Open Data): Mapzen; SRTM courtesy of the U.S. Geological Survey; ETOPO1 by U.S. NOAA; and others.</dd>
+        </div>
+        <div>
+          <dt>Challenge resources</dt>
+          <dd>From the challenge's resource list we use the NASA Planetary Data System, NASA's Lunar Reconnaissance Orbiter (LOLA and Diviner), NASA Earthdata (MODIS), NASA Worldview and the Copernicus Data Space Ecosystem; every twin card links to Worldview and the Copernicus Browser.</dd>
+        </div>
+        <div>
+          <dt>Software and type</dt>
+          <dd>three.js, MapLibre GL JS, GSAP and Lenis. Archivo typeface (SIL Open Font License).</dd>
+        </div>
+      </dl>
+      <p class="footer-credits">This site is not affiliated with or endorsed by NASA, ESA or any other agency, and shows no agency logos.</p>
+      <p class="footer-ai"><strong>How we used AI.</strong> Claude (Anthropic) helped write the data pipeline, this website and our documents; we checked the numbers against our own data files. The Twin Finder's "Ask the analyst" uses Google Gemini, is labelled as AI and answers only from the data on screen. No image or video here is AI-generated.</p>
+    </section>
   </footer>
 
   <a class="launch-fixed" href="explorer.html">

@@ -393,6 +393,7 @@ main { overflow-x: clip; }
 .moon-copy { max-width: 34rem; }
 .moon-title { font-size: clamp(2.6rem, 6vw, 6rem); }
 .moon-copy p { margin-top: 28px; color: var(--ink-2); max-width: 40ch; }
+.moon-copy .moon-note { margin-top: 16px; font-size: 14px; line-height: 1.55; max-width: 46ch; }
 
 /* 14 Limits */
 .scene-limits { justify-items: center; text-align: center; align-content: center; gap: 4vh; }
@@ -427,7 +428,7 @@ main { overflow-x: clip; }
 .data-title { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-2); }
 .data-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   border-top: 1px solid var(--line);
   border-left: 1px solid var(--line);
 }
@@ -457,7 +458,14 @@ main { overflow-x: clip; }
 .footer-name { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
 .footer-links { display: flex; gap: 28px; align-items: start; }
 .footer-links a { color: var(--ink); }
-.footer-credits, .footer-ai { grid-column: 1 / -1; max-width: 80ch; font-size: 13px; line-height: 1.6; }
+.footer-credits, .footer-ai { max-width: 80ch; font-size: 13px; line-height: 1.6; }
+.footer-ai strong { color: var(--ink); font-weight: 700; }
+/* Credits: every data source and image, grouped by world. */
+.credits { grid-column: 1 / -1; display: grid; gap: 22px; padding-top: 28px; border-top: 1px solid var(--line); scroll-margin-top: 80px; }
+.credits-title { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
+.credits-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 48px; }
+.credits-list dt { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
+.credits-list dd { margin-top: 6px; font-size: 13px; line-height: 1.6; max-width: 70ch; }
 
 /* Fixed controls */
 .launch-fixed {
@@ -546,6 +554,7 @@ main { overflow-x: clip; }
   .numbers { grid-template-columns: 1fr; }
   .data-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .site-footer { grid-template-columns: 1fr; }
+  .credits-list { grid-template-columns: 1fr; }
   .launch-fixed span:first-child { display: none; }
   .launch-fixed { bottom: 20px; }
   .chapter-bar { left: var(--gutter); transform: none; bottom: 26px; gap: 4px; }

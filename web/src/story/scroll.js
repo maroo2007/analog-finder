@@ -217,7 +217,7 @@ const REVEALS = {
   },
   moon: (tl, el) => tl
     .from($('.moon-title', el), { y: 36, opacity: 0 }, 0)
-    .from($('.moon-copy p', el), { y: 20, opacity: 0 }, 0.2),
+    .from($$('.moon-copy p', el), { y: 20, opacity: 0, stagger: 0.2 }, 0.2),
   limits: (tl, el) => tl
     .from($$('.limits li', el), { y: 36, opacity: 0, stagger: 0.18 }, 0)
     .from($('.limits-line', el), { opacity: 0 }, 0.6),
@@ -408,10 +408,13 @@ export function initScroll({ stage, data }) {
 
   return {
     onRefresh: (fn) => ScrollTrigger.addEventListener('refresh', fn),
-    scrollTo(el) {
+    scrollTo(el, { immediate = false } = {}) {
+      // Lenis clamps to the page length it last measured; the pins may have
+      // made the page longer since.
+      lenis.resize();
       const name = el?.dataset.scene;
       const st = name && triggers[name];
-      lenis.scrollTo(st ? st.start + 2 : el, { duration: 1.2 });
+      lenis.scrollTo(st ? st.start + 2 : el, immediate ? { immediate: true, force: true } : { duration: 1.2 });
     },
   };
 }
