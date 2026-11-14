@@ -79,7 +79,14 @@ main { overflow-x: clip; }
 .scene-hero { align-content: center; }
 .hero-copy { max-width: min(52vw, 760px); }
 .hero-title { font-size: clamp(3.4rem, 7.4vw, 6rem); }
-.hero-title span { display: block; }
+.hero-title > span { display: block; }
+/* Words revealed one by one (text-reveal.js): inline blocks, so each can
+   rise and blur on its own; spaces stay real text between them. */
+.rw, .statement .w { display: inline-block; }
+/* Until main.js has hidden the hero's words for their reveal, keep the hero
+   copy from flashing in finished first. Without JavaScript, no effect. */
+.js:not(.hero-ready) .hero-copy { opacity: 0; }
+
 .hero-sub { margin-top: 28px; color: var(--ink-2); font-size: clamp(16px, 1.2vw, 19px); }
 
 /* 2, 3 Statements filled word by word */

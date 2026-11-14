@@ -4,6 +4,7 @@ import { fillContent, splitWords } from './content.js';
 import { initHeader, initChapterBar, initLaunchButton } from './chrome.js';
 import { createStage, HIDDEN } from './stage.js';
 import { initScroll } from './scroll.js';
+import { revealTimeline } from './text-reveal.js';
 
 // The pinned scenes change the page's length after load, so the browser's
 // own "restore the old scroll position" lands in the wrong scene. The page
@@ -17,6 +18,23 @@ root.classList.toggle('reduced', reduced);
 initHeader();
 initLaunchButton();
 document.querySelectorAll('[data-fill]').forEach(splitWords);
+
+// The hero's words reveal as the page opens; they need no data, so they
+// don't wait for it (or for the planet textures).
+try {
+  if (!reduced) {
+    const heroWords = revealTimeline(
+      [document.querySelector('.hero-title'), document.querySelector('.hero-sub')],
+      { phone: window.matchMedia('(max-width: 760px)').matches },
+    );
+    requestAnimationFrame(() => heroWords.play());
+  }
+} finally {
+  // The hero's words are hidden for their reveal (or, with reduced motion,
+  // simply shown): the hero copy can appear now, with no flash of finished
+  // text, and it always appears even if the reveal failed.
+  root.classList.add('hero-ready');
+}
 
 async function start() {
   let data;
