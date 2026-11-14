@@ -69,11 +69,25 @@ async function start() {
   // the layout one last time.
   const id = decodeURIComponent(location.hash.slice(1));
   const target = id && document.getElementById(id);
+  await pageReady();
+  window.__bootDone?.();
   if (target && id !== 'top' && scroller?.scrollTo) {
-    const jump = () => requestAnimationFrame(() => requestAnimationFrame(() => scroller.scrollTo(target, { immediate: true })));
-    if (document.readyState === 'complete') jump();
-    else window.addEventListener('load', jump, { once: true });
+    requestAnimationFrame(() => requestAnimationFrame(() => scroller.scrollTo(target, { immediate: true })));
   }
 }
 
-start();
+/**
+ * Ready to show: every resource the first view needs has arrived (the page's
+ * load event: styles, scripts, images not marked lazy), the fonts are in, and
+ * the stage has drawn twice. The planet textures were already awaited by
+ * createStage.
+ */
+async function pageReady() {
+  if (document.readyState !== 'complete') await new Promise((r) => window.addEventListener('load', r, { once: true }));
+  await document.fonts?.ready;
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+}
+
+// The loading screen lifts when the page is ready, or right away if start-up
+// failed (the text still reads without the data).
+start().catch((err) => console.error(err)).finally(() => window.__bootDone?.());

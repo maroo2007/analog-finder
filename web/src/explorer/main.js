@@ -586,4 +586,20 @@ function toast(text) {
   toastTimer = setTimeout(() => t.classList.remove('is-on'), 1800);
 }
 
-init();
+// The loading screen lifts once the Twin Finder is ready to use: the data,
+// the Mars or Moon globe with its texture and the first target's card
+// (init), the page's own resources and fonts, and the first Earth tiles (at
+// most 5 s more, so a slow tile server never holds the page). If start-up
+// fails, it lifts anyway so the error message shows.
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+init()
+  .catch((err) => console.error(err))
+  .then(async () => {
+    if (document.readyState !== 'complete') await new Promise((r) => window.addEventListener('load', r, { once: true }));
+    await document.fonts?.ready;
+    // The card's relief pair, and the first Earth tiles.
+    const reliefs = [...document.querySelectorAll('[data-card] .compare img')]
+      .map((img) => (img.complete ? null : new Promise((r) => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); })));
+    await Promise.race([Promise.all([earthView?.firstView, ...reliefs]), wait(5000)]);
+  })
+  .finally(() => window.__bootDone?.());

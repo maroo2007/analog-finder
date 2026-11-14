@@ -61,7 +61,11 @@ export function createEarthMap(host, { onPick }) {
   veil.className = 'earth-veil';
   veil.innerHTML = '<span>Loading Earth</span>';
   host.append(veil);
-  const lift = () => veil.classList.add('is-gone');
+  // firstView resolves once the first Earth tiles are drawn (or after 6 s),
+  // so the page's loading screen can wait for a real Earth, not a black box.
+  let shown;
+  const firstView = new Promise((res) => { shown = res; });
+  const lift = () => { veil.classList.add('is-gone'); shown(); };
   map.on('sourcedata', (e) => { if (e.sourceId === 'sat-bluemarble' && e.tile) lift(); });
   setTimeout(lift, 6000);
 
@@ -82,6 +86,7 @@ export function createEarthMap(host, { onPick }) {
 
   return {
     map,
+    firstView,
     get layer() { return layer; },
     hasLayer: (name) => groups[name].length > 0,
     setLayer(name) {
