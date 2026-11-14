@@ -61,9 +61,14 @@ and what doesn't.
   `web/public/data/`. Credits for every dataset, image and map layer (the
   Copernicus notice word for word) and the "How we used AI" line are at the
   foot of the story page. "Ask the analyst" (Gemini, labelled as AI) runs
-  through one Netlify function and needs `GEMINI_API_KEY` set in Netlify;
-  until then it says it isn't set up. Run it with `npm run dev` in `web/`;
-  `npm run build` writes `web/dist/`, which `netlify.toml` publishes.
+  through one server function and needs `GEMINI_API_KEY` set on the host;
+  without it, it says it isn't set up. Run it with `npm run dev` in `web/`;
+  `npm run build` writes `web/dist/`.
+- **The website is live at https://duplicaa.vercel.app** (14 November).
+  Vercel project `duplica`, connected to the repository, Root Directory
+  `web`; every merge into `main` deploys by itself. The analyst answers
+  there (checked: a real question answered in 13 s with the data's own
+  numbers). Details in `CLAUDE.md`, "Hosting: Vercel".
 - **Registration (6 to 7 November).** Cairo registration form, an 88 second
   YouTube video in Egyptian Arabic with English captions, and a two-page
   English proposal PDF.
@@ -123,10 +128,10 @@ Atacama, Death Valley and the Andes are on the map.
 
 | # | Task | Notes |
 |---|---|---|
-| 1 | **Deploy the website on a public link** | Netlify: connect the repository, it reads `netlify.toml` (base `web`, publish `dist`). See section 7, hosting. |
-| 2 | Set `GEMINI_API_KEY` in Netlify | Free tier, from Google AI Studio, set in the Netlify UI only, never in the repository. Without it the analyst says it isn't set up; everything else works. Limits (team decision 14 November): **25 questions per visitor per day and 100 Gemini requests per day for the whole site** (50 to 100 questions), reset at midnight Pacific time; reaching either shows a friendly "back tomorrow" note, never an error. Adjust with `ANALYST_PER_VISITOR_PER_DAY` / `ANALYST_TOTAL_PER_DAY` (`web/.env.example`); keep the total at half the project's free daily quota or less. |
+| 1 | ~~Deploy the website on a public link~~ | **Done 14 November:** https://duplicaa.vercel.app (Vercel project `duplica`, Root Directory `web`, deploys from `main`). |
+| 2 | ~~Set `GEMINI_API_KEY`~~ | **Done 14 November**, in the Vercel project's Environment Variables (never in the repository). Limits (team decision 14 November): **25 questions per visitor per day and 100 Gemini requests per day for the whole site** (50 to 100 questions), reset at midnight Pacific time; reaching either shows a friendly "back tomorrow" note, never an error. Adjust with `ANALYST_PER_VISITOR_PER_DAY` / `ANALYST_TOTAL_PER_DAY` (`web/.env.example`); keep the total at half the project's free daily quota or less. |
 | 3 | Make the GitHub repository public | Judges can't open the footer's GitHub link while it is private. |
-| 4 | **Final submission, Sunday 15 November, 11:59 p.m. Cairo time** | Section 8 and `docs/JUDGING_CRITERIA.md`. 30 second English video or up to 7 slides, public link, AI disclosure. Add the YouTube link to the site's footer if there is one. |
+| 4 | **Final submission, Sunday 15 November, 11:59 p.m. Cairo time** | Section 8 and `docs/JUDGING_CRITERIA.md`. 30 second English video or up to 7 slides, the public link https://duplicaa.vercel.app, AI disclosure. Optional: a YouTube link in the site's footer if the team uploads a video. |
 | 5 | Nice to have, only if time is left | Discoveries list (Prompt 4 in `docs/ENGINE_PROMPTS.md`), Hawaii (Mauna Kea), more continents, Moon albedo (Diviner temperatures are done, as context). |
 
 Out of scope for this hackathon: the image AI (DINOv2), reverse mode by city,
@@ -349,9 +354,10 @@ used AI.
 **Colours:** Mars rust orange, Moon silver grey, Earth sand and blue.
 **Don't design for data we don't have** (photos of places, user ratings).
 
-**Hosting.** The repo is private. GitHub Pages on a private repo needs GitHub
-Pro (free with the GitHub Student Developer Pack); otherwise Netlify or Vercel
-free tiers deploy the `web/` folder. The link must be public for judging.
+**Hosting.** Live on Vercel at https://duplicaa.vercel.app (14 November;
+project `duplica`, Root Directory `web`, deploys from `main`). Netlify also
+works (`netlify.toml`). The link must be public for judging; the repository
+must be made public too, for the footer's GitHub link.
 
 ---
 

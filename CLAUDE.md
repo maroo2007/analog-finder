@@ -191,8 +191,24 @@ As of 2026-11-14 (hackathon 14 to 15 November), Phase 1 has passed, Prompts
 Africa and the Americas south of 50 N (merged in pull request #5). Every
 twin has a shaded relief image (`shade/earth/<id>_<n>.webp`, n = place 1 to
 25 in `matches/<id>.json`; `python src/render_shades.py`). **The website is
-finished** and merged into `main` (pull request #7); what is still open is
-deploying it, the Gemini key and the final submission (see **Next**).
+finished and live at https://duplicaa.vercel.app** (Vercel, deployed from
+`main`; pull requests #7 to #15), with the Gemini analyst answering. What is
+still open is making the repository public and the final submission (see
+**Next**).
+
+- **Hosting: Vercel** (2026-11-14). Project `duplica` in the team
+  `maroo2007s-projects`, connected to this repository: every merge into
+  `main` deploys to production by itself. **Root Directory must be `web`**:
+  Vercel then detects Vite (build `npm run build`, output `dist`) and serves
+  `web/api/analyst.js` as a function. Left at the repository root it reads
+  the root `vercel.json` in "services" mode (Beta), which builds only the
+  static site, and `/api/analyst` returns 404 (that happened once).
+  `GEMINI_API_KEY` is set in the project's Environment Variables
+  (Production); after changing a variable, redeploy. Deploy addresses
+  (`duplica-*.vercel.app`) sit behind Vercel's login; the public address is
+  `duplicaa.vercel.app`. A second project, `duplicaa` (created as Python),
+  failed and is not used. `netlify.toml` and the Netlify function stay, so
+  Netlify would work too.
 
 - **The website** (`web/`, 2026-11-14): a static Vite site, `npm run dev` in
   `web/` (port 5173), `npm run build` to `web/dist/`. `index.html` is the
@@ -203,11 +219,15 @@ deploying it, the Gemini key and the final submission (see **Next**).
   continent rank, Diviner on Moon cards, Google Maps, NASA Worldview and
   Copernicus Browser links, the Egypt tab). Every number is read from
   `web/public/data/`; nothing is hardcoded. "Ask the analyst" calls Gemini
-  only through `web/netlify/functions/analyst.mjs` (shared code in
-  `web/server/analyst-core.mjs`); the key is `GEMINI_API_KEY` in the Netlify
-  UI or a gitignored `web/.env`, never in the repo. Without a key the panel
-  says it isn't set up yet. `netlify.toml` builds `web/` and publishes
-  `web/dist`. Design context for Impeccable is in `PRODUCT.md` and
+  only through a server function: `web/api/analyst.js` on Vercel,
+  `web/netlify/functions/analyst.mjs` on Netlify, both thin wrappers around
+  `web/server/analyst-core.mjs`. The key is `GEMINI_API_KEY` in the host's
+  environment variables or a gitignored `web/.env`, never in the repo.
+  Without a key the panel says it isn't set up yet. Gemini models are tried
+  in order (`gemini-3.8-flash`, `gemini-3.5-flash`, `gemini-3.5-flash-lite`,
+  like `src/chatbot.py`), each given 20 s, because 3.8-flash is often
+  overloaded and can hang instead of refusing; if all are busy the visitor
+  sees a calm "busy" note. Design context for Impeccable is in `PRODUCT.md` and
   `.impeccable/`; its skill and agents are in `.claude/`. Tested in headless
   Edge at 1440 px, 390 px and with reduced motion.
 
@@ -318,15 +338,19 @@ deploying it, the Gemini key and the final submission (see **Next**).
   questions). Both reset at midnight Pacific time, when Google resets the
   free quota. Reaching either shows a friendly note ("back tomorrow") and
   rests the panel, never an error. Change them with
-  `ANALYST_PER_VISITOR_PER_DAY` and `ANALYST_TOTAL_PER_DAY` in Netlify (see
-  `web/.env.example`); keep the total at half the project's free daily
-  request quota or less (check https://aistudio.google.com/rate-limit). The
-  Streamlit chatbot shares that quota if it uses the same Google project.
-  Code: `web/server/analyst-core.mjs`, counters in Netlify Blobs.
-- **Next:** deploy the website on Netlify (public link), set
-  `GEMINI_API_KEY` there for the analyst, make the GitHub repository public
-  for judges, then the final submission (Sunday 15 November, 11:59 p.m.
-  Cairo time). Still unconfirmed: the YouTube link for the footer. Later: Prompt 4 in
+  `ANALYST_PER_VISITOR_PER_DAY` and `ANALYST_TOTAL_PER_DAY` in the host's
+  environment variables (see `web/.env.example`); keep the total at half the
+  project's free daily request quota or less (check
+  https://aistudio.google.com/rate-limit). The Streamlit chatbot shares that
+  quota if it uses the same Google project. Code:
+  `web/server/analyst-core.mjs`. On Netlify the counters live in Netlify
+  Blobs; on Vercel (live) they live in the function's memory and start
+  again when Vercel starts a new instance, so they are looser there;
+  Gemini's own free quota still caps use.
+- **Next:** make the GitHub repository public for judges, then the final
+  submission (Sunday 15 November, 11:59 p.m. Cairo time) with
+  https://duplicaa.vercel.app as the project link. Optional: a YouTube link
+  in the story page's footer if the team uploads a video. Later: Prompt 4 in
   `docs/ENGINE_PROMPTS.md` (discoveries list and interface data), more
   continents for the grid (each estimated from a test country and run under
   a cost cap), and the known-analog validation.
