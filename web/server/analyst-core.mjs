@@ -10,6 +10,8 @@ const API = 'https://generativelanguage.googleapis.com/v1beta/models';
 // Tried in order (the same list as src/chatbot.py); gemini-3.8-flash is
 // often overloaded at busy times.
 const MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite'];
+// Each model gets this long to answer before the next is tried.
+const MODEL_TIMEOUT_MS = Number(process.env.ANALYST_MODEL_TIMEOUT_MS || 20_000);
 
 // Daily limits, both counted per Pacific-time day, because Google resets the
 // Gemini free quota at midnight Pacific:
@@ -164,13 +166,16 @@ export async function handleAnalyst(req, { ip = 'unknown', quota }) {
   let res = null;
   for (const model of models) {
     try {
+      // An overloaded model can hang instead of refusing: give each one
+      // MODEL_TIMEOUT_MS, then move on, so a visitor never waits minutes.
       res = await fetch(`${API}/${encodeURIComponent(model)}:generateContent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
         body: request,
+        signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
       });
     } catch (err) {
-      console.error('Gemini request failed', model, err);
+      console.error('Gemini request failed or timed out', model, err?.name || err);
       res = null;
       continue;
     }
