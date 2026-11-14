@@ -1,6 +1,6 @@
 # Project handoff
 
-**Last updated:** 13 November 2026, the day before the hackathon.
+**Last updated:** 14 November 2026, the first day of the hackathon.
 
 Read this first if you are joining the project, or if you are an AI assistant
 picking up work in a new session. It says what we are building, what is
@@ -32,7 +32,7 @@ and what doesn't.
 
 ---
 
-## 2. Where we are (13 November 2026)
+## 2. Where we are (14 November 2026)
 
 ### Finished and on `main`
 
@@ -47,8 +47,23 @@ and what doesn't.
   matched against all of Africa.
 - **Moon targets.** NASA's **nine Artemis III candidate regions** near the
   lunar south pole, matched on terrain.
-- **Website data.** Everything the site needs for Africa, Mars and the Moon
-  is built and committed in `web/public/data/` (about 6 MB). See section 6.
+- **Website data.** Everything the site needs for both continents, Mars and
+  the Moon is built and committed in `web/public/data/` (about 2.6 MB). See
+  section 6.
+- **The website, finished** (merged into `main` on 14 November, pull
+  request #7). `web/index.html` is the scroll story (17 scenes,
+  `docs/WEBSITE_SPEC.md`); `web/explorer.html` is the Twin Finder: Mars and
+  Moon globes, a MapLibre Earth with Satellite / Map / Terrain and real
+  imagery to zoom 11, the twin card with each twin's shaded relief, rank and
+  continent rank, per-feature closeness, what Earth can't copy (with Diviner
+  temperatures on Moon cards), and links to Google Maps, NASA Worldview and
+  the Copernicus Browser; an Egypt tab. Every number comes from
+  `web/public/data/`. Credits for every dataset, image and map layer (the
+  Copernicus notice word for word) and the "How we used AI" line are at the
+  foot of the story page. "Ask the analyst" (Gemini, labelled as AI) runs
+  through one Netlify function and needs `GEMINI_API_KEY` set in Netlify;
+  until then it says it isn't set up. Run it with `npm run dev` in `web/`;
+  `npm run build` writes `web/dist/`, which `netlify.toml` publishes.
 - **Registration (6 to 7 November).** Cairo registration form, an 88 second
   YouTube video in Egyptian Arabic with English captions, and a two-page
   English proposal PDF.
@@ -108,10 +123,10 @@ Atacama, Death Valley and the Andes are on the map.
 
 | # | Task | Notes |
 |---|---|---|
-| 1 | **The website** | In progress on `feature/website`. The most important piece: it is what judges see. Spec in section 7. |
-| 2 | Refresh the website data | The Americas are merged; bring `main`'s `web/public/data/` (both continents, a shaded relief image for every twin) into `feature/website`. |
-| 3 | Publish the site on a public link | See section 7, hosting. |
-| 4 | **Final submission, 15 November** | Section 8. 30 second English video or up to 7 slides, public link. |
+| 1 | **Deploy the website on a public link** | Netlify: connect the repository, it reads `netlify.toml` (base `web`, publish `dist`). See section 7, hosting. |
+| 2 | Set `GEMINI_API_KEY` in Netlify | Free tier, from Google AI Studio, set in the Netlify UI only, never in the repository. Without it the analyst says it isn't set up; everything else works. |
+| 3 | Make the GitHub repository public | Judges can't open the footer's GitHub link while it is private. |
+| 4 | **Final submission, Sunday 15 November, 11:59 p.m. Cairo time** | Section 8 and `docs/JUDGING_CRITERIA.md`. 30 second English video or up to 7 slides, public link, AI disclosure. Add the YouTube link to the site's footer if there is one. |
 | 5 | Nice to have, only if time is left | Discoveries list (Prompt 4 in `docs/ENGINE_PROMPTS.md`), Hawaii (Mauna Kea), more continents, Moon albedo (Diviner temperatures are done, as context). |
 
 Out of scope for this hackathon: the image AI (DINOv2), reverse mode by city,
