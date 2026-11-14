@@ -13,7 +13,7 @@ export const HIDDEN = {
   marsX: 0.42, marsY: 0, marsS: 0.78, marsO: 0, marsLight: 1, marsDissolve: 0,
   dotsX: 0, dotsY: 0, dotsS: 0.62, dotsO: 0,
   earthO: 0, earthTilt: 0.28,
-  sMarsX: -0.62, sMarsO: 0, sMoonX: 0.62, sMoonO: 0, smallS: 0.2,
+  sMarsX: -0.62, sMarsO: 0, sMoonX: 0.62, sMoonO: 0, smallS: 0.2, smallY: 0,
   moonX: 0.3, moonY: 0, moonS: 0.7, moonO: 0, moonTilt: 0, regionsO: 0,
   starsO: 1,
 };
@@ -96,9 +96,11 @@ function regionOutlines(targets, color) {
 }
 
 export async function createStage(canvas, { moonTargets = [] } = {}) {
-  // Phones and touch screens get a lighter stage: native pixel density, no
-  // antialiasing, fewer polygons. The planets look the same at that size.
+  // Phones and touch screens get a lighter stage: no antialiasing and fewer
+  // polygons, but up to 2x pixel density, so the planets stay sharp on a
+  // 3x screen (at 1x they were drawn at a third of the phone's resolution).
   const lite = window.matchMedia('(max-width: 760px), (pointer: coarse)').matches;
+  const pixelRatio = () => Math.min(window.devicePixelRatio || 1, lite ? 2 : 1.5);
   const seg = lite ? 64 : 128;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !lite, powerPreference: 'high-performance' });
   renderer.setClearColor(0x06080b, 1);
@@ -166,7 +168,11 @@ export async function createStage(canvas, { moonTargets = [] } = {}) {
   // Earth: dots for "the same profile everywhere", then the real texture.
   const earth = new THREE.Group();
   const dotsMat = new THREE.PointsMaterial({ color: 0x5aa9e6, size: 2.2, sizeAttenuation: false, transparent: true, depthWrite: false });
-  const dots = new THREE.Points(landDots(earthTex.image, lite ? 26000 : 42000), dotsMat);
+  // The phone layout's globe is about a third as wide as a desktop's, so it
+  // needs far fewer dots for the same spacing; more just merge into a solid
+  // fill. Tablets use the desktop layout, so they keep the full count.
+  const phoneLayout = window.matchMedia('(max-width: 760px)').matches;
+  const dots = new THREE.Points(landDots(earthTex.image, phoneLayout ? 9000 : 42000), dotsMat);
   const dotsBack = sphere(0.995, 64, new THREE.MeshBasicMaterial({ color: 0x06080b, transparent: true }));
   const earthMat = new THREE.MeshStandardMaterial({ map: earthTex, roughness: 0.9, metalness: 0, transparent: true });
   const earthBody = sphere(1, seg, earthMat);
@@ -214,8 +220,13 @@ export async function createStage(canvas, { moonTargets = [] } = {}) {
 
   function resize() {
     w = canvas.clientWidth || window.innerWidth; h = canvas.clientHeight || window.innerHeight;
-    renderer.setPixelRatio(lite ? 1 : Math.min(window.devicePixelRatio || 1, 1.5));
+    const pr = pixelRatio();
+    renderer.setPixelRatio(pr);
     renderer.setSize(w, h, false);
+    // Point sizes are in drawn pixels, so on phones they follow the density
+    // to keep the dots as fine on screen as on a desktop (2.2 drawn pixels
+    // at 1.5x there), so Earth still reads as dots, not a solid fill.
+    dotsMat.size = lite ? (2.2 * pr) / 1.5 : 2.2;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const visH = 2 * camera.position.z * Math.tan((camera.fov * DEG) / 2);
@@ -261,8 +272,8 @@ export async function createStage(canvas, { moonTargets = [] } = {}) {
     earthBody.visible = p.earthO > 0.003;
 
     const ss = p.smallS;
-    place(sMars, p.sMarsX, 0, ss); sMars.material.opacity = p.sMarsO; show(sMars, p.sMarsO);
-    place(sMoon, p.sMoonX, 0, ss * 0.8); sMoon.material.opacity = p.sMoonO; show(sMoon, p.sMoonO);
+    place(sMars, p.sMarsX, p.smallY, ss); sMars.material.opacity = p.sMarsO; show(sMars, p.sMarsO);
+    place(sMoon, p.sMoonX, p.smallY, ss * 0.8); sMoon.material.opacity = p.sMoonO; show(sMoon, p.sMoonO);
 
     place(moon, p.moonX, p.moonY, p.moonS);
     moon.rotation.set(p.moonTilt, faceLon(0), 0, 'XYZ');
