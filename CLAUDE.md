@@ -295,8 +295,9 @@ deploying it, the Gemini key and the final submission (see **Next**).
   submission counts. Still open: the GitHub repository is private, so
   judges cannot open its link until it is made public; the AI disclosure
   (AI code acknowledged in text and metadata, AI images and videos
-  watermarked); and the China-affiliation eligibility check for Egyptian
-  Chinese University (see the doc). The final demo is planned for later.
+  watermarked). The China-affiliation check is answered: the team confirmed
+  on 2026-11-14 that Egyptian Chinese University is not affiliated with
+  China (see the doc). The final demo is planned for later.
 - **Gemini chatbot** (2026-11-13): `src/chatbot.py` (Gemini, terminal mode),
   `src/chat_app.py` (Streamlit page), `src/chat_data.py` (lookups in
   `web/public/data/`, handed to Gemini as tools so it never invents a

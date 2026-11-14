@@ -7,7 +7,9 @@
 // (gemini-3.8-flash: stable Flash model) and the generateContent reference.
 
 const API = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_MODEL = 'gemini-3.8-flash';
+// Tried in order (the same list as src/chatbot.py); gemini-3.8-flash is
+// often overloaded at busy times.
+const MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite'];
 
 // Daily limits, both counted per Pacific-time day, because Google resets the
 // Gemini free quota at midnight Pacific:
@@ -148,31 +150,41 @@ export async function handleAnalyst(req, { ip = 'unknown', quota }) {
   }
 
   const data = JSON.stringify(body.context ?? {}).slice(0, 60_000);
-  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
-  let res;
-  try {
-    res = await fetch(`${API}/${encodeURIComponent(model)}:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: `${SYSTEM}\n\nDATA (what is on the user's screen now, JSON):\n${data}` }] },
-        contents,
-        tools: TOOLS,
-        toolConfig: { functionCallingConfig: { mode: 'AUTO' } },
-        generationConfig: { temperature: 0.3, maxOutputTokens: 900 },
-      }),
-    });
-  } catch (err) {
-    console.error('Gemini request failed', err);
-    return json(502, { error: 'The analyst could not be reached.' });
+  // Models in order, like src/chatbot.py: when one is overloaded (503), out
+  // of quota (429) or unavailable, the next is tried. GEMINI_MODEL forces one.
+  const models = process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL] : MODELS;
+  const request = JSON.stringify({
+    systemInstruction: { parts: [{ text: `${SYSTEM}\n\nDATA (what is on the user's screen now, JSON):\n${data}` }] },
+    contents,
+    tools: TOOLS,
+    toolConfig: { functionCallingConfig: { mode: 'AUTO' } },
+    // Thinking "low": replies in seconds rather than tens of seconds.
+    generationConfig: { temperature: 0.3, maxOutputTokens: 900, thinkingConfig: { thinkingLevel: 'low' } },
+  });
+  let res = null;
+  for (const model of models) {
+    try {
+      res = await fetch(`${API}/${encodeURIComponent(model)}:generateContent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+        body: request,
+      });
+    } catch (err) {
+      console.error('Gemini request failed', model, err);
+      res = null;
+      continue;
+    }
+    if (res.ok) break;
+    console.error('Gemini error', model, res.status, (await res.text()).slice(0, 300));
+    // Busy, out of quota, or this model unavailable here: try the next one.
+    if (![429, 500, 503, 504, 404].includes(res.status)) break;
   }
 
-  if (res.status === 429) {
-    // Gemini's own per-minute or per-day limit: usually a busy minute.
-    return json(200, { limit: 'busy', notice: 'The analyst is busy right now. Please try again in a minute; everything else in the Twin Finder works as usual.' });
-  }
-  if (!res.ok) {
-    console.error('Gemini error', res.status, (await res.text()).slice(0, 500));
+  if (!res || !res.ok) {
+    // Every model busy (or unreachable): a busy minute, said kindly.
+    if (!res || [429, 500, 503, 504, 404].includes(res.status)) {
+      return json(200, { limit: 'busy', notice: 'The analyst is busy right now. Please try again in a minute; everything else in the Twin Finder works as usual.' });
+    }
     return json(502, { error: 'The analyst could not answer just now.' });
   }
   const out = await res.json();

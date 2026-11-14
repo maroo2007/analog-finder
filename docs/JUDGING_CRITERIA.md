@@ -170,6 +170,8 @@ for Presentation. All of it **in English**. Required fields:
   incorporated under the laws of China. Our team is from Egyptian Chinese
   University. Whether that applies is NASA's decision, based on what the
   team declares; read the Terms and Conditions clause or ask the Local Lead.
+  **Team answer (2026-11-14):** Egyptian Chinese University is not
+  affiliated with China; declare it that way on the submission.
 
 ### Judging and awards
 
