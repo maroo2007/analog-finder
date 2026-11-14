@@ -268,3 +268,6 @@ node_modules/
 web/.vite/
 # The Python rule lib/ above would also hide the site's own source folder.
 !web/src/lib/
+
+# Vercel: the local project link (project and team IDs) and build output.
+.vercel/
