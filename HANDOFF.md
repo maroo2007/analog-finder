@@ -124,7 +124,7 @@ Atacama, Death Valley and the Andes are on the map.
 | # | Task | Notes |
 |---|---|---|
 | 1 | **Deploy the website on a public link** | Netlify: connect the repository, it reads `netlify.toml` (base `web`, publish `dist`). See section 7, hosting. |
-| 2 | Set `GEMINI_API_KEY` in Netlify | Free tier, from Google AI Studio, set in the Netlify UI only, never in the repository. Without it the analyst says it isn't set up; everything else works. |
+| 2 | Set `GEMINI_API_KEY` in Netlify | Free tier, from Google AI Studio, set in the Netlify UI only, never in the repository. Without it the analyst says it isn't set up; everything else works. Limits (team decision 14 November): **25 questions per visitor per day and 100 Gemini requests per day for the whole site** (50 to 100 questions), reset at midnight Pacific time; reaching either shows a friendly "back tomorrow" note, never an error. Adjust with `ANALYST_PER_VISITOR_PER_DAY` / `ANALYST_TOTAL_PER_DAY` (`web/.env.example`); keep the total at half the project's free daily quota or less. |
 | 3 | Make the GitHub repository public | Judges can't open the footer's GitHub link while it is private. |
 | 4 | **Final submission, Sunday 15 November, 11:59 p.m. Cairo time** | Section 8 and `docs/JUDGING_CRITERIA.md`. 30 second English video or up to 7 slides, public link, AI disclosure. Add the YouTube link to the site's footer if there is one. |
 | 5 | Nice to have, only if time is left | Discoveries list (Prompt 4 in `docs/ENGINE_PROMPTS.md`), Hawaii (Mauna Kea), more continents, Moon albedo (Diviner temperatures are done, as context). |

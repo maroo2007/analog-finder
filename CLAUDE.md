@@ -306,12 +306,22 @@ deploying it, the Gemini key and the final submission (see **Next**).
   often overloaded (503), hence the model fallback list; thinking "low"
   took replies from ~50 s to ~4 s. Tests: `tests/test_chat_data.py`
   (offline). `environment-lock.yml` does not have `google-genai` and
-  `streamlit` yet; regenerate it on a Windows laptop. For the website, one
-  team key (free tier) serves every visitor from the host's secrets;
-  visitors need no key. **No per-visitor question limit, by team decision**
-  (2026-11-13: "we'll be careful"); don't add one without asking. When the
-  free quota runs out, visitors see "try again in a minute"
+  `streamlit` yet; regenerate it on a Windows laptop. This Streamlit
+  chatbot has no per-visitor question limit (team decision 2026-11-13);
+  when the free quota runs out, visitors see "try again in a minute"
   (`chatbot.Busy`).
+- **Analyst limits on the website** (team decision 2026-11-14: keep a
+  limit). "Ask the analyst" allows **25 questions per visitor per day** and
+  **100 Gemini requests per day for the whole site** (a question uses one
+  request, or two when the analyst also selects a site or twin, so 50 to 100
+  questions). Both reset at midnight Pacific time, when Google resets the
+  free quota. Reaching either shows a friendly note ("back tomorrow") and
+  rests the panel, never an error. Change them with
+  `ANALYST_PER_VISITOR_PER_DAY` and `ANALYST_TOTAL_PER_DAY` in Netlify (see
+  `web/.env.example`); keep the total at half the project's free daily
+  request quota or less (check https://aistudio.google.com/rate-limit). The
+  Streamlit chatbot shares that quota if it uses the same Google project.
+  Code: `web/server/analyst-core.mjs`, counters in Netlify Blobs.
 - **Next:** deploy the website on Netlify (public link), set
   `GEMINI_API_KEY` there for the analyst, make the GitHub repository public
   for judges, then the final submission (Sunday 15 November, 11:59 p.m.

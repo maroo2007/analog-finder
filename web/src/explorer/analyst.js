@@ -108,10 +108,19 @@ export function createAnalyst(app) {
     return div;
   }
 
+  // After a daily limit the panel rests: input, send and chips stay off.
+  let resting = false;
+  function restUntilTomorrow() {
+    resting = true;
+    panel.classList.add('is-off');
+    for (const el of [input, send, ...chips.querySelectorAll('button')]) el.disabled = true;
+    input.placeholder = 'Back tomorrow';
+  }
+
   function setBusy(on) {
     busy = on;
-    send.disabled = on;
-    input.disabled = on;
+    send.disabled = on || resting;
+    input.disabled = on || resting;
     panel.classList.toggle('is-busy', on);
     let dots = log.querySelector('.msg-wait');
     if (on && !dots) {
@@ -128,9 +137,17 @@ export function createAnalyst(app) {
     });
     let data = {};
     try { data = await res.json(); } catch { /* handled below */ }
+    if (data.limit) {
+      // A daily limit or a busy minute (sent as 200 with a friendly notice).
+      const err = new Error(data.notice || '');
+      err.status = 429;
+      err.limit = data.limit;
+      throw err;
+    }
     if (!res.ok) {
       const err = new Error(data.error || `HTTP ${res.status}`);
       err.status = res.status;
+      err.limit = data.limit; // 'visitor' | 'total' | 'busy' on a 429
       throw err;
     }
     return data; // { content: { role: 'model', parts: [...] } }
@@ -163,7 +180,7 @@ export function createAnalyst(app) {
   }
 
   async function ask(question) {
-    if (busy) return;
+    if (busy || resting) return;
     if (panel.hidden) open();
     if (!(await checkReady())) return;
     input.value = '';
@@ -188,13 +205,19 @@ export function createAnalyst(app) {
       }
     } catch (err) {
       if (!err.status) console.warn('Analyst request failed', err);
-      const msg = err.status === 429
-        ? (err.message && !err.message.startsWith('HTTP') ? err.message : 'The analyst has answered all the questions it can for now. Please try again later; everything else in the Twin Finder still works.')
-        : err.status === 503
-          ? NOT_SET_UP
-          : 'The analyst could not answer just now. Please try again in a moment.';
-      bubble('error', msg);
       history = history.slice(0, mark);
+      if (err.status === 429) {
+        // A daily limit or a busy minute: expected states, said kindly, not
+        // shown as errors. After a daily limit the input rests until tomorrow.
+        bubble('note', err.message && !err.message.startsWith('HTTP')
+          ? err.message
+          : 'The analyst is busy right now. Please try again in a minute; everything else in the Twin Finder works as usual.');
+        if (err.limit === 'visitor' || err.limit === 'total') restUntilTomorrow();
+      } else if (err.status === 503) {
+        bubble('note', NOT_SET_UP);
+      } else {
+        bubble('error', 'The analyst could not answer just now. Please try again in a moment.');
+      }
     } finally {
       setBusy(false);
       input.focus();

@@ -9,11 +9,20 @@
 const API = 'https://generativelanguage.googleapis.com/v1beta/models';
 const DEFAULT_MODEL = 'gemini-3.8-flash';
 
-// Per-visitor limits. Bursts are also capped by Netlify's rate limit (see
-// the function's config). The daily total protects the free-tier quota.
+// Daily limits, both counted per Pacific-time day, because Google resets the
+// Gemini free quota at midnight Pacific:
+// - perVisitorPerDay: questions a visitor may ask (a follow-up request that
+//   only reports what the page did for the same question is not a new one);
+// - totalPerDay: Gemini requests for the whole site, every call counted.
+//   A question uses one request, or two when the analyst also selects a site
+//   or twin, so 100 requests is 50 to 100 questions a day: plenty for
+//   judging, and well under the free tier's daily request quota. Check the
+//   project's own quota at https://aistudio.google.com/rate-limit and keep
+//   this at half of it or less.
+// Bursts are also capped by Netlify's rate limit (see the function's config).
 export const LIMITS = {
   perVisitorPerDay: Number(process.env.ANALYST_PER_VISITOR_PER_DAY || 25),
-  totalPerDay: Number(process.env.ANALYST_TOTAL_PER_DAY || 400),
+  totalPerDay: Number(process.env.ANALYST_TOTAL_PER_DAY || 100),
   maxBodyBytes: 120_000,
   maxQuestionChars: 500,
   maxTurns: 14,
@@ -122,12 +131,19 @@ export async function handleAnalyst(req, { ip = 'unknown', quota }) {
   const contents = cleanContents(body.contents);
   if (!contents) return json(400, { error: 'Bad request.' });
 
-  const allowed = await quota.take(ip);
+  // A new question ends with the visitor's own words; a follow-up for the
+  // same question ends with the page's report of what it did.
+  const last = contents[contents.length - 1];
+  const isQuestion = last.role === 'user' && last.parts.some((p) => typeof p.text === 'string');
+  const allowed = await quota.take(ip, { question: isQuestion });
   if (!allowed.ok) {
-    return json(429, {
-      error: allowed.reason === 'total'
-        ? 'The analyst has used up today\'s free questions for everyone. It resets tomorrow; everything else in the Twin Finder still works.'
-        : `You have asked ${LIMITS.perVisitorPerDay} questions today, the daily limit per visitor. It resets tomorrow; everything else in the Twin Finder still works.`,
+    // A daily limit is a normal state, not a failure: a 200 with 'limit' and
+    // a friendly notice, so the browser logs no failed request either.
+    return json(200, {
+      limit: allowed.reason,
+      notice: allowed.reason === 'total'
+        ? 'The analyst has answered all the questions it can for today. It will be back tomorrow; everything else in the Twin Finder works as usual.'
+        : `That's your ${LIMITS.perVisitorPerDay} questions for today, thank you for asking so many. The analyst will be back for you tomorrow; everything else in the Twin Finder works as usual.`,
     });
   }
 
@@ -152,7 +168,8 @@ export async function handleAnalyst(req, { ip = 'unknown', quota }) {
   }
 
   if (res.status === 429) {
-    return json(429, { error: 'The analyst\'s free quota is used up for now. Please try again later; everything else in the Twin Finder still works.' });
+    // Gemini's own per-minute or per-day limit: usually a busy minute.
+    return json(200, { limit: 'busy', notice: 'The analyst is busy right now. Please try again in a minute; everything else in the Twin Finder works as usual.' });
   }
   if (!res.ok) {
     console.error('Gemini error', res.status, (await res.text()).slice(0, 500));
@@ -166,16 +183,25 @@ export async function handleAnalyst(req, { ip = 'unknown', quota }) {
   return json(200, { content: { role: 'model', parts: content.parts } });
 }
 
-/** A simple in-memory quota, for local development and as a fallback. */
+/** Today's date in Pacific time (YYYY-MM-DD), when Google resets its quota. */
+export function quotaDay(now = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles' }).format(now);
+}
+
+/**
+ * A simple in-memory quota, for local development and as a fallback.
+ * take(ip, { question }): every call counts towards the site total; only a
+ * new question counts towards the visitor's limit.
+ */
 export function memoryQuota() {
   const counts = new Map();
   return {
-    async take(ip) {
-      const day = new Date().toISOString().slice(0, 10);
+    async take(ip, { question = true } = {}) {
+      const day = quotaDay();
       const k = `${day}:${ip}`; const t = `${day}:total`;
       if ((counts.get(t) || 0) >= LIMITS.totalPerDay) return { ok: false, reason: 'total' };
-      if ((counts.get(k) || 0) >= LIMITS.perVisitorPerDay) return { ok: false, reason: 'visitor' };
-      counts.set(k, (counts.get(k) || 0) + 1);
+      if (question && (counts.get(k) || 0) >= LIMITS.perVisitorPerDay) return { ok: false, reason: 'visitor' };
+      if (question) counts.set(k, (counts.get(k) || 0) + 1);
       counts.set(t, (counts.get(t) || 0) + 1);
       return { ok: true };
     },

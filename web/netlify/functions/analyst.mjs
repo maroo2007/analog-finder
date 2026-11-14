@@ -3,7 +3,7 @@
 // Netlify UI as an environment variable, never in netlify.toml or the repo).
 // Docs: https://docs.netlify.com/build/functions/get-started/
 import { getStore } from '@netlify/blobs';
-import { handleAnalyst, memoryQuota, LIMITS } from '../../server/analyst-core.mjs';
+import { handleAnalyst, memoryQuota, quotaDay, LIMITS } from '../../server/analyst-core.mjs';
 
 const fallback = memoryQuota();
 
@@ -25,10 +25,12 @@ function blobQuota() {
     return false;
   }
   return {
-    async take(ip) {
-      const day = new Date().toISOString().slice(0, 10);
+    // Visitor first, so a visitor over their limit never uses up the site's
+    // total; follow-up requests for the same question skip the visitor count.
+    async take(ip, { question = true } = {}) {
+      const day = quotaDay();
+      if (question && !(await bump(`${day}/ip/${ip}`, LIMITS.perVisitorPerDay))) return { ok: false, reason: 'visitor' };
       if (!(await bump(`${day}/total`, LIMITS.totalPerDay))) return { ok: false, reason: 'total' };
-      if (!(await bump(`${day}/ip/${ip}`, LIMITS.perVisitorPerDay))) return { ok: false, reason: 'visitor' };
       return { ok: true };
     },
   };
@@ -39,11 +41,11 @@ export default async (req, context) => {
   let blobs = null;
   try { blobs = blobQuota(); } catch (err) { console.warn('Blobs unavailable', err); }
   const quota = {
-    async take(ip) {
+    async take(ip, opts) {
       if (blobs) {
-        try { return await blobs.take(ip); } catch (err) { console.warn('Blobs quota failed', err); }
+        try { return await blobs.take(ip, opts); } catch (err) { console.warn('Blobs quota failed', err); }
       }
-      return fallback.take(ip);
+      return fallback.take(ip, opts);
     },
   };
   try {
