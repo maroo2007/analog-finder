@@ -24,19 +24,20 @@ Finder.)
 
 ## Project Demonstration
 
-Made on 14 November: `planetary_twin_finder_demo.mp4`, **29.5 seconds**,
-1920 x 1080, English narration with burned-in English captions (`demo.srt`
-has the same captions for YouTube). Shots are stills of our live website
-with slow zooms. Upload it to YouTube (Unlisted or Public) or Google Drive
+Made on 14 November: `planetary_twin_finder_demo_v2.mp4`, **29.5 seconds**,
+1920 x 1080, English narration with burned-in English captions
+(`demo_v2.srt` has the same captions for YouTube). It is an animated piece
+in the website's own look (`docs/submission/video.html`, rendered frame by
+frame), using the site's images, shaded reliefs and a Twin Finder screenshot. Upload it to YouTube (Unlisted or Public) or Google Drive
 (anyone with the link can view), test the link in a private window, and
 paste the full URL here and in the Cairo form.
 
-The narration is an **AI-generated voice** (Piper text-to-speech, voice
-`en_GB-alan-medium`). That is stated on screen, on the end card and in the
+The narration is an **AI-generated voice** (Kokoro text-to-speech, voice
+`bm_george`, open source). That is stated on screen, on the end card and in the
 file's metadata, as the rules require; put this in the YouTube description
 too:
 
-> Narration: AI-generated voice (Piper text-to-speech). All footage is our real website, https://duplicaa.vercel.app; no image or video is AI-generated.
+> Narration: AI-generated voice (Kokoro text-to-speech). Every image is from our website, https://duplicaa.vercel.app, or its data; none is AI-generated.
 
 ## Project
 
@@ -124,7 +125,7 @@ carry Claude co-author lines.
 | rasterio | https://rasterio.readthedocs.io/ |
 | Claude (Anthropic), AI coding and writing assistant | https://www.anthropic.com/claude |
 | Google Gemini API ("Ask the analyst") | https://ai.google.dev/ |
-| Piper text-to-speech (demo narration voice) | https://pypi.org/project/piper-tts/ |
+| Kokoro text-to-speech (demo narration voice, Apache 2.0) | https://huggingface.co/hexgrad/Kokoro-82M |
 
 Add the project repository, https://github.com/maroo2007/analog-finder, only
 once it is public: right now it answers 404 to anyone outside the team, and

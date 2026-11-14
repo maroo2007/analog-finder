@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Planetary Twin Finder demo</title>
+<style>
+@font-face{font-family:Archivo;src:url(assets/archivo.woff2) format("woff2");font-weight:100 900}
+:root{--ground:#06080b;--ink:#f3f5f7;--mars:#e0703a;--moon:#c4c9d1;--earth:#5aa9e6;--dim:rgba(243,245,247,.66);--line:rgba(243,245,247,.16)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--ground);color:var(--ink);font-family:Archivo,sans-serif;-webkit-font-smoothing:antialiased}
+#stars{position:absolute;left:0;top:0}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden}
+.h{font-weight:800;text-transform:uppercase;letter-spacing:-.032em;line-height:.93}
+.line{display:block;overflow:hidden;padding-bottom:.09em;margin-bottom:-.09em}
+.line>span{display:block}
+.sphere{position:absolute;border-radius:50%;background-repeat:repeat-x;background-size:auto 100%;overflow:hidden}
+.sphere::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.13) 0%,rgba(0,0,0,0) 34%,rgba(0,0,0,.5) 66%,rgba(0,0,0,.94) 100%)}
+.mars{background-image:url(assets/mars.jpg)}
+.earth{background-image:url(assets/earth_bluemarble.jpg)}
+.moon{background-image:url(assets/moon_lroc.jpg)}
+.dim{color:var(--dim)}
+.num{font-variant-numeric:tabular-nums}
+#cap{position:absolute;left:0;right:0;bottom:62px;text-align:center;font-size:37px;font-weight:600;letter-spacing:-.005em}
+#cap span{display:inline-block;background:rgba(6,8,11,.82);padding:11px 24px 13px;border-radius:6px}
+#ai{position:absolute;left:38px;bottom:30px;font-size:20px;font-weight:500;color:rgba(243,245,247,.55)}
+#veil{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+/* scene 2 */
+#s2list li{list-style:none;font-size:44px;font-weight:700;padding:15px 0;border-top:1px solid var(--line);width:560px;display:flex;justify-content:space-between;align-items:baseline}
+#s2list li small{font-size:24px;font-weight:500;color:var(--dim)}
+/* scene 4 */
+.world{position:absolute;top:0;width:480px;text-align:center}
+.world .sphere{left:75px;top:215px;width:330px;height:330px}
+.world h3{position:absolute;top:585px;left:0;right:0;font-size:60px}
+.world p{position:absolute;top:660px;left:0;right:0;font-size:28px;font-weight:500;color:var(--dim)}
+/* scene 5 */
+#s5shot{position:absolute;left:650px;top:170px;width:1230px;border-radius:10px;border:1px solid var(--line);box-shadow:0 40px 90px rgba(0,0,0,.6);transform-origin:0 50%}
+/* scene 7 */
+.relief{position:absolute;top:170px;width:480px;height:480px;border-radius:6px;object-fit:cover;filter:contrast(1.06)}
+.rl{position:absolute;top:676px;width:480px}
+.rl h3{font-size:50px}.rl p{font-size:27px;font-weight:500;color:var(--dim);margin-top:8px}
+#s7close{position:absolute;left:0;right:0;top:880px;text-align:center;font-size:33px;font-weight:600}
+#s7close b{font-weight:800;color:var(--earth)}
+</style></head>
+<body>
+<canvas id="stars" width="1920" height="1300"></canvas>
+
+<section class="scene" id="s1">
+  <div class="sphere mars" id="s1mars" style="width:820px;height:820px;left:1050px;top:130px"></div>
+  <h1 class="h" style="position:absolute;left:120px;top:318px;font-size:150px"><span class="line"><span>Find Mars</span></span><span class="line"><span>on Earth</span></span></h1>
+  <p id="s1sub" style="position:absolute;left:126px;top:640px;font-size:34px;font-weight:500" class="dim">Team Duplica · Cairo · NASA Space Apps Challenge 2026</p>
+</section>
+
+<section class="scene" id="s2">
+  <div class="sphere earth" id="s2earth" style="width:1500px;height:1500px;left:900px;top:330px"></div>
+  <h2 class="h" id="s2h" style="position:absolute;left:120px;top:128px;font-size:112px;width:1300px" data-words="Astronauts rehearse at just a few places"></h2>
+  <ul id="s2list" style="position:absolute;left:124px;top:520px">
+    <li>Atacama Desert <small>Chile</small></li><li>Death Valley <small>United States</small></li>
+    <li>Devon Island <small>Canada</small></li><li>Iceland <small>lava fields</small></li>
+  </ul>
+</section>
+
+<section class="scene" id="s3">
+  <canvas id="tiles" width="1920" height="1080" style="position:absolute;left:0;top:0"></canvas>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+    <h2 class="h" style="font-size:158px"><span class="line"><span>Planetary</span></span><span class="line"><span>Twin Finder</span></span></h2>
+    <p id="s3c" style="font-size:42px;font-weight:600;margin-top:44px"><span id="s3n" class="num" style="color:var(--earth);font-weight:800">0</span> dry places on Earth, scored with data</p>
+  </div>
+</section>
+
+<section class="scene" id="s4">
+  <div class="world" style="left:240px"><div class="sphere mars"></div><h3 class="h" style="color:var(--mars)">Mars</h3><p>NASA MOLA · TES</p></div>
+  <div class="world" style="left:720px"><div class="sphere moon"></div><h3 class="h" style="color:var(--moon)">Moon</h3><p>NASA LRO LOLA</p></div>
+  <div class="world" style="left:1200px"><div class="sphere earth"></div><h3 class="h" style="color:var(--earth)">Earth</h3><p>Copernicus DEM · NASA MODIS</p></div>
+  <p id="s4row" style="position:absolute;left:0;right:0;top:806px;text-align:center;font-size:40px;font-weight:600">One profile for every world: <span>slope</span> · <span>roughness</span> · <span>relief</span> · <span>brightness</span></p>
+</section>
+
+<section class="scene" id="s5">
+  <h2 class="h" id="s5h" style="position:absolute;left:120px;top:250px;font-size:92px;width:560px"><span class="line"><span>38 Mars</span></span><span class="line"><span>zones.</span></span><span class="line"><span>9 Moon</span></span><span class="line"><span>regions.</span></span></h2>
+  <p id="s5p" style="position:absolute;left:124px;top:660px;font-size:36px;font-weight:500;width:500px;line-height:1.3" class="dim">NASA's own landing sites, each with its 25 closest places on Earth.</p>
+  <img id="s5shot" src="assets/s7a_region.png" alt="">
+</section>
+
+<section class="scene" id="s6">
+  <div class="h num" id="s6n" style="position:absolute;left:104px;top:150px;font-size:440px;letter-spacing:-.04em">0%</div>
+  <p id="s6p" style="position:absolute;left:124px;top:590px;font-size:48px;font-weight:600;width:1320px;line-height:1.22">of Mars matches landed on the Atacama and Death Valley, where NASA already trains. The method was never told.</p>
+  <div style="position:absolute;left:124px;top:850px;width:1672px;height:14px;background:var(--line);border-radius:7px;overflow:hidden"><div id="s6bar" style="height:100%;width:0;background:var(--mars)"></div></div>
+  <p id="s6l" style="position:absolute;left:124px;top:884px;width:1672px;font-size:26px;font-weight:500;display:flex;justify-content:space-between" class="dim"><span>Atacama + Death Valley</span><span>everywhere else 7.5%</span></p>
+</section>
+
+<section class="scene" id="s7">
+  <img class="relief" id="s7a" src="assets/jezero_mars.webp" style="left:250px" alt="">
+  <img class="relief" id="s7b" src="assets/jezero_earth.webp" style="left:1190px" alt="">
+  <div class="rl" id="s7la" style="left:250px"><h3 class="h" style="color:var(--mars)">Jezero crater</h3><p>Mars · where Perseverance landed</p></div>
+  <div class="rl" id="s7lb" style="left:1190px"><h3 class="h" style="color:var(--earth)">Eastern Desert</h3><p>Egypt · 25.125 N, 34.54 E</p></div>
+  <div id="s7mid" style="position:absolute;left:730px;width:460px;top:268px;text-align:center">
+    <div class="h num" id="s7n" style="font-size:150px">#1</div>
+    <p style="font-size:34px;font-weight:600;margin-top:10px" class="dim">of 148,925 places</p>
+  </div>
+  <p id="s7close">Slope <b>98%</b> · Roughness <b>99%</b> · Relief <b>100%</b> · Brightness <b>99%</b> close</p>
+</section>
+
+<section class="scene" id="s8">
+  <div class="sphere mars" id="s8mars" style="width:1040px;height:1040px;left:1180px;top:-90px"></div>
+  <h2 class="h" style="position:absolute;left:120px;top:252px;font-size:146px"><span class="line"><span>Planetary</span></span><span class="line"><span>Twin Finder</span></span></h2>
+  <p class="e8" style="position:absolute;left:124px;top:566px;font-size:46px;font-weight:500">New places to rehearse for the Moon and Mars.</p>
+  <p class="e8" style="position:absolute;left:124px;top:660px;font-size:62px;font-weight:800;color:var(--mars);letter-spacing:-.01em">duplicaa.vercel.app</p>
+  <p class="e8 dim" style="position:absolute;left:124px;top:760px;font-size:30px;font-weight:500">Team Duplica · Cairo · NASA Space Apps Challenge 2026</p>
+  <p class="e8" style="position:absolute;left:124px;top:930px;font-size:22px;line-height:1.55;width:1500px;color:rgba(243,245,247,.6)"><b style="color:var(--ink)">Data:</b> NASA MOLA, TES, LRO LOLA and Diviner, MODIS · ESA Copernicus DEM<br><b style="color:var(--ink)">Narration:</b> AI-generated voice (Kokoro text-to-speech). Every image is from our website or its data; none is AI-generated.</p>
+</section>
+
+<div id="cap"><span></span></div>
+<div id="ai">AI-generated voice</div>
+<div id="veil"></div>
+
+<script src="tl.js"></script>
+<script>
+const TL = window.TL, S = TL.starts, E = TL.ends;
+const A = [0, ...S.slice(1).map((x) => x - 0.12), TL.speechEnd + 0.3];
+const B = [...A.slice(1), TL.total + 1];
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const eo = (x) => (x >= 1 ? 1 : x <= 0 ? 0 : 1 - Math.pow(2, -10 * x));
+const p = (t, a, d) => cl((t - a) / d);
+const lerp = (a, b, x) => a + (b - a) * x;
+const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
+const fmt = (n) => Math.round(n).toLocaleString('en-US');
+function rng(seed) { let s = seed; return () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646; }
+
+// stars, drawn once
+(() => { const c = $('#stars').getContext('2d'); const r = rng(7);
+  for (let i = 0; i < 520; i++) { const a = 0.15 + r() * 0.55, z = r() < 0.08 ? 1.6 : 0.9;
+    c.fillStyle = `rgba(243,245,247,${a})`; c.beginPath(); c.arc(r() * 1920, r() * 1300, z * (0.4 + r() * 0.8), 0, 7); c.fill(); } })();
+
+// scene 2 words
+const h2 = $('#s2h'); h2.innerHTML = h2.dataset.words.split(' ').map((w) => `<span style="display:inline-block;margin-right:.24em">${w}</span>`).join('');
+const s2w = [...h2.children], s2li = $$('#s2list li');
+
+// scene 3 tile field
+const tc = $('#tiles'), tx = tc.getContext('2d'), CELL = 48, COLS = 40, ROWS = 23;
+const cells = (() => { const r = rng(42), out = []; const pal = [[201,167,119],[224,112,58],[156,118,84],[90,169,230],[120,96,72]];
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) out.push({ x, y, v: r(), c: pal[Math.floor(r() * r() * pal.length)], d: r() * 0.35 }); return out; })();
+function drawTiles(lt) {
+  tx.clearRect(0, 0, 1920, 1080);
+  const front = lerp(-4, COLS + 6, p(lt, 0.0, 1.5));
+  for (const c of cells) { const k = front - c.x - c.d * 6; if (k <= 0) continue;
+    const flash = Math.exp(-k * 0.55), a = (0.10 + 0.34 * c.v) * cl(k) + flash * 0.5;
+    tx.fillStyle = `rgba(${c.c[0]},${c.c[1]},${c.c[2]},${a.toFixed(3)})`; tx.fillRect(c.x * CELL + 2, c.y * CELL - 12 + 2, CELL - 4, CELL - 4); }
+  const g = tx.createRadialGradient(960, 540, 120, 960, 540, 900); g.addColorStop(0, 'rgba(6,8,11,.9)'); g.addColorStop(0.55, 'rgba(6,8,11,.62)'); g.addColorStop(1, 'rgba(6,8,11,.1)');
+  tx.fillStyle = g; tx.fillRect(0, 0, 1920, 1080);
+}
+
+const lines = (id) => $$(`#${id} .line>span`);
+const reveal = (els, lt, t0, step, d = 0.8) => els.forEach((el, i) => { el.style.transform = `translateY(${(1 - eo(p(lt, t0 + i * step, d))) * 108}%)`; });
+const spin = (el, t, speed, phase = 0) => { el.style.backgroundPositionX = `${-(t * speed + phase)}px`; };
+
+const scenes = [
+  (lt, t) => { reveal(lines('s1'), lt, 0.12, 0.13); const m = $('#s1mars'); spin(m, t, 46, 300); m.style.transform = `scale(${lerp(1.1, 1, eo(p(lt, 0, 1.6)))})`; $('#s1sub').style.opacity = p(lt, 0.75, 0.5); },
+  (lt, t) => { s2w.forEach((w, i) => { const k = eo(p(lt, 0.05 + i * 0.09, 0.6)); w.style.opacity = k; w.style.filter = `blur(${(1 - k) * 14}px)`; w.style.transform = `translateY(${(1 - k) * 18}px)`; });
+    s2li.forEach((li, i) => { const k = eo(p(lt, 1.25 + i * 0.3, 0.7)); li.style.opacity = k; li.style.transform = `translateX(${(1 - k) * -40}px)`; });
+    const e = $('#s2earth'); spin(e, t, 70, 2685); e.style.transform = `translateY(${(1 - eo(p(lt, 0, 1.4))) * 120}px)`; },
+  (lt) => { drawTiles(lt); reveal(lines('s3'), lt, 0.06, 0.1, 0.7); $('#s3n').textContent = fmt(148925 * eo(p(lt, 0.3, 1.7))); $('#s3c').style.opacity = p(lt, 0.3, 0.35); },
+  (lt, t) => { $$('#s4 .world').forEach((w, i) => { const k = eo(p(lt, 0.05 + i * 0.2, 0.9)); const s = w.querySelector('.sphere');
+      s.style.transform = `translateY(${(1 - k) * 90}px) scale(${lerp(0.82, 1, k)})`; s.style.opacity = cl(k * 1.4); spin(s, t, 28, [300, 500, 1150][i] * 0.4);
+      const q = p(lt, 0.45 + i * 0.2, 0.45); w.querySelector('h3').style.opacity = q; w.querySelector('p').style.opacity = q; });
+    $('#s4row').style.opacity = p(lt, 1.25, 0.4); $$('#s4row span').forEach((sp, i) => { const k = p(lt, 1.5 + i * 0.28, 0.3); sp.style.color = `rgba(243,245,247,${lerp(0.45, 1, k)})`; sp.style.fontWeight = k > 0.5 ? 800 : 600; }); },
+  (lt) => { reveal(lines('s5'), lt, 0.05, 0.09); $('#s5p').style.opacity = p(lt, 0.7, 0.5);
+    const k = eo(p(lt, 0.1, 1.3)), drift = p(lt, 0, 4.2);
+    $('#s5shot').style.transform = `perspective(2200px) translateX(${(1 - k) * 380}px) rotateY(${lerp(-22, -5, k)}deg) scale(${lerp(0.94, 1.0, k) + drift * 0.035})`; $('#s5shot').style.opacity = cl(k * 1.6); },
+  (lt) => { const k = eo(p(lt, 0.1, 1.5)); $('#s6n').textContent = (92.5 * k).toFixed(1) + '%'; $('#s6bar').style.width = (92.5 * k) + '%';
+    const q = eo(p(lt, 0.9, 0.7)); $('#s6p').style.opacity = q; $('#s6p').style.transform = `translateY(${(1 - q) * 24}px)`; $('#s6l').style.opacity = p(lt, 1.5, 0.4); },
+  (lt) => { const k = eo(p(lt, 0.05, 0.9));
+    $('#s7a').style.clipPath = `inset(0 0 0 ${(1 - k) * 100}%)`; $('#s7b').style.clipPath = `inset(0 ${(1 - k) * 100}% 0 0)`;
+    $('#s7a').style.transform = `scale(${lerp(1.08, 1, k)})`; $('#s7b').style.transform = `scale(${lerp(1.08, 1, k)})`;
+    const q = p(lt, 0.5, 0.4); $('#s7la').style.opacity = q; $('#s7lb').style.opacity = q;
+    const r = eo(p(lt, 0.35, 1.5)); $('#s7n').textContent = '#' + fmt(Math.max(1, lerp(148925, 1, r))); { const L = fmt(Math.max(1, lerp(148925, 1, r))).length; $('#s7n').style.fontSize = (L >= 6 ? 84 : L === 5 ? 104 : L >= 3 ? 132 : L === 2 ? 160 : 190) + 'px'; } $('#s7mid').style.opacity = p(lt, 0.3, 0.3);
+    $('#s7close').style.opacity = p(lt, 1.7, 0.45); },
+  (lt, t) => { reveal(lines('s8'), lt, 0.05, 0.12); $$('#s8 .e8').forEach((el, i) => { const k = eo(p(lt, 0.45 + i * 0.14, 0.7)); el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * 16}px)`; });
+    const m = $('#s8mars'); spin(m, t, 40, 900); m.style.opacity = p(lt, 0, 0.6); },
+];
+const els = $$('.scene');
+
+window.render = (t) => {
+  $('#stars').style.transform = `translateY(${-t * 5}px)`;
+  els.forEach((el, i) => {
+    const a = A[i], b = B[i], on = t >= a - 0.001 && t < b;
+    el.style.visibility = on ? 'visible' : 'hidden'; if (!on) return;
+    const inn = i === 0 ? 1 : p(t, a, 0.28), out = i === els.length - 1 ? 0 : p(t, b - 0.26, 0.26);
+    el.style.opacity = inn * (1 - out);
+    el.style.transform = out > 0 ? `scale(${1 + out * 0.025})` : 'none';
+    scenes[i](t - a, t);
+  });
+  let cap = ''; for (let k = 0; k < S.length; k++) if (t >= S[k] - 0.05 && t <= E[k] + 0.12) cap = window.CAPS[k];
+  $('#cap').style.display = cap ? 'block' : 'none'; $('#cap span').textContent = cap;
+  $('#ai').style.opacity = t < A[A.length - 1] ? 1 : 0;
+  $('#veil').style.opacity = Math.max(1 - p(t, 0, 0.35), p(t, TL.total - 0.45, 0.45));
+};
+window.ready = Promise.all([document.fonts.ready, ...$$('img').map((i) => i.decode().catch(() => 0))]).then(() => { render(0); return true; });
+</script>
+</body></html>
