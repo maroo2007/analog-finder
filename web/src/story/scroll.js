@@ -266,10 +266,10 @@ export function initScroll({ stage, data }) {
   const triggers = {};
   const sceneEl = (name) => $(`[data-scene="${name}"]`);
 
-  // Everything below is tied to the scroll position itself (scrub: true):
-  // it moves exactly as fast as you scroll, stops when you stop, and runs
-  // backwards identically when you scroll up. Lenis alone provides the
-  // smoothing, so motion eases to a stop instead of braking.
+  // The big moves inside pinned scenes, the planets, the odometer and the
+  // exit fades are tied to the scroll position (scrub: true): they move as
+  // fast as you scroll and run backwards identically when you scroll up.
+  // Each scene's text reveal (REVEALS) plays in time as the scene arrives.
 
   // The odometer rolls while the counter scene is held.
   const odo = createOdometer($('[data-odo-digits]'), data.rank.ofContinent, data.rank.rankContinent);
@@ -286,12 +286,19 @@ export function initScroll({ stage, data }) {
     const name = el.dataset.scene;
     const build = REVEALS[name];
     if (build) {
-      // The reveal plays while the scene scrolls in (its top travelling from
-      // 95% to 12% of the screen), evenly, so it is complete as the scene
-      // settles and never rushes in one frame.
-      const tl = gsap.timeline({ defaults: { duration: 1, ease: 'none' } });
+      // The scene's reveal plays by itself, in time, when its top reaches
+      // 60% of the screen: headings rise in with a strong ease-out and the
+      // statement words fill one after another (the site's first motion,
+      // restored on 2026-11-14). Scrolling back above that point plays it
+      // backwards at the same speed, so up mirrors down.
+      const tl = gsap.timeline({ paused: true, defaults: { duration: 0.9, ease: 'power3.out' } });
       build(tl, el);
-      ScrollTrigger.create({ trigger: el, start: 'top 95%', end: 'top 12%', scrub: true, animation: tl });
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 60%',
+        onEnter: () => tl.play(),
+        onLeaveBack: () => tl.reverse(),
+      });
     }
     if (PINNED.includes(name)) {
       let scrubTl;
