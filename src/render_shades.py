@@ -6,14 +6,15 @@ at 463 m per pixel (the resolution the matching uses), a 65 km square, the
 same sun (azimuth 315, elevation 45) and no vertical exaggeration. So any
 difference you see is in the ground, not in how it was drawn.
 
-    python src/render_shades.py            # targets, best twin, Egypt (PNG)
-    python src/render_shades.py --twins    # every twin, as small WebP
+    python src/render_shades.py [--world mars|moon] [--workers N]
 
---twins draws all 25 twins of every target, its Egyptian tile and the
-target itself as 200 px WebP: shade/earth/<target>_<n>.webp, where n is
-the twin's place (1 to 25) in matches/<target>.json, so _1 is the same tile
-as _top; shade/earth/<target>_egypt.webp; shade/<world>/<target>.webp. It
-skips files that exist, so it can be stopped and run again.
+Draws all 25 twins of every target, its Egyptian tile and the target itself
+as 200 px WebP: shade/earth/<target>_<n>.webp, where n is the twin's place
+(1 to 25) in matches/<target>.json; shade/earth/<target>_egypt.webp;
+shade/<world>/<target>.webp. It skips files that exist, so it can be stopped
+and run again (delete shade/ first after a data rebuild). --twins, the old
+name for this, is still accepted. The earlier 280 px PNG pairs (_top, _egypt
+and the targets) were dropped on 2026-11-14: the website reads only the WebP.
 """
 
 from __future__ import annotations
@@ -36,7 +37,6 @@ import terrain as t
 
 OUT = config.ROOT / "web" / "public" / "data" / "shade"
 SIZE_PX = 140                      # 140 x 463 m = 65 km
-OUT_PX = 280
 COP = ("/vsicurl/https://copernicus-dem-30m.s3.eu-central-1.amazonaws.com/"
        "{n}/{n}.tif")
 TWIN_PX = 200                      # the per-twin WebP images
@@ -64,12 +64,6 @@ def hillshade(z: np.ndarray, px_x: float, px_y: float) -> np.ndarray:
 def _tinted(shade: np.ndarray, tint, px: int) -> Image.Image:
     rgb = (shade[..., None] * np.array(tint)[None, None, :]).clip(0, 255)
     return Image.fromarray(rgb.astype(np.uint8)).resize((px, px), Image.BICUBIC)
-
-
-def to_png(shade: np.ndarray, tint, path) -> None:
-    img = _tinted(shade, tint, OUT_PX)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    img.save(path, optimize=True)
 
 
 def webp_bytes(shade: np.ndarray, tint) -> bytes:
@@ -188,30 +182,15 @@ def render_twins(data, targets, workers: int = WORKERS) -> int:
 
 
 def main() -> int:
-    """python src/render_shades.py [--world mars|moon] [--twins [--workers N]]"""
+    """python src/render_shades.py [--world mars|moon] [--workers N]"""
     data = config.ROOT / "web" / "public" / "data"
     targets = json.loads((data / "targets.json").read_text(encoding="utf-8"))["targets"]
     if "--world" in sys.argv:
         world = sys.argv[sys.argv.index("--world") + 1]
         targets = [x for x in targets if x["world"] == world]
-    if "--twins" in sys.argv:
-        workers = (int(sys.argv[sys.argv.index("--workers") + 1])
-                   if "--workers" in sys.argv else WORKERS)
-        return render_twins(data, targets, workers)
-    egypt = {e["target"]: e for e in
-             json.loads((data / "egypt.json").read_text(encoding="utf-8"))}
-    for tgt in targets:
-        tid, world = tgt["id"], tgt["world"]
-        to_png(target_shade(tgt), TINTS[world], OUT / world / f"{tid}.png")
-        top = json.loads((data / "matches" / f"{tid}.json").read_text())[0]
-        for kind, pt in (("top", top), ("egypt", egypt.get(tid))):
-            if pt is None:
-                continue
-            z, px, py = earth_window(pt["lat"], pt["lon"])
-            to_png(hillshade(z, px, py), EARTH_TINT,
-                   OUT / "earth" / f"{tid}_{kind}.png")
-        print(tid, flush=True)
-    return 0
+    workers = (int(sys.argv[sys.argv.index("--workers") + 1])
+               if "--workers" in sys.argv else WORKERS)
+    return render_twins(data, targets, workers)
 
 
 if __name__ == "__main__":

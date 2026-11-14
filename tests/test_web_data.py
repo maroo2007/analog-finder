@@ -229,7 +229,7 @@ def test_moon_targets_in_web_data_are_terrain_only():
         assert "albedo" in x["note"]
         rows = _json(WEB / "matches" / f"{x['id']}.json")
         assert all(set(r["closeness"]) == set(t.FEATURES) for r in rows)
-        assert (WEB / "shade" / "moon" / f"{x['id']}.png").exists()
+        assert (WEB / "shade" / "moon" / f"{x['id']}.webp").exists()
 
 
 # ------------------------------------------------------------------ Diviner
@@ -290,3 +290,5 @@ def test_every_twin_has_its_shaded_relief():
         assert not missing, missing
         assert (shade / x["world"] / f"{tid}.webp").exists(), tid
     assert not list(shade.rglob("*.part"))              # no half-written file
+    # The site reads only the WebP; the old PNG pairs were dropped 2026-11-14.
+    assert not list(shade.rglob("*.png"))

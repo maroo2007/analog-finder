@@ -256,3 +256,15 @@ gee-key*.json
 # Registration video: raw clips (about 700 MB) and the edit
 nasa/
 video/
+
+# Impeccable: the engine binary is per machine (the installer downloads and
+# checksum-verifies it), and settings.local.json holds this machine's hooks.
+.claude/skills/impeccable/scripts/bin/
+.claude/settings.local.json
+
+# Website (Vite): installed packages and caches; the build goes to web/dist/,
+# already covered by dist/ above.
+node_modules/
+web/.vite/
+# The Python rule lib/ above would also hide the site's own source folder.
+!web/src/lib/

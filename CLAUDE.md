@@ -190,9 +190,26 @@ As of 2026-11-14 (hackathon 14 to 15 November), Phase 1 has passed, Prompts
 1 and 2 are done and merged, and the global Earth grid (Prompt 3) covers
 Africa and the Americas south of 50 N (merged in pull request #5). Every
 twin has a shaded relief image (`shade/earth/<id>_<n>.webp`, n = place 1 to
-25 in `matches/<id>.json`; `python src/render_shades.py --twins`). The website is being built on `feature/website`, in a git
-worktree at `C:\Users\Marwan\Desktop\analog-finder-website` (Marwan's
-laptop); open Claude Code on that folder so the Impeccable design hooks run.
+25 in `matches/<id>.json`; `python src/render_shades.py`). **The website is
+finished** and merged into `main` (pull request #7); what is still open is
+deploying it, the Gemini key and the final submission (see **Next**).
+
+- **The website** (`web/`, 2026-11-14): a static Vite site, `npm run dev` in
+  `web/` (port 5173), `npm run build` to `web/dist/`. `index.html` is the
+  scroll story (17 scenes from `docs/WEBSITE_SPEC.md`, one three.js stage,
+  GSAP ScrollTrigger and Lenis, full credits and the AI line at the foot);
+  `explorer.html` is the Twin Finder (Mars and Moon globes, a MapLibre Earth
+  with Satellite / Map / Terrain, the twin card with each twin's relief, the
+  continent rank, Diviner on Moon cards, Google Maps, NASA Worldview and
+  Copernicus Browser links, the Egypt tab). Every number is read from
+  `web/public/data/`; nothing is hardcoded. "Ask the analyst" calls Gemini
+  only through `web/netlify/functions/analyst.mjs` (shared code in
+  `web/server/analyst-core.mjs`); the key is `GEMINI_API_KEY` in the Netlify
+  UI or a gitignored `web/.env`, never in the repo. Without a key the panel
+  says it isn't set up yet. `netlify.toml` builds `web/` and publishes
+  `web/dist`. Design context for Impeccable is in `PRODUCT.md` and
+  `.impeccable/`; its skill and agents are in `.claude/`. Tested in headless
+  Edge at 1440 px, 390 px and with reduced motion.
 
 - **The Americas** (2026-11-13): 18,865 Mars-possible tiles, 1.43
   EECU-hours (stage A 0.03 run alone first with `--ndvi-only`, then stage B
@@ -221,7 +238,7 @@ laptop); open Claude Code on that folder so the Impeccable design hooks run.
   148,925) and its rank within its continent (`rank_continent` of
   `of_continent`), which the website should show. Code: `src/run_moon_targets.py`,
   `src/build_web_data.py`.
-- **Website data** is committed in `web/public/data/` (about 6 MB): targets,
+- **Website data** is committed in `web/public/data/` (about 2.6 MB): targets,
   top 25 twins per target at least 25 km apart (true distance,
   `match_grid.top_spread`), the best Egyptian tile per target, shaded relief
   pairs. Rebuild with `python src/build_web_data.py`, then
@@ -295,8 +312,10 @@ laptop); open Claude Code on that folder so the Impeccable design hooks run.
   (2026-11-13: "we'll be careful"); don't add one without asking. When the
   free quota runs out, visitors see "try again in a minute"
   (`chatbot.Busy`).
-- **Next:** the website (`docs/WEBSITE_SPEC.md`), bringing `main`'s website
-  data into `feature/website`, then the submission. Later: Prompt 4 in
+- **Next:** deploy the website on Netlify (public link), set
+  `GEMINI_API_KEY` there for the analyst, make the GitHub repository public
+  for judges, then the final submission (Sunday 15 November, 11:59 p.m.
+  Cairo time). Still unconfirmed: the YouTube link for the footer. Later: Prompt 4 in
   `docs/ENGINE_PROMPTS.md` (discoveries list and interface data), more
   continents for the grid (each estimated from a test country and run under
   a cost cap), and the known-analog validation.

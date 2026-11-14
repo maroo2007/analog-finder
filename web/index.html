@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planetary Twin Finder: find Mars on Earth</title>
+  <meta name="description" content="Places on Earth whose terrain best matches NASA's proposed landing and base sites on Mars and the Moon. NASA Space Apps 2026, Team Duplica, Cairo.">
+  <meta name="theme-color" content="#06080b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='%23e0703a'/%3E%3C/svg%3E">
+  <script type="module" src="/src/story/main.js"></script>
+</head>
+<body class="story">
+  <a class="skip" href="#main">Skip to the story</a>
+
+  <canvas id="scene-canvas" aria-hidden="true"></canvas>
+
+  <header class="site-header" data-header>
+    <a class="wordmark" href="#top">Planetary Twin Finder</a>
+    <nav aria-label="Main">
+      <a href="#top">Story</a>
+      <a href="explorer.html">Twin Finder</a>
+      <a href="#egypt">Egypt</a>
+      <a href="#method">Method</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- 1 Hero -->
+    <section class="scene scene-hero" id="top" data-scene="hero">
+      <div class="hero-copy">
+        <h1 class="display hero-title"><span>Find</span> <span>Mars</span> <span>on Earth</span></h1>
+        <p class="hero-sub">NASA Space Apps 2026 · Team Duplica · Cairo</p>
+      </div>
+    </section>
+
+    <!-- 2 Problem -->
+    <section class="scene scene-statement" id="chapter-problem" data-scene="problem" data-chapter="problem">
+      <p class="statement" data-fill>Astronauts rehearse Mars and Moon missions at a few places on Earth, chosen mostly by experience, not by searching the whole planet.</p>
+    </section>
+
+    <!-- 3 Idea -->
+    <section class="scene scene-statement" data-scene="idea" data-chapter="problem">
+      <p class="statement" data-fill>We give every patch of ground on Earth, Mars and the Moon the same profile, and let the data find the closest twins.</p>
+    </section>
+
+    <!-- 4 Two steps -->
+    <section class="scene scene-steps" data-scene="steps" data-chapter="problem">
+      <div class="steps-pair">
+        <div class="step step-pick">
+          <h2 class="display step-word">Pick</h2>
+          <p class="label">A site on Mars or the Moon</p>
+        </div>
+        <div class="step step-match">
+          <h2 class="display step-word">Match</h2>
+          <p class="label">Its twins on Earth</p>
+        </div>
+      </div>
+      <div class="steps-across">
+        <p class="display across-line">Across <span class="num" data-bind="placesTotal">148,925</span> places</p>
+        <div class="bar" aria-hidden="true"><span class="bar-fill" data-across-fill></span></div>
+      </div>
+    </section>
+
+    <!-- 5 Three worlds -->
+    <section class="scene scene-worlds" id="method" data-scene="worlds" data-chapter="method">
+      <h2 class="display worlds-title">Three worlds. <br>One ruler.</h2>
+      <ul class="world-keys" aria-label="The three worlds">
+        <li><i style="--c: var(--mars)"></i>Mars</li>
+        <li><i style="--c: var(--earth)"></i>Earth</li>
+        <li><i style="--c: var(--moon)"></i>Moon</li>
+      </ul>
+    </section>
+
+    <!-- 6 Pick -->
+    <section class="scene scene-pick" data-scene="pick" data-chapter="method">
+      <div class="pick-map" aria-hidden="true">
+        <img src="/img/mars.jpg" alt="" loading="lazy" decoding="async">
+      </div>
+      <h2 class="display pick-title"><span class="step-no num">1</span> Pick a target</h2>
+      <aside class="world-panel" aria-label="Select a world">
+        <h3 class="panel-title">Select a world</h3>
+        <div class="tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-world-tab="mars">Mars · <span data-bind="marsCount">38</span> zones</button>
+          <button role="tab" aria-selected="false" data-world-tab="moon">Moon · <span data-bind="moonCount">9</span> regions</button>
+        </div>
+        <ul class="thumb-grid" data-thumbs></ul>
+        <p class="panel-foot" data-thumb-name>Jezero</p>
+      </aside>
+    </section>
+
+    <!-- 7 Measure -->
+    <section class="scene scene-measure" data-scene="measure" data-chapter="method">
+      <ol class="measure-steps">
+        <li data-measure-step="1"><p>Every world cut into 9 km tiles at the same 463 m pixel size</p></li>
+        <li data-measure-step="2"><p>Four numbers per tile: slope, roughness, relief, brightness</p></li>
+        <li data-measure-step="3"><p>On Earth, anything with plants, water or ice is removed</p></li>
+      </ol>
+      <div class="tile-stack" data-tile-stack>
+        <!-- Each label lives on its own layer, so it moves with it exactly. -->
+        <div class="tile-3d" data-tile-3d role="img" aria-label="A Jezero crater tile separating into four measured layers: slope, roughness, relief and brightness">
+          <div class="tile-base"><img data-shade="mars-tile" alt="" decoding="async"></div>
+          <div class="tile-layer" data-i="1"><span class="tile-tag">Slope</span></div>
+          <div class="tile-layer" data-i="2"><span class="tile-tag">Roughness</span></div>
+          <div class="tile-layer" data-i="3"><span class="tile-tag">Relief</span></div>
+          <div class="tile-layer" data-i="4"><span class="tile-tag">Brightness</span></div>
+        </div>
+        <p class="tile-caption label">Jezero crater tile, 9 km</p>
+      </div>
+    </section>
+
+    <!-- 8 Match -->
+    <section class="scene scene-match" data-scene="match" data-chapter="method">
+      <h2 class="display match-title"><span class="step-no num">2</span> Match its twins on Earth</h2>
+    </section>
+
+    <!-- 9 Twin Finder -->
+    <section class="scene scene-finder" data-scene="finder" data-chapter="method">
+      <h2 class="display finder-title">The Twin Finder</h2>
+      <figure class="finder-shot" data-finder-shot>
+        <img src="/img/explorer.png" alt="The Twin Finder showing Jezero crater on Mars and its closest twins on Earth" loading="lazy" decoding="async">
+      </figure>
+      <ol class="finder-captions">
+        <li>Click any site on Mars or the Moon</li>
+        <li>See its closest places on Earth, ranked</li>
+        <li>Read why they match, and why they don't</li>
+      </ol>
+    </section>
+
+    <!-- 10 Promises -->
+    <section class="scene scene-promises" id="chapter-proof" data-scene="promises" data-chapter="proof">
+      <ul class="promises">
+        <li>
+          <h2 class="display promise-word">Blind-tested</h2>
+          <p class="label promise-line">92.5% found NASA's own training sites</p>
+        </li>
+        <li>
+          <h2 class="display promise-word">Open data</h2>
+          <p class="label promise-line">NASA and ESA, free for anyone</p>
+        </li>
+        <li>
+          <h2 class="display promise-word">Honest</h2>
+          <p class="label promise-line">Every match says what doesn't match</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 11 Egypt -->
+    <section class="scene scene-egypt" id="egypt" data-scene="egypt" data-chapter="egypt">
+      <h2 class="display egypt-title">Jezero <span class="twin-arrow" aria-label="and its twin in">↔</span> Egypt</h2>
+      <div class="pair">
+        <figure>
+          <img data-shade="mars" alt="Shaded relief of Jezero crater, Mars" width="280" height="280" decoding="async">
+          <figcaption class="label"><i style="--c: var(--mars)"></i>Jezero crater, Mars</figcaption>
+        </figure>
+        <figure>
+          <img data-shade="earth" alt="Shaded relief of the matching tile in Egypt" width="280" height="280" decoding="async">
+          <figcaption class="label"><i style="--c: var(--earth)"></i><span data-bind="egyptPlace">Egypt</span></figcaption>
+        </figure>
+      </div>
+      <dl class="closeness" data-closeness></dl>
+      <p class="egypt-caption">Jezero crater, where Perseverance landed. Its closest twin in all of <span data-bind="continent">Africa</span> is in Egypt's Eastern Desert, <span class="num" data-bind="egyptCoords">25.13°N, 34.54°E</span>.</p>
+    </section>
+
+    <!-- 12 Counter -->
+    <section class="scene scene-counter" data-scene="counter" data-chapter="egypt">
+      <p class="counter-side">Every Mars-possible place in <span data-bind="continent">Africa</span>, ranked against the same crater.</p>
+      <div class="counter">
+        <p class="odometer display num" data-odometer aria-live="off">
+          <span class="visually-hidden" data-bind="rankText">#1</span>
+          <span class="odo-digits" aria-hidden="true" data-odo-digits></span>
+        </p>
+        <p class="counter-lead">Jezero's closest twin in <span data-bind="continent">Africa</span></p>
+        <p class="label counter-label">Rank among dry places in <span data-bind="continentUpper">Africa</span></p>
+      </div>
+      <ol class="counter-scale" aria-label="Rank scale">
+        <li class="label is-top">Egypt <span class="num" data-bind="rankShort">#1</span></li>
+        <li class="label"><span class="num" data-bind="scaleMid">#65,030</span></li>
+        <li class="label"><span class="num" data-bind="scaleEnd">#130,060</span></li>
+      </ol>
+    </section>
+
+    <!-- 13 Moon -->
+    <section class="scene scene-moon" id="chapter-moon" data-scene="moon" data-chapter="moon">
+      <div class="moon-copy">
+        <h2 class="display moon-title">The Moon is harder</h2>
+        <p>The lunar south pole is rougher than almost any dry land in <span data-bind="areas">Africa and the Americas</span>. Its closest twins are in <span data-bind="moonPlaces">Chile, Argentina and Bolivia</span>. We show the rank and say plainly how far off it still is.</p>
+        <p class="moon-note">The targets are NASA's <span data-bind="moonCount">9</span> Artemis III candidate regions. Artemis III is now a crewed test flight in Earth orbit; the first landing moved to Artemis IV (2028), and its site is not chosen yet.</p>
+      </div>
+    </section>
+
+    <!-- 14 Limits -->
+    <section class="scene scene-limits" id="chapter-limits" data-scene="limits" data-chapter="limits">
+      <ul class="limits">
+        <li class="display">Gravity</li>
+        <li class="display">Air</li>
+        <li class="display">Radiation</li>
+      </ul>
+      <p class="limits-line">No place on Earth copies these.</p>
+    </section>
+
+    <!-- 15 Call to action -->
+    <section class="scene scene-cta" data-scene="cta">
+      <h2 class="display cta-title">Find your twin</h2>
+      <a class="btn-primary" href="explorer.html">
+        <span>Launch the Twin Finder</span>
+        <span class="arrow-box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+      </a>
+    </section>
+
+    <!-- 16 Numbers -->
+    <section class="scene scene-numbers" data-scene="numbers">
+      <ul class="numbers">
+        <li><span class="display num" data-count data-bind="marsCount">38</span><span class="label">NASA Mars zones</span></li>
+        <li><span class="display num" data-count data-bind="moonCount">9</span><span class="label">Artemis regions</span></li>
+        <li><span class="display num" data-count data-bind="placesTotal">148,925</span><span class="label">Places scored</span></li>
+      </ul>
+    </section>
+
+    <!-- 17 Open data -->
+    <section class="scene scene-data" data-scene="data">
+      <h2 class="data-title">Built on open data</h2>
+      <ul class="data-grid">
+        <li>MOLA</li>
+        <li>TES</li>
+        <li>LRO LOLA</li>
+        <li>LRO Diviner</li>
+        <li>NASA PDS</li>
+        <li>MODIS</li>
+        <li>Copernicus DEM</li>
+        <li>JRC Water</li>
+        <li>USGS</li>
+        <li class="is-you"><a href="explorer.html">Your site?</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- 18 Footer -->
+  <footer class="site-footer">
+    <div class="footer-team">
+      <p class="footer-name">Team Duplica</p>
+      <p>Egyptian Chinese University, Cairo · NASA Space Apps Challenge 2026</p>
+    </div>
+    <nav class="footer-links" aria-label="Project links">
+      <a href="https://github.com/maroo2007/analog-finder">GitHub</a>
+      <a href="#method">Method</a>
+      <a href="explorer.html">Twin Finder</a>
+      <a href="#credits">Credits</a>
+    </nav>
+    <section class="credits" id="credits" aria-labelledby="credits-title">
+      <h2 class="credits-title" id="credits-title">Data and credits</h2>
+      <dl class="credits-list">
+        <div>
+          <dt>Mars</dt>
+          <dd>MOLA elevation and TES albedo (NASA Mars Global Surveyor), from the NASA Planetary Data System via USGS Astropedia. Exploration Zones: NASA, with USGS CTX mosaics. Colour mosaic: Viking (NASA/JPL/USGS).</dd>
+        </div>
+        <div>
+          <dt>Moon</dt>
+          <dd>LOLA south pole elevation (NASA LRO; NASA PGDA, Barker et al. 2023). Diviner (NASA LRO), Paige et al. 2010, PDS Geosciences. Artemis III regions: NASA, outlines USGS DOI 10.5066/P1MEQ6UK, drawn from LROC QuickMap (Arizona State University). Globe textures: NASA Scientific Visualization Studio, CGI Moon Kit (LROC colour, LOLA elevation).</dd>
+        </div>
+        <div>
+          <dt>Earth</dt>
+          <dd>Copernicus DEM GLO-30 (ESA, via AWS Open Data): produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM-30. MODIS vegetation, albedo and land cover (NASA, via NASA Earthdata and Google Earth Engine). JRC Global Surface Water (European Commission Joint Research Centre). Blue Marble Next Generation (NASA Earth Observatory, Visible Earth).</dd>
+        </div>
+        <div>
+          <dt>Twin Finder maps</dt>
+          <dd>EOxCloudless Sentinel-2 by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2025), CC BY-NC-SA 4.0. We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS): Blue Marble, Landsat WELD and ASTER GDEM relief (ASTER GDEM is a product of METI and NASA). © OpenStreetMap contributors. Terrain Tiles (AWS Open Data): Mapzen; SRTM courtesy of the U.S. Geological Survey; ETOPO1 by U.S. NOAA; and others.</dd>
+        </div>
+        <div>
+          <dt>Challenge resources</dt>
+          <dd>From the challenge's resource list we use the NASA Planetary Data System, NASA's Lunar Reconnaissance Orbiter (LOLA and Diviner), NASA Earthdata (MODIS), NASA Worldview and the Copernicus Data Space Ecosystem; every twin card links to Worldview and the Copernicus Browser.</dd>
+        </div>
+        <div>
+          <dt>Software and type</dt>
+          <dd>three.js, MapLibre GL JS, GSAP and Lenis. Archivo typeface (SIL Open Font License).</dd>
+        </div>
+      </dl>
+      <p class="footer-credits">This site is not affiliated with or endorsed by NASA, ESA or any other agency, and shows no agency logos.</p>
+      <p class="footer-ai"><strong>How we used AI.</strong> Claude (Anthropic) helped write the data pipeline, this website and our documents; we checked the numbers against our own data files. The Twin Finder's "Ask the analyst" uses Google Gemini, is labelled as AI and answers only from the data on screen. No image or video here is AI-generated.</p>
+    </section>
+  </footer>
+
+  <a class="launch-fixed" href="explorer.html">
+    <span>Launch the Twin Finder</span>
+    <span class="arrow-box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+  </a>
+
+  <nav class="chapter-bar" aria-label="Chapters" data-chapter-bar>
+    <a href="#chapter-problem" data-chapter-link="problem"><span class="seg-fill"></span><span class="seg-name">Problem</span></a>
+    <a href="#method" data-chapter-link="method"><span class="seg-fill"></span><span class="seg-name">Method</span></a>
+    <a href="#chapter-proof" data-chapter-link="proof"><span class="seg-fill"></span><span class="seg-name">Proof</span></a>
+    <a href="#egypt" data-chapter-link="egypt"><span class="seg-fill"></span><span class="seg-name">Egypt</span></a>
+    <a href="#chapter-moon" data-chapter-link="moon"><span class="seg-fill"></span><span class="seg-name">Moon</span></a>
+    <a href="#chapter-limits" data-chapter-link="limits"><span class="seg-fill"></span><span class="seg-name">Limits</span></a>
+  </nav>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "planetary-twin-finder-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Story page and Twin Finder for Planetary Twin Finder (NASA Space Apps 2026, Team Duplica)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@netlify/blobs": "^11.1.9",
+    "gsap": "^3.15.1",
+    "lenis": "^1.3.27",
+    "maplibre-gl": "^6.18.0",
+    "three": "^0.187.0"
+  }
+}
