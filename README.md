@@ -108,3 +108,10 @@ On Mac, `brew install gh`; on Linux, see https://cli.github.com. During
 
 On Windows 11, turn off Smart App Control first, or it blocks parts of pandas
 and other compiled libraries. See `CLAUDE.md`.
+
+## Third-party code in this repository
+
+`.claude/skills/impeccable/` (and the `impeccable-*` agents in
+`.claude/agents/`) is [Impeccable](https://github.com/pbakaus/impeccable) by
+Paul Bakaus, used under the Apache License 2.0; its `LICENSE` and
+`NOTICE.md` are in that folder. We used it to design the website.
