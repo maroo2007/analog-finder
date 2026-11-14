@@ -27,7 +27,8 @@ const S2_ATTRIBUTION = `<a href="https://cloudless.eox.at" target="_blank" rel="
 const ESRI_ATTRIBUTION = 'Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community';
 const TERRAIN_ATTRIBUTION = '<a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">Terrain Tiles</a>: Mapzen; SRTM courtesy of the U.S. Geological Survey; ETOPO1 by U.S. NOAA; and <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md" target="_blank" rel="noopener">others</a>';
 
-// Map: OpenStreetMap's standard raster map. OpenFreeMap's vector tiles were
+// Map, zoomed in: OpenStreetMap's standard raster map (zoomed out it is NASA's
+// English reference map, below). OpenFreeMap's vector tiles were
 // tried first but weigh up to 1.5 MB at low zoom and took 2 to 20 s, leaving
 // the globe white. OSM tiles are 2 to 22 KB and arrived in under a second.
 // Tile policy (interactive use allowed; attribution must be clearly on the
@@ -65,6 +66,24 @@ export function baseSources() {
       tileSize: 256, minzoom: 6, maxzoom: 12,
     },
     'sat-sharp': sharp,
+    // NASA's reference map, with place names in English (OSM's own tiles
+    // name every place in its local language, so Egypt read in Arabic):
+    // land and water, borders and main roads, labels. Native to zoom 9.
+    'map-water': {
+      type: 'raster',
+      tiles: [`${GIBS}/OSM_Land_Water_Map/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`],
+      tileSize: 256, maxzoom: 9, attribution: GIBS_ATTRIBUTION,
+    },
+    'map-features': {
+      type: 'raster',
+      tiles: [`${GIBS}/Reference_Features/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`],
+      tileSize: 256, maxzoom: 9,
+    },
+    'map-labels': {
+      type: 'raster',
+      tiles: [`${GIBS}/Reference_Labels/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`],
+      tileSize: 256, maxzoom: 9,
+    },
     'map-osm': {
       type: 'raster',
       tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
@@ -94,8 +113,14 @@ export function baseLayers() {
       { id: 'sat-landsat', type: 'raster', source: 'sat-landsat', minzoom: 6, paint: { 'raster-fade-duration': 250, 'raster-contrast': 0.25, 'raster-saturation': 0.15 } },
       { id: 'sat-sharp', type: 'raster', source: 'sat-sharp', minzoom: 5, paint: { 'raster-fade-duration': 400 } },
     ],
+    // Zoomed out (countries, cities): NASA's English reference map. Zoomed in
+    // past about 9, where it runs out of detail, it fades into OpenStreetMap
+    // for streets and close-up features.
     map: [
-      { id: 'map-osm', type: 'raster', source: 'map-osm', paint: { 'raster-fade-duration': 150 } },
+      { id: 'map-water', type: 'raster', source: 'map-water', maxzoom: 9.6, paint: { 'raster-fade-duration': 150, 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 8.5, 1, 9.5, 0] } },
+      { id: 'map-features', type: 'raster', source: 'map-features', maxzoom: 9.6, paint: { 'raster-fade-duration': 150, 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 8.5, 1, 9.5, 0] } },
+      { id: 'map-labels', type: 'raster', source: 'map-labels', maxzoom: 9.6, paint: { 'raster-fade-duration': 150, 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 8.5, 1, 9.5, 0] } },
+      { id: 'map-osm', type: 'raster', source: 'map-osm', minzoom: 8.5, paint: { 'raster-fade-duration': 150, 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 8.5, 0, 9.5, 1] } },
     ],
     terrain: [
       { id: 'terrain-ground', type: 'background', paint: { 'background-color': '#1a1f26' } },
