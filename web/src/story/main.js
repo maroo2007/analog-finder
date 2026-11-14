@@ -1,7 +1,7 @@
 import '../styles/base.css';
 import '../styles/story.css';
 import { fillContent, splitWords } from './content.js';
-import { initHeader, initChapterBar } from './chrome.js';
+import { initHeader, initChapterBar, initLaunchButton } from './chrome.js';
 import { createStage, HIDDEN } from './stage.js';
 import { initScroll } from './scroll.js';
 
@@ -15,6 +15,7 @@ const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 root.classList.toggle('reduced', reduced);
 
 initHeader();
+initLaunchButton();
 document.querySelectorAll('[data-fill]').forEach(splitWords);
 
 async function start() {

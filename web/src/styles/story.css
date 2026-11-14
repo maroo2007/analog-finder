@@ -478,7 +478,11 @@ main { overflow-x: clip; }
   font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   text-decoration: none;
   color: var(--ink);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out), visibility 0.5s;
 }
+/* Off once the footer is in view: it has its own Twin Finder link, and the
+   button would sit on top of the footer's links. */
+.launch-fixed.is-away { opacity: 0; transform: translateY(12px); visibility: hidden; pointer-events: none; }
 .launch-fixed .arrow-box { width: 40px; height: 40px; background: var(--accent); color: var(--ground); border-color: var(--accent); transition: background-color 0.25s var(--ease-out); }
 .launch-fixed:hover .arrow-box { background: #7cbcef; }
 

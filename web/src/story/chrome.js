@@ -17,6 +17,15 @@ export function initHeader() {
   onScroll();
 }
 
+/** The fixed "Launch the Twin Finder" button steps aside over the footer. */
+export function initLaunchButton() {
+  const btn = document.querySelector('.launch-fixed');
+  const footer = document.querySelector('.site-footer');
+  if (!btn || !footer || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(([e]) => btn.classList.toggle('is-away', e.isIntersecting))
+    .observe(footer);
+}
+
 /**
  * Chapter bar: each segment fills with the scroll progress through its
  * chapter; the current one widens and shows its name. It appears from the

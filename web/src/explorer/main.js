@@ -123,6 +123,8 @@ async function init() {
 
   try {
     earthView = createEarthView($('[data-earth-view]'), { onPick: (key) => selectKey(key) });
+    // Development only (stripped from the build): lets tests read the map.
+    if (import.meta.env.DEV) window.__earth = earthView;
   } catch (err) {
     console.warn('WebGL unavailable; using the flat likeness map', err);
     webgl = false;
