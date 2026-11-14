@@ -318,7 +318,24 @@ still open is making the repository public and the final submission (see
   (AI code acknowledged in text and metadata, AI images and videos
   watermarked). The China-affiliation check is answered: the team confirmed
   on 2026-11-14 that Egyptian Chinese University is not affiliated with
-  China (see the doc). The final demo is planned for later.
+  China (see the doc).
+- **The 30 second demo video is done** (2026-11-14, approved by the team):
+  1920x1080, 30 fps, exactly 30.0 s, English narration with captions burned
+  in plus an `.srt`. It is on Marwan's laptop in the worktree's `video/`
+  folder, which git ignores (about 24 MB); share it by hand or upload it,
+  never commit it. Footage is frame-exact screen capture of the live site;
+  no AI images or video, no NASA logos. Narration: HeyGen free stock voice
+  "Annie - Lifelike". Music: synthesised in code (`video/music.mjs`), no
+  samples. The disclosure is already in the file's metadata; paste the same
+  line into the submission's AI section: "Footage is screen capture of our
+  own website; no AI-generated images or video. The English narration is an
+  AI-generated voice (HeyGen stock voice "Annie") reading a script the team
+  wrote with Claude (Anthropic). The background music was composed and
+  synthesised in code by Claude, with no samples or recordings. The website
+  code was written with help from Claude." Editing lesson: HeyGen's word
+  timestamps drift by up to 0.3 s, so cutting lines on them clipped word
+  endings; `video/compose-vo.mjs` cuts at the real silences instead and
+  `video/checkcuts.mjs` proves every cut edge is silent.
 - **Gemini chatbot** (2026-11-13): `src/chatbot.py` (Gemini, terminal mode),
   `src/chat_app.py` (Streamlit page), `src/chat_data.py` (lookups in
   `web/public/data/`, handed to Gemini as tools so it never invents a
@@ -350,8 +367,10 @@ still open is making the repository public and the final submission (see
   Gemini's own free quota still caps use.
 - **Next:** make the GitHub repository public for judges, then the final
   submission (Sunday 15 November, 11:59 p.m. Cairo time) with
-  https://duplicaa.vercel.app as the project link. Optional: a YouTube link
-  in the story page's footer if the team uploads a video. Later: Prompt 4 in
+  https://duplicaa.vercel.app as the project link and the demo video
+  uploaded (local Cairo form first, then the global Space Apps site).
+  Optional: a YouTube link in the story page's footer if the team uploads
+  the video there. Later: Prompt 4 in
   `docs/ENGINE_PROMPTS.md` (discoveries list and interface data), more
   continents for the grid (each estimated from a test country and run under
   a cost cap), and the known-analog validation.
