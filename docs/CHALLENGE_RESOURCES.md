@@ -66,10 +66,10 @@ Facts from the code as of 13 November, to help decide what to add:
 - **LOLA (on this list, under LRO).** We use LOLA already, but from NASA PGDA
   (`terrain.moon_patch`), not from the PDS Geosciences node linked here. Same
   instrument; credit both.
-- **Diviner (on this list).** Not used yet. `HANDOFF.md` section 7 already
-  names it as the first Moon upgrade (rock abundance and night temperature).
-  The challenge page singles it out for the poles, which makes it the
-  strongest candidate to add.
+- **Diviner (on this list).** Used since 2026-11-14, as context on the Moon
+  cards (not for matching): the south Polar Resource Product gives each
+  Artemis region its temperatures and cold-trap and ice-stability shares.
+  See `HANDOFF.md` section 4 and `src/run_diviner.py`.
 - **Copernicus (on this list).** Our Earth elevation is the Copernicus DEM
   GLO-30, read from AWS Open Data. The ESA portal linked here is a different
   door to the Copernicus programme (mainly Sentinel imagery).

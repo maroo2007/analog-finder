@@ -112,7 +112,7 @@ Atacama, Death Valley and the Andes are on the map.
 | 2 | Refresh the website data | The Americas are merged; bring `main`'s `web/public/data/` (both continents, a shaded relief image for every twin) into `feature/website`. |
 | 3 | Publish the site on a public link | See section 7, hosting. |
 | 4 | **Final submission, 15 November** | Section 8. 30 second English video or up to 7 slides, public link. |
-| 5 | Nice to have, only if time is left | Discoveries list (Prompt 4 in `docs/ENGINE_PROMPTS.md`), Hawaii (Mauna Kea), more continents, Moon albedo/thermal. |
+| 5 | Nice to have, only if time is left | Discoveries list (Prompt 4 in `docs/ENGINE_PROMPTS.md`), Hawaii (Mauna Kea), more continents, Moon albedo (Diviner temperatures are done, as context). |
 
 Out of scope for this hackathon: the image AI (DINOv2), reverse mode by city,
 and the Egypt field trip.
@@ -206,11 +206,23 @@ Moon elevation: LOLA south pole DEM, 80 m, polar stereographic, NASA PGDA
 Shackleton crater comes out 4.06 km deep (published 4.2 km). Each region's box
 is its extent plus 15 km a side, at least 120 pixels; no box reaches the pole.
 
-**Moon upgrades, later:** the Moon has no brightness or heat feature yet. Two
-open NASA data sets would add them: **Diviner thermal** (LRO's radiometer:
-rock abundance and night-time temperature, the Moon's version of the Mars
-heat layer) and **LOLA albedo** (LOLA's 1064 nm normal albedo, available for
-the polar regions). Either needs the same check as Mars heat first: that it
+**Diviner temperatures (context, added 2026-11-14):** each Moon region in
+`targets.json` has a `diviner` object from LRO Diviner's south Polar Resource
+Product (Paige et al. 2010, doi:10.1126/science.1187726; PDS Geosciences,
+`urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab`, 605
+MB, MD5 checked against the bundle manifest; cells about 500 m). Per region,
+area weighted: the annual maximum surface temperature and the annual average
+2 cm down (lowest, mean, highest, K and °C), the **cold-trap** share (annual
+maximum below 110 K) and the **ice-stability** shares (water ice stable at
+the surface, or within 2.9 m). It is shown on Moon cards under "what Earth
+can't copy" and is **not a matching feature**. Call the shares cold traps or
+ice stability, never permanent shadow: Diviner measures heat, not light. The
+product has no winter minimum (that needs the 30 GB seasonal PCP). Code:
+`src/run_diviner.py`, then `build_web_data.py`.
+
+**Moon matching upgrade, later:** the Moon is still matched on terrain only.
+**LOLA albedo** (LOLA's 1064 nm normal albedo, available for the polar
+regions) could add brightness, after the same check as Mars heat: that it
 measures the same thing on both worlds.
 
 ---
@@ -225,6 +237,7 @@ measures the same thing on both worlds.
 | Mars | Colour mosaic (`web/public/img/mars.jpg`) | Viking, NASA/JPL/USGS |
 | Moon | LOLA south pole DEM, 80 m | NASA PGDA (Barker et al. 2023, doi:10.60903/gsfcpgda-lola-spole) |
 | Moon | Artemis III regions | NASA, outlines from USGS DOI 10.5066/P1MEQ6UK, drawn from LROC QuickMap (ASU, `quickmap.lroc.asu.edu`) |
+| Moon | Diviner south Polar Resource Product (temperatures, ice stability; context only) | NASA LRO Diviner team (UCLA), PDS Geosciences Node; Paige et al. 2010, Science 330, 479, doi:10.1126/science.1187726 |
 | Earth | Copernicus DEM GLO-30 | ESA, AWS Open Data, no key (attribution below) |
 | Earth | NDVI MOD13C1, albedo MCD43C3, land cover MCD12Q1 (the grid) | NASA MODIS via Google Earth Engine |
 | Earth | NDVI MOD13A2, albedo MCD43A3 (the 92.5% validation, `src/surface.py`) | NASA MODIS via Google Earth Engine |
@@ -262,7 +275,7 @@ rebuild).
 
 | File | Contents |
 |---|---|
-| `targets.json` | `features`: the four feature keys with label and unit. `targets`: 47 entries (38 Mars, 9 Moon) with `id`, `name`, `world` (`mars`/`moon`), `lat`, `lon`, `bbox`, `matched_on`, median `features`, `best_score`. Moon entries also have `code` (USGS region code, e.g. `MA`), `outline`, `area_km2` and a `note`. |
+| `targets.json` | `features`: the four feature keys with label and unit. `targets`: 47 entries (38 Mars, 9 Moon) with `id`, `name`, `world` (`mars`/`moon`), `lat`, `lon`, `bbox`, `matched_on`, median `features`, `best_score`. Moon entries also have `code` (USGS region code, e.g. `MA`), `outline`, `area_km2`, a `note` and `diviner` (temperatures, cold-trap and ice-stability shares, source, files, MD5; context only, section 4). |
 | `matches/<id>.json` | Top 25 Earth twins for that target: `lat`, `lon`, `country`, `continent`, `score`, `rank`, `of`, `rank_continent`, `of_continent`, `features`, `closeness` per feature. |
 | `egypt.json` | Best Egyptian tile per target: `target`, `lat`, `lon`, `score`, `rank`, `of`, `rank_continent`, `of_continent` (Africa). |
 | `likeness.png`, `likeness_americas.png` + `likeness.json` | The "how Mars-like" map per continent. `likeness.json` lists `maps` (`area`, `image`, `bounds`) and keeps `bounds` for Africa ([[-35, -18], [38, 52]], lat/lon); the Americas are [[-56.5, -125], [50, -34]]. |
@@ -373,6 +386,7 @@ No passwords or keys in this file or the repository. Ever.
 | `src/earth_grid.py` | Earth Engine exports under cost caps, local terrain per 1 degree square |
 | `src/match_grid.py` | Ranks Earth tiles against a target; `top_spread` (25 km rule) |
 | `src/run_mars_targets.py`, `src/run_moon_targets.py` | Profile the NASA targets |
+| `src/run_diviner.py` | Diviner temperatures per Moon region (context, not matching) |
 | `src/build_web_data.py` | Writes `web/public/data/` |
 | `src/render_shades.py` | Shaded relief images |
 | `src/run_phase1.py`, `src/run_thermal.py` | The validation runs and the rejected heat variant |
