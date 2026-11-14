@@ -8,7 +8,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { HIDDEN } from './stage.js';
 import { createOdometer } from './odometer.js';
-import { revealTimeline } from './text-reveal.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -170,50 +169,42 @@ function blendStates(a, b, u) {
   return out;
 }
 
-/**
- * The text of each scene, in the order it is revealed, word by word
- * (text-reveal.js): it plays in time as the scene arrives, and backwards
- * when you scroll back above it. Each selector may match several blocks.
- */
-const TEXT = {
-  problem: ['.statement'],
-  idea: ['.statement'],
-  steps: ['.step-pick .step-word', '.step-pick .label', '.step-match .step-word', '.step-match .label', '.across-line'],
-  worlds: ['.worlds-title', '.world-keys'],
-  pick: ['.pick-title'],
-  measure: ['.measure-steps li p'],
-  match: ['.match-title'],
-  finder: ['.finder-title', '.finder-captions li'],
-  promises: ['.promise-word'],
-  egypt: ['.egypt-title', '.egypt-caption'],
-  counter: ['.counter-side', '.counter-lead', '.counter-label'],
-  moon: ['.moon-title', '.moon-copy p'],
-  limits: ['.limits li', '.limits-line'],
-  cta: ['.cta-title'],
-};
-
-/**
- * Everything else a scene does as it scrolls in (not its text), tied to the
- * scroll position, one shared rhythm.
- */
+/** What each scene does when it arrives. All time-based, one shared rhythm. */
 const REVEALS = {
   hero: null,
-  // The statement words fill from grey to white as you read down.
-  problem: (tl, el) => tl.to($$('.w', el), { color: '#f3f5f7', stagger: 0.045, duration: 0.5, ease: 'power1.out' }, 0.15),
-  idea: (tl, el) => tl.to($$('.w', el), { color: '#f3f5f7', stagger: 0.045, duration: 0.5, ease: 'power1.out' }, 0.15),
+  problem: (tl, el) => tl
+    .from($('.statement', el), { opacity: 0, y: 28, duration: 0.7 }, 0)
+    .to($$('.w', el), { color: '#f3f5f7', stagger: 0.045, duration: 0.5, ease: 'power1.out' }, 0.15),
+  idea: (tl, el) => tl
+    .from($('.statement', el), { opacity: 0, y: 28, duration: 0.7 }, 0)
+    .to($$('.w', el), { color: '#f3f5f7', stagger: 0.045, duration: 0.5, ease: 'power1.out' }, 0.15),
   steps: (tl, el) => tl
-    .fromTo($('[data-across-fill]', el), { '--p': 0 }, { '--p': 1, duration: 1.2, ease: 'power2.inOut' }, 0.5),
+    .from($('.step-pick', el), { x: -40, opacity: 0 })
+    .from($('.step-match', el), { x: 40, opacity: 0 }, '<0.12')
+    .from($('.steps-across', el), { y: 24, opacity: 0 }, '<0.3')
+    .fromTo($('[data-across-fill]', el), { '--p': 0 }, { '--p': 1, duration: 1.2, ease: 'power2.inOut' }, '<0.2'),
+  worlds: (tl, el) => tl
+    .from($('.worlds-title', el), { y: 36, opacity: 0 }, 0.25)
+    .from($('.world-keys', el), { opacity: 0 }, '<0.2'),
   pick: (tl, el) => tl
     .from($('.pick-map img', el), { scale: 1.12, duration: 1.4, ease: 'power2.out' }, 0)
+    .from($('.pick-title', el), { x: -30, opacity: 0 }, 0.1)
     .from($('.world-panel', el), { x: 60, opacity: 0 }, 0.2),
+  measure: (tl, el) => tl
+    .from($$('.measure-steps li', el), { x: -24, opacity: 0, stagger: 0.18 }, 0.1),
+  match: (tl, el) => tl.from($('.match-title', el), { x: 60, opacity: 0 }),
+  finder: (tl, el) => tl
+    .from($$('.finder-captions li', el), { y: 16, opacity: 0, stagger: 0.18 }, 0.3),
   promises: (tl, el) => {
     $$('.promises li', el).forEach((it, i) => {
+      tl.from(it, { y: 40, opacity: 0 }, i * 0.18);
       tl.fromTo($('.promise-line', it), { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 0.7 }, i * 0.18 + 0.25);
     });
   },
   egypt: (tl, el) => {
     const figs = $$('.pair figure', el);
-    tl.fromTo(figs[0], { rotateY: 24, x: -20 }, { rotateY: 0, x: 0, duration: 1.1 }, 0)
+    tl.from($('.egypt-title', el), { y: 30, opacity: 0 }, 0)
+      .fromTo(figs[0], { rotateY: 24, x: -20 }, { rotateY: 0, x: 0, duration: 1.1 }, 0)
       .fromTo(figs[1], { rotateY: -24, x: 20 }, { rotateY: 0, x: 0, duration: 1.1 }, 0);
     $$('.closeness > div', el).forEach((d, i) => {
       const v = Number(d.dataset.value) || 0;
@@ -222,8 +213,17 @@ const REVEALS = {
       tl.fromTo($('.bar-fill', d), { '--p': 0 }, { '--p': v / 100, duration: 1, ease: 'power2.out' }, 0.35 + i * 0.1);
       tl.to(proxy, { v, duration: 1, ease: 'power2.out', onUpdate: () => { num.textContent = Math.round(proxy.v); } }, 0.35 + i * 0.1);
     });
+    tl.from($('.egypt-caption', el), { y: 16, opacity: 0 }, 0.7);
   },
-  cta: (tl, el) => tl.from($('.btn-primary', el), { y: 16, opacity: 0 }, 0.2),
+  moon: (tl, el) => tl
+    .from($('.moon-title', el), { y: 36, opacity: 0 }, 0)
+    .from($$('.moon-copy p', el), { y: 20, opacity: 0, stagger: 0.2 }, 0.2),
+  limits: (tl, el) => tl
+    .from($$('.limits li', el), { y: 36, opacity: 0, stagger: 0.18 }, 0)
+    .from($('.limits-line', el), { opacity: 0 }, 0.6),
+  cta: (tl, el) => tl
+    .from($('.cta-title', el), { y: 36, opacity: 0 }, 0)
+    .from($('.btn-primary', el), { y: 16, opacity: 0 }, 0.2),
 };
 
 /**
@@ -276,23 +276,14 @@ export function initScroll({ stage, data }) {
   odo.set(0);
   const odoProxy = { t: 0 };
   SCRUBS.counter = (tl) => tl.to(odoProxy, { t: 1, duration: 1, ease: 'power1.inOut', onUpdate: () => odo.set(odoProxy.t) }, 0);
+  REVEALS.counter = (tl, el) => tl
+    .from($('.counter-side', el), { x: -20, opacity: 0 }, 0)
+    .from($('.counter-lead', el), { y: 14, opacity: 0 }, 0.3)
+    .from($('.counter-label', el), { opacity: 0 }, 0.5);
 
   // Build every scene top to bottom: its reveal first, then its pin.
   for (const el of $$('[data-scene]')) {
     const name = el.dataset.scene;
-    // Text first: word by word, in time, when the scene's top reaches 72%
-    // of the screen; backwards when you scroll back above that point. (The
-    // hero's text plays as the page opens, from main.js.)
-    if (TEXT[name]) {
-      const blocks = TEXT[name].flatMap((sel) => $$(sel, el));
-      const words = revealTimeline(blocks, { phone: phoneQuery.matches });
-      ScrollTrigger.create({
-        trigger: el,
-        start: 'top 72%',
-        onEnter: () => words.play(),
-        onLeaveBack: () => words.reverse(),
-      });
-    }
     const build = REVEALS[name];
     if (build) {
       // The reveal plays while the scene scrolls in (its top travelling from
