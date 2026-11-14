@@ -1,4 +1,5 @@
-// Netlify Function: POST /api/analyst. Holds GEMINI_API_KEY (set in the
+// Netlify Function: /api/analyst (GET: is the analyst set up? POST: a
+// question). Holds GEMINI_API_KEY (set in the
 // Netlify UI as an environment variable, never in netlify.toml or the repo).
 // Docs: https://docs.netlify.com/build/functions/get-started/
 import { getStore } from '@netlify/blobs';

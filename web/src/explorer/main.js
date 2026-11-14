@@ -2,7 +2,7 @@ import '../styles/base.css';
 import '../styles/explorer.css';
 import {
   loadTargets, loadMatches, loadEgypt, loadLikeness, likenessLayers,
-  rankInfo, continentName, shadePaths, fmtInt, fmtLatLon, mapsUrl,
+  rankInfo, continentName, shadePaths, fmtInt, fmtLatLon, mapsUrl, worldviewUrl, copernicusUrl,
 } from '../lib/data.js';
 import { earthKm } from '../lib/geo.js';
 import { drawMars, drawMoon, createEarthMap } from './maps.js';
@@ -48,6 +48,27 @@ function noteCoverage(rows) {
     if (r.of) coverage.total = r.of;
     if (r.ofContinent) coverage.areas.set(r.continent, r.ofContinent);
   }
+}
+
+// From src/targets/moon_artemis.json ("caveat"), shortened.
+const ARTEMIS_NOTE = 'NASA chose these nine regions for Artemis III, now a crewed test flight in Earth orbit. The first landing moved to Artemis IV (2028), and its site is not chosen yet.';
+
+/** Diviner temperatures for a Moon region (targets.json "diviner"), shown as
+ * context next to what Earth can't copy. Never called permanent shadow:
+ * Diviner measures heat, not light. */
+const C_MINUS = (v) => `${v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}`;
+const kc = (k, c) => `${k.toFixed(1)} K <small>(${C_MINUS(c)} °C)</small>`;
+const share = (v) => (v === 0 ? '0%' : `${(v * 100).toFixed(1)}%`);
+function divinerHtml(d) {
+  const avg = d?.annual_mean_2cm;
+  if (!avg) return '';
+  return `<dl class="diviner">
+      <div><dt>Coldest annual average</dt><dd>${kc(avg.k.lowest, avg.c.lowest)}</dd></div>
+      <div><dt>Mean annual average</dt><dd>${kc(avg.k.mean, avg.c.mean)}</dd></div>
+      <div><dt>Cold traps</dt><dd>${share(d.cold_trap_share)} <small>of the region</small></dd></div>
+      <div><dt>Ice stable within 2.9 m</dt><dd>${share(d.ice_stable_within_2_9m_share)} <small>of the region</small></dd></div>
+    </dl>
+    <p class="diviner-note">Yearly average temperatures 2 cm down, across the region. A cold trap stays below ${d.cold_trap_k ?? 110} K all year, cold enough for surface ice to last. Context only, not used for matching. Diviner (NASA LRO), Paige et al. 2010, PDS Geosciences.</p>`;
 }
 
 const ARROW = '<span class="arrow-box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>';
@@ -260,6 +281,9 @@ async function selectTarget(id, key = null) {
 
   $('[data-target-kind]').textContent = WORLD[target.world].kind;
   $('[data-target-name]').textContent = target.name;
+  const note = $('[data-target-note]');
+  note.hidden = target.world !== 'moon';
+  note.textContent = target.world === 'moon' ? ARTEMIS_NOTE : '';
   $('[data-target-feats]').innerHTML = (target.matched_on || []).map((k) => `<div><dt>${feat(k).label}</dt><dd>${fmtFeature(k, target.features?.[k])}</dd></div>`).join('');
 
   $('[data-card]').innerHTML = '<p class="card-loading">Loading twins</p>';
@@ -516,9 +540,15 @@ function renderCard() {
     ${relief}
     ${print}
     ${verdict}
-    <p class="card-limits">Gravity, air and radiation: no place on Earth copies these.</p>
+    <section class="cant-copy" aria-labelledby="cant-copy-heading">
+      <h3 class="pane-title" id="cant-copy-heading">What Earth can't copy</h3>
+      <p class="card-limits">Gravity, air and radiation: no place on Earth copies these.</p>
+      ${isMoon ? divinerHtml(target.diviner) : ''}
+    </section>
     <div class="card-actions">
       <a class="btn-maps" href="${mapsUrl(m.lat, m.lon)}" target="_blank" rel="noopener">Open in Google Maps ${ARROW}</a>
+      <a class="btn-ghost" href="${worldviewUrl(m.lat, m.lon)}" target="_blank" rel="noopener">NASA Worldview</a>
+      <a class="btn-ghost" href="${copernicusUrl(m.lat, m.lon)}" target="_blank" rel="noopener">Copernicus Browser</a>
       <button type="button" class="btn-ghost" data-copy>Copy link</button>
     </div>`;
 

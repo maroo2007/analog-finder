@@ -13,10 +13,10 @@ function analystDevApi(env) {
       for (const k of ['GEMINI_API_KEY', 'GEMINI_MODEL', 'ANALYST_PER_VISITOR_PER_DAY', 'ANALYST_TOTAL_PER_DAY']) {
         if (env[k] && !process.env[k]) process.env[k] = env[k];
       }
-      let core;
       let quota;
       server.middlewares.use('/api/analyst', async (req, res) => {
-        core ??= await server.ssrLoadModule('/server/analyst-core.mjs');
+        // Loaded per request: Vite caches it and reloads it after an edit.
+        const core = await server.ssrLoadModule('/server/analyst-core.mjs');
         quota ??= core.memoryQuota();
         const chunks = [];
         for await (const c of req) chunks.push(c);

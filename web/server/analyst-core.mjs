@@ -105,8 +105,12 @@ function cleanContents(contents) {
  * @param {{ ip?: string, quota: { take(ip: string): Promise<{ ok: boolean, reason?: string }> } }} env
  */
 export async function handleAnalyst(req, { ip = 'unknown', quota }) {
-  if (req.method !== 'POST') return json(405, { error: 'Use POST.' });
   const key = process.env.GEMINI_API_KEY;
+  // GET is the panel's status check: is a key set? It never calls Gemini and
+  // never counts against the quota. A missing key is a normal state (no
+  // error), so the panel can say so without a failed request.
+  if (req.method === 'GET') return json(200, { configured: Boolean(key) });
+  if (req.method !== 'POST') return json(405, { error: 'Use POST.' });
   if (!key) return json(503, { error: 'The analyst is not configured on this server (GEMINI_API_KEY is not set).' });
 
   const raw = await req.text();

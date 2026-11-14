@@ -81,3 +81,19 @@ export const fmtLatLon = (lat, lon, dp = 2) => `${fmtLat(lat, dp)}, ${fmtLon(lon
 export function mapsUrl(lat, lon) {
   return `https://www.google.com/maps/@${lat.toFixed(4)},${lon.toFixed(4)},11z/data=!3m1!1e3`;
 }
+
+/**
+ * NASA Worldview (on the challenge's resource list), framed on a box about
+ * 40 km across around the place, with a marker on it.
+ */
+export function worldviewUrl(lat, lon) {
+  const dLat = 0.18;
+  const dLon = dLat / Math.max(0.2, Math.cos((lat * Math.PI) / 180));
+  const v = [lon - dLon, lat - dLat, lon + dLon, lat + dLat].map((x) => x.toFixed(4)).join(',');
+  return `https://worldview.earthdata.nasa.gov/?v=${v}&s=${lon.toFixed(4)},${lat.toFixed(4)}`;
+}
+
+/** Copernicus Browser (Copernicus Data Space Ecosystem, also on the list). */
+export function copernicusUrl(lat, lon) {
+  return `https://browser.dataspace.copernicus.eu/?zoom=12&lat=${lat.toFixed(4)}&lng=${lon.toFixed(4)}`;
+}

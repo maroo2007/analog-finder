@@ -47,11 +47,33 @@ export function createAnalyst(app) {
     return b;
   }));
 
+  // Is a Gemini key set on the server? Asked once, on first open. Until a
+  // key is set, the panel says so plainly and sends nothing.
+  let ready = null; // null: not asked yet; then a Promise of true / false
+  const NOT_SET_UP = 'The analyst isn\'t set up on this copy of the site yet, so it can\'t answer questions here. Everything else in the Twin Finder works.';
+  function checkReady() {
+    ready ??= fetch(ENDPOINT, { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : { configured: false }))
+      .then((d) => d.configured === true)
+      .catch(() => false)
+      .then((ok) => {
+        if (!ok) {
+          bubble('note', NOT_SET_UP);
+          panel.classList.add('is-off');
+          for (const el of [input, send, ...chips.querySelectorAll('button')]) el.disabled = true;
+          input.placeholder = 'Not set up yet';
+        }
+        return ok;
+      });
+    return ready;
+  }
+
   const open = () => {
     panel.hidden = false;
     openBtn.setAttribute('aria-expanded', 'true');
     requestAnimationFrame(() => panel.classList.add('is-open'));
     input.focus();
+    checkReady();
   };
   const close = () => {
     panel.classList.remove('is-open');
@@ -143,6 +165,7 @@ export function createAnalyst(app) {
   async function ask(question) {
     if (busy) return;
     if (panel.hidden) open();
+    if (!(await checkReady())) return;
     input.value = '';
     bubble('user', question);
     const mark = history.length;
@@ -164,11 +187,11 @@ export function createAnalyst(app) {
         if (round === 1) bubble('note', 'Done.');
       }
     } catch (err) {
-      console.error(err);
+      if (!err.status) console.warn('Analyst request failed', err);
       const msg = err.status === 429
         ? (err.message && !err.message.startsWith('HTTP') ? err.message : 'The analyst has answered all the questions it can for now. Please try again later; everything else in the Twin Finder still works.')
         : err.status === 503
-          ? 'The analyst is not switched on for this copy of the site yet.'
+          ? NOT_SET_UP
           : 'The analyst could not answer just now. Please try again in a moment.';
       bubble('error', msg);
       history = history.slice(0, mark);
