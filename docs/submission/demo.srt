@@ -1,0 +1,27 @@
+1
+00:00:00,250 --> 00:00:02,408
+We are Team Duplica, from Cairo.
+
+2
+00:00:02,458 --> 00:00:06,612
+Astronauts train for Mars and the Moon at just a few places on Earth.
+
+3
+00:00:06,662 --> 00:00:09,878
+Planetary Twin Finder searches with data instead.
+
+4
+00:00:09,928 --> 00:00:14,126
+With NASA elevation and brightness data, it profiles three worlds,
+
+5
+00:00:14,176 --> 00:00:18,146
+then ranks Earth's closest twins for NASA's own landing sites.
+
+6
+00:00:18,196 --> 00:00:23,075
+Blind tested: ninety-two percent of matches found sites NASA already uses.
+
+7
+00:00:23,125 --> 00:00:26,598
+Jezero crater's closest twin? Egypt's Eastern Desert.

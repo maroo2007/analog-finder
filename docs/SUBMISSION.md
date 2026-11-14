@@ -3,9 +3,10 @@
 Drafted 14 November 2026 for the team's project page (spaceappschallenge.org,
 My Team, Project tab). Every number is from `HANDOFF.md` and the website
 data. Every link below was checked and opened on 14 November, except the two
-GitHub links, which GitHub refused to automated checks. Submission closes
-**Sunday 15 November, 11:59 p.m. Cairo time**; only the last "Submit for
-Judging" counts. Rules: `docs/JUDGING_CRITERIA.md`.
+GitHub links, which GitHub refused to automated checks. **Cairo deadline: Saturday 14 November, 1:00 p.m. Cairo time, for both
+the NASA page ("Submit for Judging") and the Cairo form**, which also needs
+the project PDF (Cairo submission guide). NASA's global system stays open
+until Sunday 15 November, 11:59 p.m., but that gives Cairo teams no extra time. Rules: `docs/JUDGING_CRITERIA.md`.
 
 ---
 
@@ -23,10 +24,19 @@ Finder.)
 
 ## Project Demonstration
 
-Not made yet. A video of **30 seconds or less** (English, or Arabic with
-English subtitles) or **at most 7 slides including the title and intro**,
-on YouTube or Google Drive, shared so anyone with the link can open it.
-Paste the full URL, starting with `https://`.
+Made on 14 November: `planetary_twin_finder_demo.mp4`, **29.5 seconds**,
+1920 x 1080, English narration with burned-in English captions (`demo.srt`
+has the same captions for YouTube). Shots are stills of our live website
+with slow zooms. Upload it to YouTube (Unlisted or Public) or Google Drive
+(anyone with the link can view), test the link in a private window, and
+paste the full URL here and in the Cairo form.
+
+The narration is an **AI-generated voice** (Piper text-to-speech, voice
+`en_GB-alan-medium`). That is stated on screen, on the end card and in the
+file's metadata, as the rules require; put this in the YouTube description
+too:
+
+> Narration: AI-generated voice (Piper text-to-speech). All footage is our real website, https://duplicaa.vercel.app; no image or video is AI-generated.
 
 ## Project
 
@@ -53,10 +63,9 @@ from the story page.)
 
 ## Use of Super Intelligence (SI)
 
-Select the options for **code**, **text and documents**, and **an AI
-feature inside the project** (chatbot / large language model), if the list
-has them. Do **not** select images, video or audio: none of ours are
-AI-generated. The website's credits already say this in its "How we used AI"
+Select the options for **code**, **text and documents**, **audio** (the
+demo's AI narration voice) and **an AI feature inside the project** (chatbot / large language model), if the list
+has them. Do **not** select images or video: none of ours are AI-generated. The website's credits already say this in its "How we used AI"
 line, which is what judges can see:
 
 > Claude (Anthropic) helped write the data pipeline, this website and our documents; we checked the numbers against our own data files. The Twin Finder's "Ask the analyst" uses Google Gemini, is labelled as AI and answers only from the data on screen. No image or video here is AI-generated.
@@ -115,6 +124,7 @@ carry Claude co-author lines.
 | rasterio | https://rasterio.readthedocs.io/ |
 | Claude (Anthropic), AI coding and writing assistant | https://www.anthropic.com/claude |
 | Google Gemini API ("Ask the analyst") | https://ai.google.dev/ |
+| Piper text-to-speech (demo narration voice) | https://pypi.org/project/piper-tts/ |
 
 Add the project repository, https://github.com/maroo2007/analog-finder, only
 once it is public: right now it answers 404 to anyone outside the team, and
