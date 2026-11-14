@@ -7,11 +7,16 @@
 // (gemini-3.8-flash: stable Flash model) and the generateContent reference.
 
 const API = 'https://generativelanguage.googleapis.com/v1beta/models';
-// Tried in order (the same list as src/chatbot.py); gemini-3.8-flash is
-// often overloaded at busy times.
-const MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite'];
+// Tried in order. gemini-3.8-flash is often overloaded (it refuses with 503
+// or hangs until the time limit), so it comes last: on 14 November every
+// question that started with it waited for it first.
+const MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'];
 // Each model gets this long to answer before the next is tried.
-const MODEL_TIMEOUT_MS = Number(process.env.ANALYST_MODEL_TIMEOUT_MS || 20_000);
+const MODEL_TIMEOUT_MS = Number(process.env.ANALYST_MODEL_TIMEOUT_MS || 12_000);
+// A model that just refused or timed out is skipped for this long, so the
+// next questions don't wait on it again (kept in this instance's memory).
+const BUSY_PAUSE_MS = 5 * 60_000;
+const busyUntil = new Map();
 
 // Daily limits, both counted per Pacific-time day, because Google resets the
 // Gemini free quota at midnight Pacific:
@@ -164,7 +169,12 @@ export async function handleAnalyst(req, { ip = 'unknown', quota }) {
     generationConfig: { temperature: 0.3, maxOutputTokens: 900, thinkingConfig: { thinkingLevel: 'low' } },
   });
   let res = null;
-  for (const model of models) {
+  // Models that refused or timed out lately go to the back of the queue
+  // (still tried if every other one fails).
+  const now = Date.now();
+  const order = [...models].sort((a, b) => ((busyUntil.get(a) || 0) > now) - ((busyUntil.get(b) || 0) > now));
+  for (const model of order) {
+    const t0 = Date.now();
     try {
       // An overloaded model can hang instead of refusing: give each one
       // MODEL_TIMEOUT_MS, then move on, so a visitor never waits minutes.
@@ -175,14 +185,19 @@ export async function handleAnalyst(req, { ip = 'unknown', quota }) {
         signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
       });
     } catch (err) {
-      console.error('Gemini request failed or timed out', model, err?.name || err);
+      console.error('Gemini request failed or timed out', model, err?.name || err, `${Date.now() - t0} ms`);
+      busyUntil.set(model, Date.now() + BUSY_PAUSE_MS);
       res = null;
       continue;
     }
-    if (res.ok) break;
-    console.error('Gemini error', model, res.status, (await res.text()).slice(0, 300));
+    if (res.ok) {
+      console.log('Gemini answered', model, `${Date.now() - t0} ms`);
+      break;
+    }
+    console.error('Gemini error', model, res.status, `${Date.now() - t0} ms`, (await res.text()).slice(0, 300));
     // Busy, out of quota, or this model unavailable here: try the next one.
     if (![429, 500, 503, 504, 404].includes(res.status)) break;
+    busyUntil.set(model, Date.now() + BUSY_PAUSE_MS);
   }
 
   if (!res || !res.ok) {
