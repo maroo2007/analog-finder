@@ -320,9 +320,9 @@ still open is making the repository public and the final submission (see
   on 2026-11-14 that Egyptian Chinese University is not affiliated with
   China (see the doc).
 - **The 30 second demo video is done** (2026-11-14, approved by the team):
-  1920x1080, 30 fps, 29.5 s (the official guide's limit is "30 seconds or
-  less" and over it means no Global Judging, so we keep half a second of
-  margin), English narration with captions burned in plus an `.srt`. It is
+  1920x1080, 30 fps, 29.8 s (the official guide's limit is "30 seconds or
+  less" and over it means no Global Judging, so we keep a fifth of a second of
+  margin; it opens with "We are Team Duplica."), English narration with captions burned in plus an `.srt`. It is
   the only video the final submission takes: the 88 second Arabic video was
   for registration and is done. Remaining form fields (official Project
   Submission Guide, 13 November): project name, high-level summary, demo
