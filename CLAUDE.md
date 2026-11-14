@@ -224,10 +224,10 @@ still open is making the repository public and the final submission (see
   `web/server/analyst-core.mjs`. The key is `GEMINI_API_KEY` in the host's
   environment variables or a gitignored `web/.env`, never in the repo.
   Without a key the panel says it isn't set up yet. Gemini models are tried
-  in order: `gemini-3.5-flash`, `gemini-3.5-flash-lite`, then
-  `gemini-3.8-flash` last, because 3.8-flash is often overloaded and
-  refuses (503) or hangs. Each gets 12 s; a model that refuses or times out
-  is skipped for 5 minutes; if all are busy the visitor sees a calm "busy"
+  in order, fastest first: `gemini-3.5-flash-lite` (answered in about 2 s on
+  the live site), then `gemini-3.5-flash`, then `gemini-3.8-flash`; the two
+  larger ones were overloaded on 14 November (503, or a hang). Each gets
+  8 s; a model that refuses or times out is skipped for 5 minutes; if all are busy the visitor sees a calm "busy"
   note. The function logs which model answered and how long it took. Design context for Impeccable is in `PRODUCT.md` and
   `.impeccable/`; its skill and agents are in `.claude/`. Tested in headless
   Edge at 1440 px, 390 px and with reduced motion.
